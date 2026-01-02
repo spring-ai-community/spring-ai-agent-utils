@@ -73,6 +73,21 @@ public class SkillsUtils {
 
 	}
 
+	public static Map<String, Skill> skillsMap(List<String> rootDirectories) throws IOException {
+		
+		Map<String, Skill> skillsMap = new HashMap<>();
+
+		for (String rootDirectory : rootDirectories) {
+			List<Skill> skillFiles = skillsList(rootDirectory);
+
+			for (Skill skillFile : skillFiles) {
+				skillsMap.put(skillFile.getFrontMatterValue("name"), skillFile);
+			}
+		}
+
+		return skillsMap;
+	}
+
 	public static Map<String, Skill> skillsMap(String rootDirectory) throws IOException {
 		List<Skill> skillFiles = skillsList(rootDirectory);
 		Map<String, Skill> skillsMap = new HashMap<>();
@@ -134,4 +149,5 @@ public class SkillsUtils {
 	public static List<Skill> skillsList(Path rootDirectory) throws IOException {
 		return skillsList(rootDirectory.toString());
 	}
+
 }

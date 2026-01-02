@@ -38,6 +38,13 @@ import org.springframework.ai.tool.annotation.ToolParam;
 
 public class FileSystemTools {
 
+	private static final String READ_SYSTEM_REMINDER_SUFFIX = """
+
+			<system-reminder>
+			Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
+			</system-reminder>
+
+			""";
 
 	// @formatter:off
 	@Tool(name = "Read", description = """
@@ -131,7 +138,7 @@ public class FileSystemTools {
 				result.append(line).append("\n");
 			}
 
-			return result.toString();
+			return result.toString() + READ_SYSTEM_REMINDER_SUFFIX;
 
 		}
 		catch (IOException e) {
@@ -318,11 +325,10 @@ public class FileSystemTools {
 
 	/**
 	 * Generates a formatted snippet of the file showing context around the edited
-	 * section. Matches Claude Code's Edit tool output format with line numbers and
-	 * arrow separator.
+	 * section. Matches Claude Code's Edit tool output format with line numbers and arrow
+	 * separator.
 	 * @param fileContent the complete file content after editing
-	 * @param newString the new string that was inserted (used to find the edit
-	 * location)
+	 * @param newString the new string that was inserted (used to find the edit location)
 	 * @return formatted snippet with line numbers
 	 */
 	private String generateEditSnippet(String fileContent, String newString) {

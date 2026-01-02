@@ -16,6 +16,7 @@
 package org.springaicommunity.ai.agent.skills;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -32,34 +33,40 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 
 public class SkillsToolProvider {
 
-	private static String DESCRIPTION = """
-			Execute a skill within the main conversation
+	private static String buildDescription(String availableSkillsXml) {
+		return """
+				Execute a skill within the main conversation
 
-			<skills_instructions>
-			When users ask you to perform tasks, check if any of the available skills below can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.
+				<skills_instructions>
+				When users ask you to perform tasks, check if any of the available skills below can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.
 
-			How to use skills:
-			- Invoke skills using this tool with the skill name only (no arguments)
-			- When you invoke a skill, you will see <command-message>The "{name}" skill is loading</command-message>
-			- The skill's prompt will expand and provide detailed instructions on how to complete the task
-			- Examples:
-			- `command: "pdf"` - invoke the pdf skill
-			- `command: "xlsx"` - invoke the xlsx skill
-			- `command: "ms-office-suite:pdf"` - invoke using fully qualified name
+				How to use skills:
+				- Invoke skills using this tool with the skill name only (no arguments)
+				- When you invoke a skill, you will see <command-message>The "{name}" skill is loading</command-message>
+				- The skill's prompt will expand and provide detailed instructions on how to complete the task
+				- Examples:
+				  - `command: "pdf"` - invoke the pdf skill
+				  - `command: "xlsx"` - invoke the xlsx skill
+				  - `command: "ms-office-suite:pdf"` - invoke using fully qualified name
 
-			Important:
-			- Only use skills listed in <available_skills> below
-			- Do not invoke a skill that is already running
-			- Do not use this tool for built-in CLI commands (like /help, /clear, etc.)
-			</skills_instructions>
+				Important:
+				- Only use skills listed in <available_skills> below
+				- Do not invoke a skill that is already running
+				- Do not use this tool for built-in CLI commands (like /help, /clear, etc.)
+				</skills_instructions>
 
-			""";
+				<available_skills>
+				%s
+				</available_skills>
+				""".formatted(availableSkillsXml);
+	}
 
 	public static record SkillsInput(
 			@ToolParam(description = "The skill name (no arguments). E.g., \"pdf\" or \"xlsx\"") String command) {
 	}
 
-	public static class SkillsFunction implements Function<SkillsInput, String> {				
+	public static class SkillsFunction implements Function<SkillsInput, String> {
+
 		private Map<String, Skill> skillsMap;
 
 		public SkillsFunction(Map<String, Skill> skillsMap) {
@@ -80,6 +87,17 @@ public class SkillsToolProvider {
 
 	}
 
+	public static ToolCallback create(List<String> skillsDirectories) {
+		Map<String, Skill> skillsMap;
+		try {
+			skillsMap = SkillsUtils.skillsMap(skillsDirectories);
+		}
+		catch (IOException ex) {
+			throw new RuntimeException("Failed to load skills from directory: " + skillsDirectories, ex);
+		}
+		return create(skillsMap);
+	}
+
 	public static ToolCallback create(String skillsDirectory) {
 		Map<String, Skill> skillsMap;
 		try {
@@ -92,24 +110,25 @@ public class SkillsToolProvider {
 	}
 
 	public static ToolCallback create(Map<String, Skill> skillsMap) {
-
-		var skillsXml = skillsMap.values()
+		String skillsXml = skillsMap.values()
 			.stream()
-			.map(skill -> "<skill>" + skillFrontMatterToXML(skill) + "</skill>")
+			.map(SkillsToolProvider::skillToXml)
 			.collect(Collectors.joining("\n"));
 
 		return FunctionToolCallback.builder("Skill", new SkillsFunction(skillsMap))
-			.description(DESCRIPTION + "\n<available_skills>" + skillsXml + "</available_skills>")
+			.description(buildDescription(skillsXml))
 			.inputType(SkillsInput.class)
 			.build();
 	}
 
-	private static String skillFrontMatterToXML(Skill skill) {
-		return skill.getFrontMatter()
+	private static String skillToXml(Skill skill) {
+		String frontMatterXml = skill.getFrontMatter()
 			.entrySet()
 			.stream()
-			.map(e -> "<" + e.getKey() + ">" + e.getValue() + "</" + e.getKey() + ">")
+			.map(e -> "  <%s>%s</%s>".formatted(e.getKey(), e.getValue(), e.getKey()))
 			.collect(Collectors.joining("\n"));
+
+		return "<skill>\n%s\n</skill>".formatted(frontMatterXml);
 	}
 
 }

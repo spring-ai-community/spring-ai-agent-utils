@@ -53,7 +53,7 @@
     </properties>
 
     <modules>
-        <!-- <module>tool-search-tool-demo</module> -->
+        <module>chat-demo</module>
         <module>skills-demo</module>
     </modules>
 
