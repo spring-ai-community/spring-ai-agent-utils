@@ -1,0 +1,889 @@
+{
+    "query": {
+        "original": "spring ai tzolov",
+        "show_strict_warning": false,
+        "is_navigational": true,
+        "is_news_breaking": false,
+        "spellcheck_off": true,
+        "country": "us",
+        "bad_results": false,
+        "should_fallback": false,
+        "postal_code": "",
+        "city": "",
+        "header_country": "",
+        "more_results_available": true,
+        "state": ""
+    },
+    "mixed": {
+        "type": "mixed",
+        "main": [
+            {
+                "type": "web",
+                "index": 0,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 1,
+                "all": false
+            },
+            {
+                "type": "videos",
+                "all": true
+            },
+            {
+                "type": "web",
+                "index": 2,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 3,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 4,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 5,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 6,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 7,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 8,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 9,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 10,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 11,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 12,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 13,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 14,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 15,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 16,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 17,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 18,
+                "all": false
+            },
+            {
+                "type": "web",
+                "index": 19,
+                "all": false
+            }
+        ],
+        "top": [],
+        "side": []
+    },
+    "type": "search",
+    "videos": {
+        "type": "videos",
+        "results": [
+            {
+                "type": "video_result",
+                "url": "https://www.youtube.com/watch?v=wXgcb1LC4uk",
+                "title": "#5 Spring AI | Setting the Spring Boot with Spring AI Project - ...",
+                "description": "Creating Spring AI from Spring InitializerGithub : https://github.com/navinreddy20/SpringAIwithModels.gitCheck out our courses:AI-Powered DevOps with AWS Liv",
+                "age": "March 29, 2025",
+                "page_age": "2025-03-29T08:38:30",
+                "fetched_content_timestamp": 1766965056,
+                "video": {
+                    "duration": "06:43",
+                    "creator": "Telusko",
+                    "publisher": "YouTube"
+                },
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "youtube.com",
+                    "hostname": "www.youtube.com",
+                    "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+                    "path": "› watch"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/QAlirbKpVFU9kil8ZWv4rj9Je1BUTX6RBMTLWGZ8xCk/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS93/WGdjYjFMQzR1ay9t/YXhyZXNkZWZhdWx0/LmpwZw",
+                    "original": "https://i.ytimg.com/vi/wXgcb1LC4uk/maxresdefault.jpg"
+                }
+            },
+            {
+                "type": "video_result",
+                "url": "https://www.youtube.com/watch?v=FzLABAppJfM",
+                "title": "AI for Java Developers: Full Course / Workshop on Getting Started ...",
+                "description": "**Every Java Developer is now an AI Developer. Transform your Java skills for the AI era with this comprehensive 5.5-hour Spring AI masterclass!** Are you a ...",
+                "age": "June 27, 2025",
+                "page_age": "2025-06-27T00:47:32",
+                "fetched_content_timestamp": 1766646331,
+                "video": {
+                    "duration": "05:37:40",
+                    "creator": "Dan Vega",
+                    "publisher": "YouTube"
+                },
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "youtube.com",
+                    "hostname": "www.youtube.com",
+                    "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+                    "path": "› watch"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/xeYDYxWEA7deM36M9sd73IS1viw6WQfQsnuhIiITLA0/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS9G/ekxBQkFwcEpmTS9t/YXhyZXNkZWZhdWx0/LmpwZw",
+                    "original": "https://i.ytimg.com/vi/FzLABAppJfM/maxresdefault.jpg"
+                }
+            },
+            {
+                "type": "video_result",
+                "url": "https://www.youtube.com/watch?v=4nBG848oArI",
+                "title": "#1 Spring AI Tutorial | Introduction - YouTube",
+                "description": "Spring AI tutorialCheck out our courses:AI-Powered DevOps with AWS Live Course V2: https://go.telusko.com/ai-devops-v2Coupon: TELUSKO10 (10% Discount)Java",
+                "age": "March 26, 2025",
+                "page_age": "2025-03-26T11:42:03",
+                "fetched_content_timestamp": 1766756662,
+                "video": {
+                    "duration": "05:33",
+                    "creator": "Telusko",
+                    "publisher": "YouTube"
+                },
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "youtube.com",
+                    "hostname": "www.youtube.com",
+                    "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+                    "path": "› watch"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/Eo3TOYN3buJgi587PSBI_bBoFth3mZ8eiFlfTNzVrtY/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS80/bkJHODQ4b0FySS9t/YXhyZXNkZWZhdWx0/LmpwZw",
+                    "original": "https://i.ytimg.com/vi/4nBG848oArI/maxresdefault.jpg"
+                }
+            },
+            {
+                "type": "video_result",
+                "url": "https://www.youtube.com/watch?v=9Crrhz0pm8s",
+                "title": "Spring AI Full Course with Projects – Build Smarter Spring Boot ...",
+                "description": "Learn how to seamlessly integrate AI capabilities into your Spring Boot applications using Spring AI. With hands-on projects and practical examples, you'll g...",
+                "age": "December 17, 2024",
+                "page_age": "2024-12-17T16:58:56",
+                "fetched_content_timestamp": 1736785679,
+                "video": {
+                    "duration": "04:32:44",
+                    "views": 43162,
+                    "creator": "freeCodeCamp.org",
+                    "publisher": "YouTube"
+                },
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "youtube.com",
+                    "hostname": "www.youtube.com",
+                    "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+                    "path": "› watch"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/TRb7plIykzgRoqPrjUK9FqapMTKWR58p_M82k_H0ivg/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS85/Q3JyaHowcG04cy9t/YXhyZXNkZWZhdWx0/LmpwZw",
+                    "original": "https://i.ytimg.com/vi/9Crrhz0pm8s/maxresdefault.jpg"
+                }
+            },
+            {
+                "type": "video_result",
+                "url": "https://www.youtube.com/watch?v=zglUkgkLkh0",
+                "title": "Spring AI Tutorial | Build Your First AI App with Java Spring Boot!",
+                "description": "Welcome to the Spring AI Tutorial — your complete step-by-step guide to building your first AI-powered app with Java Spring Boot! 🚀In this video, you’ll lea...",
+                "age": "November 2, 2025",
+                "page_age": "2025-11-02T09:14:46",
+                "fetched_content_timestamp": 1762227381,
+                "video": {
+                    "duration": "01:24:31",
+                    "creator": "Selenium Express",
+                    "publisher": "YouTube"
+                },
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "youtube.com",
+                    "hostname": "www.youtube.com",
+                    "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+                    "path": "› watch"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/ESDyp127ftoG0On6p2Vqe0utDU6LZ9z5uzA67D1sKuI/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS96/Z2xVa2drTGtoMC9t/YXhyZXNkZWZhdWx0/LmpwZw",
+                    "original": "https://i.ytimg.com/vi/zglUkgkLkh0/maxresdefault.jpg"
+                }
+            },
+            {
+                "type": "video_result",
+                "url": "https://www.youtube.com/watch?v=TSFkdlreRMQ",
+                "title": "Build AI-Powered Apps with MCP Clients in Spring AI - YouTube",
+                "description": "Learn how to build MCP (Model Context Protocol) clients using Spring AI to augment Large Language Models with custom context and functionality!In this tutori...",
+                "age": "November 7, 2025",
+                "page_age": "2025-11-07T21:15:41",
+                "fetched_content_timestamp": 1766552515,
+                "video": {
+                    "duration": "16:02",
+                    "creator": "Dan Vega",
+                    "publisher": "YouTube"
+                },
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "youtube.com",
+                    "hostname": "www.youtube.com",
+                    "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+                    "path": "› watch"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/RcpQ4X7HWxnguUkfpTvPf1j3z-7WYvhenbTL0xZ3teA/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS9U/U0ZrZGxyZVJNUS9t/YXhyZXNkZWZhdWx0/LmpwZw",
+                    "original": "https://i.ytimg.com/vi/TSFkdlreRMQ/maxresdefault.jpg"
+                }
+            }
+        ],
+        "mutated_by_goggles": false
+    },
+    "web": {
+        "type": "search",
+        "results": [
+            {
+                "title": "tzolov (Christian Tzolov) · GitHub",
+                "url": "https://github.com/tzolov",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "<strong>A command-line chatbot built with Spring AI that demonstrates Retrieval-Augmented Generation (RAG) and conversational memory capabilities</strong>.",
+                "profile": {
+                    "name": "GitHub",
+                    "url": "https://github.com/tzolov",
+                    "long_name": "github.com",
+                    "img": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "generic",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "github.com",
+                    "hostname": "github.com",
+                    "favicon": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw",
+                    "path": "› tzolov"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/mklgKWqYlkiJWPqsumIiEmbnfEgXGd77pUzanbYtOp0/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9hdmF0/YXJzLmdpdGh1YnVz/ZXJjb250ZW50LmNv/bS91LzEzNTE1NzM_/dj00",
+                    "original": "https://avatars.githubusercontent.com/u/1351573?v=4",
+                    "logo": false
+                }
+            },
+            {
+                "title": "Author | Christian Tzolov - Spring",
+                "url": "https://spring.io/authors/tzolov/",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "I <strong>help Java developers build intelligent AI applications with a pragmatic approach that makes advanced AI concepts accessible for real-world enterprise systems</strong>. Find my recent blogs below, plus my talks and LinkedIn posts.",
+                "profile": {
+                    "name": "Spring",
+                    "url": "https://spring.io/authors/tzolov/",
+                    "long_name": "spring.io",
+                    "img": "https://imgs.search.brave.com/l1t0YkKiNyi1xwfJL_T18h4qrw1dGdxShq9a46U02S4/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMTA0NTAyM2I5/YTg4ZDQwMGYzOWJl/OGVhMDI3YWFiZmRm/ZDhkNjJhODJlOGQ5/MDdmOTkzZTA1NTVm/OWE4Nzg3Mi9zcHJp/bmcuaW8v"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "generic",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "spring.io",
+                    "hostname": "spring.io",
+                    "favicon": "https://imgs.search.brave.com/l1t0YkKiNyi1xwfJL_T18h4qrw1dGdxShq9a46U02S4/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMTA0NTAyM2I5/YTg4ZDQwMGYzOWJl/OGVhMDI3YWFiZmRm/ZDhkNjJhODJlOGQ5/MDdmOTkzZTA1NTVm/OWE4Nzg3Mi9zcHJp/bmcuaW8v",
+                    "path": "› authors  › tzolov"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/WFpftWz7N66epmrxtnJmH7rZR2QJVgE__iQ0JDARVIk/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9zcHJp/bmcuaW8vaW1nL29n/LXNwcmluZy5wbmc",
+                    "original": "https://spring.io/img/og-spring.png",
+                    "logo": false
+                }
+            },
+            {
+                "title": "Smart Tool Selection: Achieving 34-64% Token Savings with Spring AI's Dynamic Tool Discovery",
+                "url": "https://spring.io/blog/2025/12/11/spring-ai-tool-search-tools-tzolov/",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "Engineering | <strong>Christian Tzolov | December 11, 2025</strong> | ... As AI agents connect to more services—Slack, GitHub, Jira, MCP servers—tool libraries grow rapidly. A typical multi-server setup can easily have 50+ tools consuming 55,000+ tokens ...",
+                "profile": {
+                    "name": "Spring",
+                    "url": "https://spring.io/blog/2025/12/11/spring-ai-tool-search-tools-tzolov/",
+                    "long_name": "spring.io",
+                    "img": "https://imgs.search.brave.com/l1t0YkKiNyi1xwfJL_T18h4qrw1dGdxShq9a46U02S4/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMTA0NTAyM2I5/YTg4ZDQwMGYzOWJl/OGVhMDI3YWFiZmRm/ZDhkNjJhODJlOGQ5/MDdmOTkzZTA1NTVm/OWE4Nzg3Mi9zcHJp/bmcuaW8v"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "generic",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "spring.io",
+                    "hostname": "spring.io",
+                    "favicon": "https://imgs.search.brave.com/l1t0YkKiNyi1xwfJL_T18h4qrw1dGdxShq9a46U02S4/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMTA0NTAyM2I5/YTg4ZDQwMGYzOWJl/OGVhMDI3YWFiZmRm/ZDhkNjJhODJlOGQ5/MDdmOTkzZTA1NTVm/OWE4Nzg3Mi9zcHJp/bmcuaW8v",
+                    "path": "› blog  › 2025  › 12  › 11  › spring-ai-tool-search-tools-tzolov"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/WFpftWz7N66epmrxtnJmH7rZR2QJVgE__iQ0JDARVIk/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9zcHJp/bmcuaW8vaW1nL29n/LXNwcmluZy5wbmc",
+                    "original": "https://spring.io/img/og-spring.png",
+                    "logo": false
+                }
+            },
+            {
+                "title": "Explainable AI Agents: Capture LLM Tool Call Reasoning with Spring AI",
+                "url": "https://spring.io/blog/2025/12/23/spring-ai-tool-argument-augmenter-tzolov/",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "Engineering | Christian Tzolov | <strong>December 23, 2025</strong> | ... When building AI agents with tool calling capabilities, developers often need insights into why an LLM chose a particular tool—not just which tool it selected.",
+                "profile": {
+                    "name": "Spring",
+                    "url": "https://spring.io/blog/2025/12/23/spring-ai-tool-argument-augmenter-tzolov/",
+                    "long_name": "spring.io",
+                    "img": "https://imgs.search.brave.com/l1t0YkKiNyi1xwfJL_T18h4qrw1dGdxShq9a46U02S4/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMTA0NTAyM2I5/YTg4ZDQwMGYzOWJl/OGVhMDI3YWFiZmRm/ZDhkNjJhODJlOGQ5/MDdmOTkzZTA1NTVm/OWE4Nzg3Mi9zcHJp/bmcuaW8v"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "generic",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "spring.io",
+                    "hostname": "spring.io",
+                    "favicon": "https://imgs.search.brave.com/l1t0YkKiNyi1xwfJL_T18h4qrw1dGdxShq9a46U02S4/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMTA0NTAyM2I5/YTg4ZDQwMGYzOWJl/OGVhMDI3YWFiZmRm/ZDhkNjJhODJlOGQ5/MDdmOTkzZTA1NTVm/OWE4Nzg3Mi9zcHJp/bmcuaW8v",
+                    "path": "› blog  › 2025  › 12  › 23  › spring-ai-tool-argument-augmenter-tzolov"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/WFpftWz7N66epmrxtnJmH7rZR2QJVgE__iQ0JDARVIk/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9zcHJp/bmcuaW8vaW1nL29n/LXNwcmluZy5wbmc",
+                    "original": "https://spring.io/img/og-spring.png",
+                    "logo": false
+                }
+            },
+            {
+                "title": "GitHub - tzolov/spring-ai-cli-chatbot: A command-line chatbot built with Spring AI that demonstrates Retrieval-Augmented Generation (RAG) and conversational memory capabilities.",
+                "url": "https://github.com/tzolov/spring-ai-cli-chatbot",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "<strong>A command-line chatbot built with Spring AI that demonstrates Retrieval-Augmented Generation (RAG) and conversational memory capabilities</strong>. - tzolov/spring-ai-cli-chatbot",
+                "profile": {
+                    "name": "GitHub",
+                    "url": "https://github.com/tzolov/spring-ai-cli-chatbot",
+                    "long_name": "github.com",
+                    "img": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "software",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "github.com",
+                    "hostname": "github.com",
+                    "favicon": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw",
+                    "path": "› tzolov  › spring-ai-cli-chatbot"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/tu2VX4gLQ8BDYG_u45k4e6Rz0GpYEnjmIayL5_SdJpk/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9vcGVu/Z3JhcGguZ2l0aHVi/YXNzZXRzLmNvbS9l/NDUyMzBjMWJiYjdj/ZjgyZmVkYzlmNmZi/YWNjZDIxMzVmNGRi/NWQ0MmI0MGFlNTg0/NWFlYjZlMzA0ZTE5/ODgwL3R6b2xvdi9z/cHJpbmctYWktY2xp/LWNoYXRib3Q",
+                    "original": "https://opengraph.githubassets.com/e45230c1bbb7cf82fedc9f6fbaccd2135f4db5d42b40ae5845aeb6e304e19880/tzolov/spring-ai-cli-chatbot",
+                    "logo": false
+                }
+            },
+            {
+                "title": "GitHub - tzolov/spring-ai-function-calling-portability: Demonstrate Function Calling code portability across 4 AI Models: OpenAI, AzureOpenAI, VertexAI Gemini and Mistral AI.",
+                "url": "https://github.com/tzolov/spring-ai-function-calling-portability",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "Demonstrate Function Calling code portability across 4 AI Models: OpenAI, AzureOpenAI, VertexAI Gemini and Mistral AI. - tzolov/spring-ai-function-calling-portability",
+                "profile": {
+                    "name": "GitHub",
+                    "url": "https://github.com/tzolov/spring-ai-function-calling-portability",
+                    "long_name": "github.com",
+                    "img": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "software",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "github.com",
+                    "hostname": "github.com",
+                    "favicon": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw",
+                    "path": "› tzolov  › spring-ai-function-calling-portability"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/Y7F6AbJopY0XcNDtyqh9-bLgd4oUSayn6XN3hQU_NlQ/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9vcGVu/Z3JhcGguZ2l0aHVi/YXNzZXRzLmNvbS81/OGM1ZTQ5MTZiNTMx/N2U1OWMxZTFkNGY3/NTY0NGZiZjEzMWMx/NjA1YzkwNDBiOWU2/MmU2NTdiNDVlMzcz/ZDkwL3R6b2xvdi9z/cHJpbmctYWktZnVu/Y3Rpb24tY2FsbGlu/Zy1wb3J0YWJpbGl0/eQ",
+                    "original": "https://opengraph.githubassets.com/58c5e4916b5317e59c1e1d4f75644fbf131c1605c9040b9e62e657b45e373d90/tzolov/spring-ai-function-calling-portability",
+                    "logo": false
+                }
+            },
+            {
+                "title": "GitHub - tzolov/spring-ai-structured-output-demo: Demonstrate how to use the Spring AI [Structured Output](https://docs.spring.io/spring-ai/reference/1.0-SNAPSHOT/api/structured-output-converter.html) converters for Bean, Map and List converters.",
+                "url": "https://github.com/tzolov/spring-ai-structured-output-demo",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "Demonstrate how to use the Spring AI [Structured Output](https://docs.spring.io/spring-ai/reference/1.0-SNAPSHOT/api/structured-output-converter.html) converters for Bean, Map and List converters. - tzolov/spring-ai-structured-output-demo",
+                "profile": {
+                    "name": "GitHub",
+                    "url": "https://github.com/tzolov/spring-ai-structured-output-demo",
+                    "long_name": "github.com",
+                    "img": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "software",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "github.com",
+                    "hostname": "github.com",
+                    "favicon": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw",
+                    "path": "› tzolov  › spring-ai-structured-output-demo"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/zI-R85_wM-Xm5bzcMoiQrKpffMbDo6ET-ebYXq9dWUk/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9vcGVu/Z3JhcGguZ2l0aHVi/YXNzZXRzLmNvbS8z/MGJlZDhhZWU0MzZh/M2Q4Mzg5MWM4ZmQx/YWJmYWJjZmMxZThh/MWExY2FhOTRkMzBi/NGFlZGExMGVmOWMz/YjcxL3R6b2xvdi9z/cHJpbmctYWktc3Ry/dWN0dXJlZC1vdXRw/dXQtZGVtbw",
+                    "original": "https://opengraph.githubassets.com/30bed8aee436a3d83891c8fd1abfabcfc1e8a1a1caa94d30b4aeda10ef9c3b71/tzolov/spring-ai-structured-output-demo",
+                    "logo": false
+                }
+            },
+            {
+                "title": "GitHub - tzolov/voice-assistant-chatbot: Spring Boot application that serves as a voice-enabled chatbot assistant. It leverages Spring AI to process voice inputs, interact with a OpenAI chat model, and respond with audio outputs",
+                "url": "https://github.com/tzolov/voice-assistant-chatbot",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "<strong>Spring Boot application that serves as a voice-enabled chatbot assistant</strong>. It leverages Spring AI to process voice inputs, interact with a OpenAI chat model, and respond with audio outputs - tzolov/voice-assistant-chatbot",
+                "profile": {
+                    "name": "GitHub",
+                    "url": "https://github.com/tzolov/voice-assistant-chatbot",
+                    "long_name": "github.com",
+                    "img": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "software",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "github.com",
+                    "hostname": "github.com",
+                    "favicon": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw",
+                    "path": "› tzolov  › voice-assistant-chatbot"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/2yM7cS-NbSh2Ta5ruNvljk10lQnDfx-Qwse5T3qQbPY/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9vcGVu/Z3JhcGguZ2l0aHVi/YXNzZXRzLmNvbS85/M2IyYTE0Mjk0NTQz/MDRkOTI4ZmJmMmRl/YmU4ZWUxZGNiNGMy/MWU1NWNiNWQyYWI1/MjUyZWQwZTU0MWU3/MzM5L3R6b2xvdi92/b2ljZS1hc3Npc3Rh/bnQtY2hhdGJvdA",
+                    "original": "https://opengraph.githubassets.com/93b2a1429454304d928fbf2debe8ee1dcb4c21e55cb5d2ab5252ed0e541e7339/tzolov/voice-assistant-chatbot",
+                    "logo": false
+                }
+            },
+            {
+                "title": "GitHub - tzolov/playground-flight-booking: Spring AI powered expert system demo",
+                "url": "https://github.com/tzolov/playground-flight-booking",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "Spring AI powered expert system demo. Contribute to tzolov/playground-flight-booking development by creating an account on GitHub.",
+                "profile": {
+                    "name": "GitHub",
+                    "url": "https://github.com/tzolov/playground-flight-booking",
+                    "long_name": "github.com",
+                    "img": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "software",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "github.com",
+                    "hostname": "github.com",
+                    "favicon": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw",
+                    "path": "› tzolov  › playground-flight-booking"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/D0pQASV1yIgJQJgi3smKXtjWLMYdu2dp6T1-zCzaPo4/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9vcGVu/Z3JhcGguZ2l0aHVi/YXNzZXRzLmNvbS81/YjgzYTgyNDk0YzNi/MTIxYzkzYWVmY2Ri/NjY0MjlkYjBmZTc1/MWZiMmE0MWUzZjI2/NWY4ZDcwNWFkMmY4/NDQyL3R6b2xvdi9w/bGF5Z3JvdW5kLWZs/aWdodC1ib29raW5n",
+                    "original": "https://opengraph.githubassets.com/5b83a82494c3b121c93aefcdb66429db0fe751fb2a41e3f265f8d705ad2f8442/tzolov/playground-flight-booking",
+                    "logo": false
+                }
+            },
+            {
+                "title": "GitHub - tzolov/spring-ai-mcp-blogpost: Companion example for the Spring AI MCP Intro blog post",
+                "url": "https://github.com/tzolov/spring-ai-mcp-blogpost",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "This repository contains the example code for the Spring AI Model Context Protocol (MCP) blog post, demonstrating how to build both MCP Servers and Clients using Spring Boot.",
+                "profile": {
+                    "name": "GitHub",
+                    "url": "https://github.com/tzolov/spring-ai-mcp-blogpost",
+                    "long_name": "github.com",
+                    "img": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "software",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "github.com",
+                    "hostname": "github.com",
+                    "favicon": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw",
+                    "path": "› tzolov  › spring-ai-mcp-blogpost"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/MutuJVPne7WRMDr33-t79Lp7n7OxF0x8ufZ5JZKm7j4/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9vcGVu/Z3JhcGguZ2l0aHVi/YXNzZXRzLmNvbS8y/NThkMTBhMmVkZGE3/ZjZkOTY4YjU1Mjk0/MzA0NmNiZTg2NDgz/MzJmMGFjZTMyZjI2/YzkxODZlYjU4YmU2/YTMzL3R6b2xvdi9z/cHJpbmctYWktbWNw/LWJsb2dwb3N0",
+                    "original": "https://opengraph.githubassets.com/258d10a2edda7f6d968b552943046cbe8648332f0ace32f26c9186eb58be6a33/tzolov/spring-ai-mcp-blogpost",
+                    "logo": false
+                }
+            },
+            {
+                "title": "Christian Tzolov | Spring I/O 2024 - The Spring Developer Conference",
+                "url": "https://2024.springio.net/speakers/christian-tzolov/",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "Christian Tzolov is a <strong>Spring Framework Engineer at Broadcom; Lead developer for the Spring AI project</strong>; Contributing to various Spring projects including Spring Integration, Spring Cloud DataFlow; Committer, PMC member at Apache Software Foundation.",
+                "profile": {
+                    "name": "Springio",
+                    "url": "https://2024.springio.net/speakers/christian-tzolov/",
+                    "long_name": "2024.springio.net",
+                    "img": "https://imgs.search.brave.com/GQnClDMa-PK0KASvbBeyGduK2b26roRPfpqfVX9TokY/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOGI5ZDQ1Yzdi/YjU4MmZhZjQ2YTgx/ZjBkZDgzNzI3OGM5/YzI5ZjYzZDhiNDY5/ZTliMjdlN2UzODgz/YTc3MTc5Ny8yMDI0/LnNwcmluZ2lvLm5l/dC8"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "generic",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "2024.springio.net",
+                    "hostname": "2024.springio.net",
+                    "favicon": "https://imgs.search.brave.com/GQnClDMa-PK0KASvbBeyGduK2b26roRPfpqfVX9TokY/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOGI5ZDQ1Yzdi/YjU4MmZhZjQ2YTgx/ZjBkZDgzNzI3OGM5/YzI5ZjYzZDhiNDY5/ZTliMjdlN2UzODgz/YTc3MTc5Ny8yMDI0/LnNwcmluZ2lvLm5l/dC8",
+                    "path": "› speakers  › christian-tzolov"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/hHSvvrIOL2Nz_VxoQYuGDYXUuNzuEFMmw-Y1avh9fco/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly8yMDI0/LnNwcmluZ2lvLm5l/dC9pbWFnZXMvc3By/aW5naW8yMy5qcGc",
+                    "original": "https://2024.springio.net/images/springio23.jpg",
+                    "logo": false
+                }
+            },
+            {
+                "title": "GitHub - tzolov/spring-ai-mcp: Java SDK for the Model Context Protocol (MCP), providing seamless integration between Java and Spring applications and MCP-compliant AI models and tools.",
+                "url": "https://github.com/tzolov/spring-ai-mcp",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "Java SDK for the Model Context Protocol (MCP), providing seamless integration between Java and Spring applications and MCP-compliant AI models and tools. - tzolov/spring-ai-mcp",
+                "profile": {
+                    "name": "GitHub",
+                    "url": "https://github.com/tzolov/spring-ai-mcp",
+                    "long_name": "github.com",
+                    "img": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "software",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "github.com",
+                    "hostname": "github.com",
+                    "favicon": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw",
+                    "path": "› tzolov  › spring-ai-mcp"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/Pv_VVCqeHrisP0ziSJreVhqvbIwxNPax9GFrCQCMXm0/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9vcGVu/Z3JhcGguZ2l0aHVi/YXNzZXRzLmNvbS85/YmIyZmYxNzgyOWU0/NmEwZWYwYjBlM2E2/ZTQyNDQxYzYwZGQz/NjQyYmNlMzc0ZmFh/MDU0MGRkNzEzOGQ1/MzU5L3R6b2xvdi9z/cHJpbmctYWktbWNw",
+                    "original": "https://opengraph.githubassets.com/9bb2ff17829e46a0ef0b0e3a6e42441c60dd3642bce374faa0540dd7138d5359/tzolov/spring-ai-mcp",
+                    "logo": false
+                }
+            },
+            {
+                "title": "GitHub - tzolov/spring-ai-ollama-huggingface-demo: This project demonstrates the integration of Spring AI with Ollama, leveraging Hugging Face GGUF models for both chat completion and embedding tasks.",
+                "url": "https://github.com/tzolov/spring-ai-ollama-huggingface-demo",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "This project demonstrates the integration of Spring AI with Ollama, leveraging Hugging Face GGUF models for both chat completion and embedding tasks. - tzolov/spring-ai-ollama-huggingface-demo",
+                "profile": {
+                    "name": "GitHub",
+                    "url": "https://github.com/tzolov/spring-ai-ollama-huggingface-demo",
+                    "long_name": "github.com",
+                    "img": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "software",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "github.com",
+                    "hostname": "github.com",
+                    "favicon": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw",
+                    "path": "› tzolov  › spring-ai-ollama-huggingface-demo"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/fDWOv7zEFSGVmbKTo6ZTR27mthKV6dX47VSZ11JFhHc/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9vcGVu/Z3JhcGguZ2l0aHVi/YXNzZXRzLmNvbS8x/MzRlYTIzZGU5MDMx/Yzg4MDdiNGUxOGZm/MDI1Y2FiMzE4OGQy/ZTkxZWMxMjAwMzlm/ZWU3MzY2YThlZmZk/YWY4L3R6b2xvdi9z/cHJpbmctYWktb2xs/YW1hLWh1Z2dpbmdm/YWNlLWRlbW8",
+                    "original": "https://opengraph.githubassets.com/134ea23de9031c8807b4e18ff025cab3188d2e91ec120039fee7366a8effdaf8/tzolov/spring-ai-ollama-huggingface-demo",
+                    "logo": false
+                }
+            },
+            {
+                "title": "Introducing Spring AI by Christian Tzolov / Mark Pollack @ Spring I/O 2024 - YouTube",
+                "url": "https://www.youtube.com/watch?v=umKbaXsiCOY",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "Spring I/O 2024 - 30-31 May, BarcelonaSlides: https://2024.springio.net/slides/introducing-spring-ai-springio24.pdfThis session explores Spring AI, a new fra...",
+                "page_age": "2024-06-28T15:29:59",
+                "profile": {
+                    "name": "YouTube",
+                    "url": "https://www.youtube.com/watch?v=umKbaXsiCOY",
+                    "long_name": "youtube.com",
+                    "img": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "video",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "youtube.com",
+                    "hostname": "www.youtube.com",
+                    "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+                    "path": "  › spring i/o"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/MkAqIRG0MpSAKy-puWgPt67MWXgNAofjEpHR6x5u-AE/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS91/bUtiYVhzaUNPWS9t/YXhyZXNkZWZhdWx0/LmpwZz9zcXA9LW9h/eW13RW1DSUFLRU5B/RjhxdUtxUU1hOEFF/Qi1BSC1DWUFDMEFX/S0Fnd0lBQkFCR0Zr/Z1hTaGxNQTg9JmFt/cDtycz1BT240Q0xB/aEdjYkdycGNURmRh/OGtSaW1sMUJkb0VU/Q2VB",
+                    "original": "https://i.ytimg.com/vi/umKbaXsiCOY/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGFkgXShlMA8=&amp;rs=AOn4CLAhGcbGrpcTFda8kRiml1BdoETCeA",
+                    "logo": false
+                },
+                "age": "June 28, 2024"
+            },
+            {
+                "title": "Christian Tzolov at VoxxedDays Amsterdam 2025",
+                "url": "https://amsterdam.voxxeddays.com/speaker/?id=7801",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "Christian Tzolov is a <strong>R&amp;D Software Engineer at the Spring Framework team in Broadcom</strong> · Lead for the Spring AI and Spring AI MCP projects, contributor to various Spring and ASF projects including Spring Integration, Spring Cloud DataFlow. His work focuses on system integrations, distributed ...",
+                "page_age": "2024-09-19T10:27:30",
+                "profile": {
+                    "name": "VoxxedDays Amsterdam",
+                    "url": "https://amsterdam.voxxeddays.com/speaker/?id=7801",
+                    "long_name": "amsterdam.voxxeddays.com",
+                    "img": "https://imgs.search.brave.com/CcH5qWrj9b-RIu3epgZ5kUHkqvRIjB6naEtk5kkLGOk/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOGRhNzBlMmY0/OTIzZjEwNGMzZTRl/MTkyYTIyNDRlOGNi/MzM1Njg3MjRjMGUz/OGM1ODI5MWRmZGI2/MGYzNzQwZC9hbXN0/ZXJkYW0udm94eGVk/ZGF5cy5jb20v"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "generic",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "amsterdam.voxxeddays.com",
+                    "hostname": "amsterdam.voxxeddays.com",
+                    "favicon": "https://imgs.search.brave.com/CcH5qWrj9b-RIu3epgZ5kUHkqvRIjB6naEtk5kkLGOk/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOGRhNzBlMmY0/OTIzZjEwNGMzZTRl/MTkyYTIyNDRlOGNi/MzM1Njg3MjRjMGUz/OGM1ODI5MWRmZGI2/MGYzNzQwZC9hbXN0/ZXJkYW0udm94eGVk/ZGF5cy5jb20v",
+                    "path": "  › home  › speaker"
+                },
+                "age": "September 19, 2024"
+            },
+            {
+                "title": "Building Agentic Systems with Spring AI & MCP Christian Tzolov",
+                "url": "https://2025.springio.net/slides/from-single-shot-llms-to-intelligent-agents-building-scalable-ai-systems-with-spring-ai-and-mcp-springio25.pdf",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "Spring AI &amp; MCP · <strong>Christian Tzolov</strong> · Spring AI &amp; MCP Java SDK · @christzolov , @tzolov · Integration Problem! Using Generative AI · Your APIs · Your Data · Generative AI · Retrieval · Memory · Tools · Observability · VectorStore · Modular RAG · ETL · Model Context Protocol (MCP) ...",
+                "profile": {
+                    "name": "Springio",
+                    "url": "https://2025.springio.net/slides/from-single-shot-llms-to-intelligent-agents-building-scalable-ai-systems-with-spring-ai-and-mcp-springio25.pdf",
+                    "long_name": "2025.springio.net",
+                    "img": "https://imgs.search.brave.com/z4XfibEqjomzIeZt8u9eT846CH5f8Lrv7LpHsudHIv8/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOWY2ZWZiNDI0/OGM4ZTcwMWMyMzAw/NzEwNDU0YzYzNWNk/ZGYyYjg4YjM1MTRj/N2JjYTVkNTFjYThk/ZGM2NGY4YS8yMDI1/LnNwcmluZ2lvLm5l/dC8"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "generic",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "2025.springio.net",
+                    "hostname": "2025.springio.net",
+                    "favicon": "https://imgs.search.brave.com/z4XfibEqjomzIeZt8u9eT846CH5f8Lrv7LpHsudHIv8/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOWY2ZWZiNDI0/OGM4ZTcwMWMyMzAw/NzEwNDU0YzYzNWNk/ZGYyYjg4YjM1MTRj/N2JjYTVkNTFjYThk/ZGM2NGY4YS8yMDI1/LnNwcmluZ2lvLm5l/dC8",
+                    "path": "› slides  › from-single-shot-llms-to-intelligent-agents-building-scalable-ai-systems-with-spring-ai-and-mcp-springio25.pdf"
+                },
+                "content_type": "pdf"
+            },
+            {
+                "title": "GitHub - tzolov/spring-ai-bedrock-nova-demo: Demonstrates the integration of Amazon Bedrock's Converse API with Spring AI, showcasing various AI capabilities including text generation, multimodal inputs (images, video, documents), and function/tool calling.",
+                "url": "https://github.com/tzolov/spring-ai-bedrock-nova-demo",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "<strong>Demonstrates the integration of Amazon Bedrock&#x27;s Converse API with Spring AI</strong>, showcasing various AI capabilities including text generation, multimodal inputs (images, video, documents), and function/tool calling. - tzolov/spring-ai-bedrock-nova-demo",
+                "profile": {
+                    "name": "GitHub",
+                    "url": "https://github.com/tzolov/spring-ai-bedrock-nova-demo",
+                    "long_name": "github.com",
+                    "img": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "software",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "github.com",
+                    "hostname": "github.com",
+                    "favicon": "https://imgs.search.brave.com/xxsA4YxzaR0cl-DBsH9-lpv2gsif3KMYgM87p26bs_o/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYWQyNWM1NjA5/ZjZmZjNlYzI2MDNk/N2VkNmJhYjE2MzZl/MDY5ZTMxMDUzZmY1/NmU3NWIzNWVmMjk0/NTBjMjJjZi9naXRo/dWIuY29tLw",
+                    "path": "› tzolov  › spring-ai-bedrock-nova-demo"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/f3JCeHsWoyqnP3LABIxapMLcb10MGPtpx59nhwPZR3M/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9vcGVu/Z3JhcGguZ2l0aHVi/YXNzZXRzLmNvbS84/MDRjYWRmZmY3MTQy/MDUwYTdlYWY3ZGIx/NzU1ODZjN2FjNjFh/NjRlZDA0NTM4ZTZm/NGU1ZGQxMzZjY2Nk/YzRlL3R6b2xvdi9z/cHJpbmctYWktYmVk/cm9jay1ub3ZhLWRl/bW8",
+                    "original": "https://opengraph.githubassets.com/804cadfff7142050a7eaf7db175586c7ac61a64ed04538e6f4e5dd136cccdc4e/tzolov/spring-ai-bedrock-nova-demo",
+                    "logo": false
+                }
+            },
+            {
+                "title": "Christian Tzolov's Speaker Profile @ Sessionize",
+                "url": "https://sessionize.com/tzolov/",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "Christian Tzolov, <strong>R&amp;D Software Engineer at Broadcom&#x27;s Spring team</strong>, leads the Spring AI and MCP Java SDK projects. He specializes in connecting enterprise systems with AI capabilities, helping Java developers build intelligent applications.",
+                "profile": {
+                    "name": "Sessionize",
+                    "url": "https://sessionize.com/tzolov/",
+                    "long_name": "sessionize.com",
+                    "img": "https://imgs.search.brave.com/4MCa3bFwJY8cYXVyDcDeqfUV_QhEU1zDRtErapOmbXU/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNTI5MDFkMmFh/NjY0OTU0NDMxMjlh/OTM2M2NmNzYyYzFk/NDBhYjJhMGZkYWFh/NDE0Njk2ZGU2NzM0/NjcxYWE1Yy9zZXNz/aW9uaXplLmNvbS8"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "generic",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "sessionize.com",
+                    "hostname": "sessionize.com",
+                    "favicon": "https://imgs.search.brave.com/4MCa3bFwJY8cYXVyDcDeqfUV_QhEU1zDRtErapOmbXU/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNTI5MDFkMmFh/NjY0OTU0NDMxMjlh/OTM2M2NmNzYyYzFk/NDBhYjJhMGZkYWFh/NDE0Njk2ZGU2NzM0/NjcxYWE1Yy9zZXNz/aW9uaXplLmNvbS8",
+                    "path": "› tzolov"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/H3laJrdUhT3R9uRJeKEWNlYzcKa2RqazT2lqTlRs6yg/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9zZXNz/aW9uaXplLmNvbS9p/bWFnZS85YjcyLTQw/MG80MDBvMi1YYXFn/aEhnUGlXSlJGQzFj/SDZNU1A4LnBuZw",
+                    "original": "https://sessionize.com/image/9b72-400o400o2-XaqghHgPiWJRFC1cH6MSP8.png",
+                    "logo": false
+                }
+            },
+            {
+                "title": "Christian Tzolov | Spring I/O 2025 - The Spring Developer Conference",
+                "url": "https://2025.springio.net/speakers/christian-tzolov/",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "<strong>Christian Tzolov is a Spring Framework Engineer at Broadcom; co-lead developer for the Spring AI project; founder and lead for the MCP Java SDK project; Committer, PMC member at Apache Software Foundation</strong>.",
+                "profile": {
+                    "name": "Springio",
+                    "url": "https://2025.springio.net/speakers/christian-tzolov/",
+                    "long_name": "2025.springio.net",
+                    "img": "https://imgs.search.brave.com/z4XfibEqjomzIeZt8u9eT846CH5f8Lrv7LpHsudHIv8/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOWY2ZWZiNDI0/OGM4ZTcwMWMyMzAw/NzEwNDU0YzYzNWNk/ZGYyYjg4YjM1MTRj/N2JjYTVkNTFjYThk/ZGM2NGY4YS8yMDI1/LnNwcmluZ2lvLm5l/dC8"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "generic",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "2025.springio.net",
+                    "hostname": "2025.springio.net",
+                    "favicon": "https://imgs.search.brave.com/z4XfibEqjomzIeZt8u9eT846CH5f8Lrv7LpHsudHIv8/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOWY2ZWZiNDI0/OGM4ZTcwMWMyMzAw/NzEwNDU0YzYzNWNk/ZGYyYjg4YjM1MTRj/N2JjYTVkNTFjYThk/ZGM2NGY4YS8yMDI1/LnNwcmluZ2lvLm5l/dC8",
+                    "path": "› speakers  › christian-tzolov"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/sYE1jDUTgFOnZF30XPkoSc5SrwA1LBJS56E9yOTR4Sg/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly8yMDI1/LnNwcmluZ2lvLm5l/dC9pbWFnZXMvcGlj/LXNwcmluZy0wMy5q/cGc",
+                    "original": "https://2025.springio.net/images/pic-spring-03.jpg",
+                    "logo": false
+                }
+            },
+            {
+                "title": "Bootiful Spring AI by Mark Pollack, Christian Tzolov, Josh Long, James Ward - YouTube",
+                "url": "https://www.youtube.com/watch?v=Sw3PlFXfWj4",
+                "is_source_local": false,
+                "is_source_both": false,
+                "description": "The age of artificial intelligence (because the search for regular intelligence hasn&#x27;t gone well..) is nearly at hand, and it&#x27;s everywhere! But is it...",
+                "page_age": "2025-10-09T05:35:16",
+                "profile": {
+                    "name": "YouTube",
+                    "url": "https://www.youtube.com/watch?v=Sw3PlFXfWj4",
+                    "long_name": "youtube.com",
+                    "img": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v"
+                },
+                "language": "en",
+                "family_friendly": true,
+                "type": "search_result",
+                "subtype": "video",
+                "is_live": false,
+                "meta_url": {
+                    "scheme": "https",
+                    "netloc": "youtube.com",
+                    "hostname": "www.youtube.com",
+                    "favicon": "https://imgs.search.brave.com/Wg4wjE5SHAargkzePU3eSLmWgVz84BEZk1SjSglJK_U/rs:fit:32:32:1:0/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOTkyZTZiMWU3/YzU3Nzc5YjExYzUy/N2VhZTIxOWNlYjM5/ZGVjN2MyZDY4Nzdh/ZDYzMTYxNmI5N2Rk/Y2Q3N2FkNy93d3cu/eW91dHViZS5jb20v",
+                    "path": "› watch"
+                },
+                "thumbnail": {
+                    "src": "https://imgs.search.brave.com/KUI7VUWUjSjyYbZAgeNTAEBsaQ9Zu6Z2GxMTse_M_bQ/rs:fit:200:200:1:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS9T/dzNQbEZYZldqNC9t/YXhyZXNkZWZhdWx0/LmpwZz9zcXA9LW9h/eW13RW1DSUFLRU5B/RjhxdUtxUU1hOEFF/Qi1BSC1DWUFDMEFX/S0Fnd0lBQkFCR0hJ/Z1NTZ2tNQTg9JmFt/cDtycz1BT240Q0xD/dDFWLUhYQ1VXMlhU/eGFHZ013Um5lc01f/LWVn",
+                    "original": "https://i.ytimg.com/vi/Sw3PlFXfWj4/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGHIgSSgkMA8=&amp;rs=AOn4CLCt1V-HXCUW2XTxaGgMwRnesM_-eg",
+                    "logo": false
+                },
+                "age": "October 9, 2025"
+            }
+        ],
+        "family_friendly": true
+    }
+}
