@@ -66,13 +66,18 @@ public class Application {
 				// Explain Spring AI and recursive advisors in simple terms. Do full
 				// research before answering. Collect information from internet if needed.
 				// """)
+				// .prompt("""
+				// 		Explain reinforcement learning in simple terms and use. 
+				// 		First load the required skills.
+				// 		The use the Youtube video https://youtu.be/vXtfdGphr3c?si=xy8U2Al_Um5vE4Jd transcript to support your answer.
+				// 		Use absolute paths for the skills and scripts.
+				// 		Do not ask me for more details.
+				// 		""")
 				.prompt("""
-						Explain reinforcement learning in simple terms and use. 
-						First load the required skills.
-						The use the Youtube video https://youtu.be/vXtfdGphr3c?si=xy8U2Al_Um5vE4Jd transcript to support your answer.
-						Use absolute paths for the skills and scripts.
-						Do not ask me for more details.
-						""")
+						Please review the following class and suggest improvements:
+						/Users/christiantzolov/Dev/projects/spring-ai-agent-utils/spring-ai-agent-utils/src/main/java/org/springaicommunity/ai/agent/tools/BraveWebSearchTool.java
+						Check also the related tests and make sure they pass.
+						""")						
 				.toolContext(Map.of("foo", "bar"))
 				.call()
 				.content();
