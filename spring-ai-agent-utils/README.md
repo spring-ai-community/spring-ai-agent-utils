@@ -55,7 +55,9 @@ public class Application {
         return args -> {
             ChatClient chatClient = chatClientBuilder
                 // Load skills
-                .defaultToolCallbacks(SkillsToolProvider.create(".claude/skills"))
+                .defaultToolCallbacks(SkillsTool.builder()
+                    .skillsRootDirectory(".claude/skills")
+                    .build())
 
                 // Register tools
                 .defaultTools(new ShellTools())
@@ -188,7 +190,7 @@ Where you store a skill determines its scope:
 
 ### How Skills Are Invoked
 
-The `SkillsToolProvider` implements a three-step process:
+The `SkillsTool` implements a three-step process:
 
 1. **Discovery**: At startup, loads skill names and descriptions (lightweight)
 2. **Activation**: When a request semantically matches a skill's description, the AI invokes it
@@ -229,11 +231,13 @@ The AI loads supporting files only when needed, preserving context.
 
 **Tool Access for Skills:**
 
-To enable skills to load additional references or run scripts, include the appropriate tools when registering the `SkillsToolProvider`:
+To enable skills to load additional references or run scripts, include the appropriate tools when registering the `SkillsTool`:
 
 ```java
 ChatClient chatClient = chatClientBuilder
-    .defaultToolCallbacks(SkillsToolProvider.create(".claude/skills"))
+    .defaultToolCallbacks(SkillsTool.builder()
+        .skillsRootDirectory(".claude/skills")
+        .build())
 
     // Required for skills to load reference files (reference.md, examples.md, etc.)
     .defaultTools(new FileSystemTools())

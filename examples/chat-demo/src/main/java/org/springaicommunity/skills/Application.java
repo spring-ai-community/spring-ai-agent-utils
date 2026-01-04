@@ -2,10 +2,10 @@ package org.springaicommunity.skills;
 
 import java.util.Scanner;
 
-import org.springaicommunity.ai.agent.skills.SkillsToolProvider;
 import org.springaicommunity.ai.agent.tools.BraveWebSearchTool;
 import org.springaicommunity.ai.agent.tools.FileSystemTools;
 import org.springaicommunity.ai.agent.tools.ShellTools;
+import org.springaicommunity.ai.agent.tools.SkillsTool;
 import org.springaicommunity.ai.agent.tools.SmartWebFetchTool;
 import org.springaicommunity.ai.agent.tools.TodoWriteTool;
 
@@ -43,7 +43,7 @@ public class Application {
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off
 				.defaultSystem(systemPrompt)
-				.defaultToolCallbacks(SkillsToolProvider.create(skillsDir)) // skills tool
+				.defaultToolCallbacks(SkillsTool.builder().skillsRootDirectory(skillsDir).build()) // skills tool
 				.defaultTools(new ShellTools())// built-in shell tools
 				.defaultTools(new FileSystemTools())// built-in file system tools
 				.defaultTools(SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build())

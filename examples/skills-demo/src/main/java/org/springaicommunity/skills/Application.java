@@ -2,10 +2,10 @@ package org.springaicommunity.skills;
 
 import java.util.Map;
 
-import org.springaicommunity.ai.agent.skills.SkillsToolProvider;
 import org.springaicommunity.ai.agent.tools.BraveWebSearchTool;
 import org.springaicommunity.ai.agent.tools.FileSystemTools;
 import org.springaicommunity.ai.agent.tools.ShellTools;
+import org.springaicommunity.ai.agent.tools.SkillsTool;
 import org.springaicommunity.ai.agent.tools.SmartWebFetchTool;
 import org.springaicommunity.ai.agent.tools.TodoWriteTool;
 
@@ -44,7 +44,7 @@ public class Application {
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off
 				.defaultSystem(systemPrompt)
-				.defaultToolCallbacks(SkillsToolProvider.create(skillsDir)) // skills tool
+				.defaultToolCallbacks(SkillsTool.builder().skillsRootDirectory(skillsDir).build()) // skills tool
 				.defaultTools(new ShellTools())// built-in shell tools
 				.defaultTools(new FileSystemTools())// built-in file system tools
 				.defaultTools(SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build())
@@ -67,17 +67,19 @@ public class Application {
 				// research before answering. Collect information from internet if needed.
 				// """)
 				// .prompt("""
-				// 		Explain reinforcement learning in simple terms and use. 
-				// 		First load the required skills.
-				// 		The use the Youtube video https://youtu.be/vXtfdGphr3c?si=xy8U2Al_Um5vE4Jd transcript to support your answer.
-				// 		Use absolute paths for the skills and scripts.
-				// 		Do not ask me for more details.
-				// 		""")
+				// Explain reinforcement learning in simple terms and use.
+				// First load the required skills.
+				// The use the Youtube video
+				// https://youtu.be/vXtfdGphr3c?si=xy8U2Al_Um5vE4Jd transcript to support
+				// your answer.
+				// Use absolute paths for the skills and scripts.
+				// Do not ask me for more details.
+				// """)
 				.prompt("""
 						Please review the following class and suggest improvements:
 						/Users/christiantzolov/Dev/projects/spring-ai-agent-utils/spring-ai-agent-utils/src/main/java/org/springaicommunity/ai/agent/tools/BraveWebSearchTool.java
 						Check also the related tests and make sure they pass.
-						""")						
+						""")
 				.toolContext(Map.of("foo", "bar"))
 				.call()
 				.content();

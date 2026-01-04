@@ -13,25 +13,28 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.springaicommunity.ai.agent.skills;
+package org.springaicommunity.ai.agent.tools;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.springaicommunity.ai.agent.skills.SkillsUtils.Skill;
+import org.springaicommunity.ai.agent.utils.SkillsUtils;
+import org.springaicommunity.ai.agent.utils.SkillsUtils.Skill;
 
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.util.Assert;
 
 /**
  * @author Christian Tzolov
  */
 
-public class SkillsToolProvider {
+public class SkillsTool {
 
 	private static String buildDescription(String availableSkillsXml) {
 		return """
@@ -58,7 +61,8 @@ public class SkillsToolProvider {
 				<available_skills>
 				%s
 				</available_skills>
-				""".formatted(availableSkillsXml);
+				"""
+			.formatted(availableSkillsXml);
 	}
 
 	public static record SkillsInput(
@@ -87,40 +91,6 @@ public class SkillsToolProvider {
 
 	}
 
-	public static ToolCallback create(List<String> skillsDirectories) {
-		Map<String, Skill> skillsMap;
-		try {
-			skillsMap = SkillsUtils.skillsMap(skillsDirectories);
-		}
-		catch (IOException ex) {
-			throw new RuntimeException("Failed to load skills from directory: " + skillsDirectories, ex);
-		}
-		return create(skillsMap);
-	}
-
-	public static ToolCallback create(String skillsDirectory) {
-		Map<String, Skill> skillsMap;
-		try {
-			skillsMap = SkillsUtils.skillsMap(skillsDirectory);
-		}
-		catch (IOException ex) {
-			throw new RuntimeException("Failed to load skills from directory: " + skillsDirectory, ex);
-		}
-		return create(skillsMap);
-	}
-
-	public static ToolCallback create(Map<String, Skill> skillsMap) {
-		String skillsXml = skillsMap.values()
-			.stream()
-			.map(SkillsToolProvider::skillToXml)
-			.collect(Collectors.joining("\n"));
-
-		return FunctionToolCallback.builder("Skill", new SkillsFunction(skillsMap))
-			.description(buildDescription(skillsXml))
-			.inputType(SkillsInput.class)
-			.build();
-	}
-
 	private static String skillToXml(Skill skill) {
 		String frontMatterXml = skill.getFrontMatter()
 			.entrySet()
@@ -129,6 +99,62 @@ public class SkillsToolProvider {
 			.collect(Collectors.joining("\n"));
 
 		return "<skill>\n%s\n</skill>".formatted(frontMatterXml);
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+
+		private Map<String, Skill> skillsMap = new HashMap<>();
+
+		private Builder() {
+
+		}
+
+		public Builder skillsMap(Map<String, Skill> skillsMap) {
+			Assert.notNull(skillsMap, "skills map can't be null");
+			this.skillsMap.putAll(skillsMap);
+			return this;
+		}
+
+		public Builder skillsRootDirectory(String skillsRootDirectory) {
+			try {
+				this.skillsMap.putAll(SkillsUtils.skillsMap(skillsRootDirectory));
+			}
+			catch (IOException ex) {
+				throw new RuntimeException("Failed to load skills from directory: " + skillsRootDirectory, ex);
+			}
+
+			return this;
+		}
+
+		public Builder skillsRootDirectories(List<String> skillsRootDirectories) {
+			try {
+				this.skillsMap.putAll(SkillsUtils.skillsMap(skillsRootDirectories));
+			}
+			catch (IOException ex) {
+				throw new RuntimeException("Failed to load skills from directories: " + skillsRootDirectories, ex);
+			}
+
+			return this;
+		}
+
+		public ToolCallback build() {
+			Assert.notEmpty(this.skillsMap, "At least one skill must be configured");
+
+			String skillsXml = skillsMap.values()
+				.stream()
+				.map(SkillsTool::skillToXml)
+				.collect(Collectors.joining("\n"));
+
+			return FunctionToolCallback.builder("Skill", new SkillsFunction(skillsMap))
+				.description(buildDescription(skillsXml))
+				.inputType(SkillsInput.class)
+				.build();
+		}
+
 	}
 
 }
