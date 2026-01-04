@@ -53,7 +53,7 @@
     </properties>
 
     <modules>
-        <module>chat-demo</module>
+        <module>code-agent-demo</module>
         <module>skills-demo</module>
     </modules>
 

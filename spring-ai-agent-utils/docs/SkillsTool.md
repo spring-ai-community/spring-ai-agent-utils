@@ -632,7 +632,7 @@ public class SkillsConfiguration {
 
 ```java
 // Enable debug logging
-logging.level.org.springaicommunity.ai.agent.tools.SkillsTool=DEBUG
+logging.level.org.springaicommunity.agent.tools.SkillsTool=DEBUG
 ```
 
 ### Skill Can't Access Files

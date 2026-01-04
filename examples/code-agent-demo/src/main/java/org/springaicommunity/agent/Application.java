@@ -1,6 +1,6 @@
-package org.springaicommunity.skills;
+package org.springaicommunity.agent;
 
-import java.util.Map;
+import java.util.Scanner;
 
 import org.springaicommunity.agent.tools.BraveWebSearchTool;
 import org.springaicommunity.agent.tools.FileSystemTools;
@@ -10,16 +10,22 @@ import org.springaicommunity.agent.tools.SmartWebFetchTool;
 import org.springaicommunity.agent.tools.TodoWriteTool;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
 import org.springframework.core.io.Resource;
 
 @SpringBootApplication
 public class Application {
+
+	// static final String skillsDir = "/Users/christiantzolov/.claude/skills";
+	static final String skillsDir = "/Users/christiantzolov/Dev/projects/spring-ai-agent-utils/.claude/skills";
 
 	@Value("classpath:/CODE_AGENT_PROMPT_V2.md")
 	Resource systemPrompt;
@@ -28,17 +34,10 @@ public class Application {
 		SpringApplication.run(Application.class, args);
 	}
 
-	// static final String skillsDir = "/Users/christiantzolov/.claude/skills";
-	static final String skillsDir = "/Users/christiantzolov/Dev/projects/spring-ai-agent-utils/.claude/skills";
-
-	// static final String skillsDir =
-	// "/Users/christiantzolov/Dev/projects/demo/test-skills/skills/skills/pdf";
-
 	@Bean
-	CommandLineRunner commandLineRunner(ChatClient.Builder chatClientBuilder
+	CommandLineRunner commandLineRunner(ChatClient.Builder chatClientBuilder) {
 
-	) {
-		// , ToolCallbackProvider toolCallbackProvider) {
+		MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder().maxMessages(500).build();
 
 		return args -> {
 
@@ -52,39 +51,20 @@ public class Application {
 				.defaultTools(new TodoWriteTool())
 
 				// .defaultToolCallbacks(toolCallbackProvider) // MCP tool provider
-				.defaultAdvisors(ToolCallAdvisor.builder().build()) // tool calling advisor
+				.defaultAdvisors(ToolCallAdvisor.builder().conversationHistoryEnabled(false).build()) // tool calling advisor
+				.defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).order(Ordered.HIGHEST_PRECEDENCE + 1000).build())
 				.defaultAdvisors(new MyLoggingAdvisor()) // logging advisor
 				.build();
 				// @formatter:on
 
-			var answer1 = chatClient
-				// .prompt("""
-				// Create a PDF explaining the concept of Chain of Thought (CoT) prompting
-				// in AI. Don't ask me for more details.
-				// """)
-				// .prompt("""
-				// Explain Spring AI and recursive advisors in simple terms. Do full
-				// research before answering. Collect information from internet if needed.
-				// """)
-				// .prompt("""
-				// Explain reinforcement learning in simple terms and use.
-				// First load the required skills.
-				// The use the Youtube video
-				// https://youtu.be/vXtfdGphr3c?si=xy8U2Al_Um5vE4Jd transcript to support
-				// your answer.
-				// Use absolute paths for the skills and scripts.
-				// Do not ask me for more details.
-				// """)
-				.prompt("""
-						Please review the following class and suggest improvements:
-						/Users/christiantzolov/Dev/projects/spring-ai-agent-utils/spring-ai-agent-utils/src/main/java/org/springaicommunity/ai/agent/tools/BraveWebSearchTool.java
-						Check also the related tests and make sure they pass.
-						""")
-				.toolContext(Map.of("foo", "bar"))
-				.call()
-				.content();
-
-			System.out.println("CoT Answer: " + answer1);
+			// 3. Start the chat loop
+			System.out.println("\nI am your assistant.\n");
+			try (Scanner scanner = new Scanner(System.in)) {
+				while (true) {
+					System.out.print("\nUSER: ");
+					System.out.println("\nASSISTANT: " + chatClient.prompt(scanner.nextLine()).call().content());
+				}
+			}
 		};
 
 	}
