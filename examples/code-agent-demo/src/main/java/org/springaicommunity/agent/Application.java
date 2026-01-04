@@ -1,9 +1,11 @@
 package org.springaicommunity.agent;
 
+import java.util.List;
 import java.util.Scanner;
 
 import org.springaicommunity.agent.tools.BraveWebSearchTool;
 import org.springaicommunity.agent.tools.FileSystemTools;
+import org.springaicommunity.agent.tools.GrepTool;
 import org.springaicommunity.agent.tools.ShellTools;
 import org.springaicommunity.agent.tools.SkillsTool;
 import org.springaicommunity.agent.tools.SmartWebFetchTool;
@@ -24,11 +26,14 @@ import org.springframework.core.io.Resource;
 @SpringBootApplication
 public class Application {
 
-	// static final String skillsDir = "/Users/christiantzolov/.claude/skills";
-	static final String skillsDir = "/Users/christiantzolov/Dev/projects/spring-ai-agent-utils/.claude/skills";
+	@Value("${app.agent.skills.paths}")
+	List<String> skillPaths;
 
-	@Value("classpath:/CODE_AGENT_PROMPT_V2.md")
+	@Value("classpath:/prompt/CODE_AGENT_PROMPT_V2.md")
 	Resource systemPrompt;
+
+	@Value("${BRAVE_API_KEY:#{null}}")
+	String braveApiKey;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
@@ -43,22 +48,24 @@ public class Application {
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off
 				.defaultSystem(systemPrompt)
-				.defaultToolCallbacks(SkillsTool.builder().addSkillsDirectory(skillsDir).build()) // skills tool
-				.defaultTools(new ShellTools())// built-in shell tools
-				.defaultTools(new FileSystemTools())// built-in file system tools
-				.defaultTools(SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build())
-				.defaultTools(BraveWebSearchTool.builder(System.getenv("BRAVE_API_KEY")).resultCount(15).build())
-				.defaultTools(new TodoWriteTool())
-
-				// .defaultToolCallbacks(toolCallbackProvider) // MCP tool provider
-				.defaultAdvisors(ToolCallAdvisor.builder().conversationHistoryEnabled(false).build()) // tool calling advisor
-				.defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).order(Ordered.HIGHEST_PRECEDENCE + 1000).build())
-				.defaultAdvisors(new MyLoggingAdvisor()) // logging advisor
+				.defaultToolCallbacks(SkillsTool.builder().addSkillsDirectories(skillPaths).build()) // skills tool
+				.defaultTools( // Common agentic tools
+					new ShellTools(), // shell tools. needed by the skills to execute scripts
+					new FileSystemTools(),// file system tools. needed by the skills to read/write additional resources
+					SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build(),
+					BraveWebSearchTool.builder(braveApiKey).resultCount(15).build(),
+					new TodoWriteTool(),
+					new GrepTool())
+				.defaultAdvisors(
+					ToolCallAdvisor.builder().conversationHistoryEnabled(false).build(), // tool calling advisor
+					MessageChatMemoryAdvisor.builder(chatMemory).order(Ordered.HIGHEST_PRECEDENCE + 1000).build(),
+					new MyLoggingAdvisor()) // logging advisor
 				.build();
 				// @formatter:on
 
-			// 3. Start the chat loop
+			// Start the chat loop
 			System.out.println("\nI am your assistant.\n");
+
 			try (Scanner scanner = new Scanner(System.in)) {
 				while (true) {
 					System.out.print("\nUSER: ");
@@ -66,7 +73,6 @@ public class Application {
 				}
 			}
 		};
-
 	}
 
 }

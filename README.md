@@ -15,7 +15,8 @@ spring-ai-agent-utils/
 ├── spring-ai-agent-utils/     # Core library
 │   └── README.md              # Detailed documentation
 ├── examples/
-│   └── skills-demo/           # Example application
+│   ├── code-agent-demo/       # Full-featured AI coding assistant
+│   └── skills-demo/           # Focused skills system demo
 └── .claude/skills/            # Example agent skills
     └── ai-tuto/               # AI tutor skill example
 ```
@@ -80,7 +81,7 @@ public class Application {
 For detailed documentation, see:
 
 - **[Library Documentation](spring-ai-agent-utils/README.md)** - Complete API reference, tool capabilities, and skills development guide
-- **[Example Application](examples/skills-demo)** - Working demo with all tools and agent skills
+- **[Example Applications](#examples)** - Working demos showcasing different use cases
 
 ## Architecture Insights
 
@@ -113,20 +114,20 @@ Key patterns implemented:
 # Build the entire project
 mvn clean install
 
-# Run the example
-cd examples/skills-demo
+# Run an example
+cd examples/code-agent-demo  # or examples/skills-demo
 mvn spring-boot:run
 ```
 
 ## Examples
 
-The [skills-demo](examples/skills-demo) example demonstrates:
+Two comprehensive examples demonstrate different use cases:
 
-- Complete ChatClient configuration with all tools
-- Agent skills integration
-- Custom advisors for logging
-- Multi-provider support (Anthropic, OpenAI, Google)
-- Example AI tutor skill with Python script integration
+- **[code-agent-demo](examples/code-agent-demo)** - Full-featured AI coding assistant with interactive CLI, all 7 tools, conversation memory, and multi-model support. Best for understanding complete agent architectures.
+
+- **[skills-demo](examples/skills-demo)** - Focused demonstration of the SkillsTool system with custom skill development, helper scripts, and the ai-tuto educational skill example.
+
+See the [Examples README](examples/README.md) for detailed setup, configuration, and usage guide for both examples.
 
 ## License
 

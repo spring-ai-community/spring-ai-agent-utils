@@ -222,7 +222,12 @@ brave.api.key=${BRAVE_API_KEY}
 
 ## Examples
 
-See [examples/skills-demo](../examples/skills-demo) for a complete working application demonstrating all tools and agent skills.
+Two comprehensive examples demonstrate different use cases:
+
+- **[code-agent-demo](../examples/code-agent-demo)** - Full-featured AI coding assistant with interactive CLI, all 7 tools, conversation memory, and multi-model support
+- **[skills-demo](../examples/skills-demo)** - Focused demonstration of the SkillsTool system with custom skill development and helper scripts
+
+See the [Examples README](../examples/README.md) for detailed setup, configuration, and usage guide.
 
 ## Requirements
 
