@@ -83,7 +83,6 @@ For detailed documentation, see:
 - **[Library Documentation](spring-ai-agent-utils/README.md)** - Complete API reference, tool capabilities, and skills development guide
 - **[Example Applications](#examples)** - Working demos showcasing different use cases
 
-## Architecture Insights
 
 This project reimplements key Claude Code features based on:
 
@@ -92,14 +91,6 @@ This project reimplements key Claude Code features based on:
 - [Claude Code Internals](https://agiflow.io/blog/claude-code-internals-reverse-engineering-prompt-augmentation/) - Reverse engineering prompt augmentation
 - [Claude Code Skills](https://mikhail.io/2025/10/claude-code-skills/) - Implementation patterns
 
-Key patterns implemented:
-
-- **Tool Callbacks** - Spring AI's tool registration mechanism
-- **Agent Skills System** - Markdown-based skill definitions with YAML front-matter
-- **Progressive Disclosure** - Skills with supporting reference files
-- **Semantic Matching** - Automatic skill invocation based on descriptions
-- **Builder Pattern** - Fluent configuration for complex tools
-- **Smart Caching** - 15-minute TTL cache for web content
 
 ## Requirements
 
