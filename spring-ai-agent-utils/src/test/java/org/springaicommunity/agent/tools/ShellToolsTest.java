@@ -15,6 +15,9 @@
  */
 package org.springaicommunity.agent.tools;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,12 +25,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
-import org.springaicommunity.agent.tools.ShellTools;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Tests for {@link ShellTools}.
@@ -51,7 +50,7 @@ class ShellToolsTest {
 		@Test
 		@DisplayName("Should execute simple echo command successfully")
 		void shouldExecuteSimpleEchoCommand() {
-			String result = shellTools.bash("echo 'Hello World'", null, null, null, null);
+			String result = shellTools.bash("echo 'Hello World'", null, null, null);
 
 			assertThat(result).contains("bash_id: shell_");
 			assertThat(result).contains("Hello World");
@@ -61,7 +60,7 @@ class ShellToolsTest {
 		@Test
 		@DisplayName("Should execute pwd command successfully")
 		void shouldExecutePwdCommand() {
-			String result = shellTools.bash("pwd", null, null, null, null);
+			String result = shellTools.bash("pwd", null, null, null);
 
 			assertThat(result).contains("bash_id: shell_");
 			assertThat(result).contains("/");
@@ -72,7 +71,7 @@ class ShellToolsTest {
 		@DisplayName("Should execute ls command successfully")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldExecuteLsCommand() {
-			String result = shellTools.bash("ls /tmp", null, null, null, null);
+			String result = shellTools.bash("ls /tmp", null, null, null);
 
 			assertThat(result).contains("bash_id: shell_");
 			assertThat(result).doesNotContain("Exit code:");
@@ -82,8 +81,7 @@ class ShellToolsTest {
 		@DisplayName("Should handle commands with multiple lines of output")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldHandleMultipleLinesOfOutput() {
-			String result = shellTools.bash("echo 'Line 1'; echo 'Line 2'; echo 'Line 3'", null,
-					null, null, null);
+			String result = shellTools.bash("echo 'Line 1'; echo 'Line 2'; echo 'Line 3'", null, null, null);
 
 			assertThat(result).contains("bash_id: shell_");
 			assertThat(result).contains("Line 1");
@@ -101,7 +99,7 @@ class ShellToolsTest {
 		@DisplayName("Should capture non-zero exit code")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldCaptureNonZeroExitCode() {
-			String result = shellTools.bash("exit 1", null, null, null, null);
+			String result = shellTools.bash("exit 1", null, null, null);
 
 			assertThat(result).contains("bash_id: shell_");
 			assertThat(result).contains("Exit code: 1");
@@ -111,7 +109,7 @@ class ShellToolsTest {
 		@DisplayName("Should capture stderr output")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldCaptureStderrOutput() {
-			String result = shellTools.bash("echo 'Error message' >&2", null, null, null, null);
+			String result = shellTools.bash("echo 'Error message' >&2", null, null, null);
 
 			assertThat(result).contains("bash_id: shell_");
 			assertThat(result).contains("STDERR:");
@@ -122,8 +120,7 @@ class ShellToolsTest {
 		@DisplayName("Should capture both stdout and stderr")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldCaptureBothStdoutAndStderr() {
-			String result = shellTools.bash("echo 'Output'; echo 'Error' >&2", null, null, null,
-					null);
+			String result = shellTools.bash("echo 'Output'; echo 'Error' >&2", null, null, null);
 
 			assertThat(result).contains("bash_id: shell_");
 			assertThat(result).contains("Output");
@@ -135,8 +132,7 @@ class ShellToolsTest {
 		@DisplayName("Should handle invalid command gracefully")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldHandleInvalidCommand() {
-			String result = shellTools.bash("invalidcommandthatdoesnotexist", null, null, null,
-					null);
+			String result = shellTools.bash("invalidcommandthatdoesnotexist", null, null, null);
 
 			assertThat(result).contains("bash_id: shell_");
 			assertThat(result).containsAnyOf("STDERR:", "Exit code:");
@@ -152,7 +148,7 @@ class ShellToolsTest {
 		@DisplayName("Should timeout long-running command")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldTimeoutLongRunningCommand() {
-			String result = shellTools.bash("sleep 10", 1000L, null, null, null);
+			String result = shellTools.bash("sleep 10", 1000L, null, null);
 
 			assertThat(result).contains("bash_id: shell_");
 			assertThat(result).contains("Command timed out after 1000ms");
@@ -163,7 +159,7 @@ class ShellToolsTest {
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldUseDefaultTimeout() {
 			// This command should complete well within the default 120 second timeout
-			String result = shellTools.bash("echo 'Fast command'", null, null, null, null);
+			String result = shellTools.bash("echo 'Fast command'", null, null, null);
 
 			assertThat(result).contains("bash_id: shell_");
 			assertThat(result).contains("Fast command");
@@ -175,7 +171,7 @@ class ShellToolsTest {
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldEnforceMaximumTimeoutLimit() {
 			// Request timeout greater than 600000ms, should be capped at 600000ms
-			String result = shellTools.bash("echo 'Test'", 999999999L, null, null, null);
+			String result = shellTools.bash("echo 'Test'", 999999999L, null, null);
 
 			assertThat(result).contains("bash_id: shell_");
 			assertThat(result).contains("Test");
@@ -191,8 +187,7 @@ class ShellToolsTest {
 		@DisplayName("Should start background process successfully")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldStartBackgroundProcess() {
-			String result = shellTools.bash("echo 'Background task'; sleep 1; echo 'Done'", null,
-					null, true, null);
+			String result = shellTools.bash("echo 'Background task'; sleep 1; echo 'Done'", null, null, true);
 
 			assertThat(result).contains("bash_id: shell_");
 			assertThat(result).contains("Background shell started with ID:");
@@ -203,42 +198,41 @@ class ShellToolsTest {
 			assertThat(shellId).isNotNull();
 
 			// Clean up
-			shellTools.killShell(shellId, null);
+			shellTools.killShell(shellId);
 		}
 
 		@Test
 		@DisplayName("Should execute background process and retrieve output")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldExecuteBackgroundProcessAndRetrieveOutput() throws InterruptedException {
-			String startResult = shellTools.bash("echo 'Start'; sleep 1; echo 'End'", null, null,
-					true, null);
+			String startResult = shellTools.bash("echo 'Start'; sleep 1; echo 'End'", null, null, true);
 
 			String shellId = extractShellId(startResult);
 
 			// Wait a bit for process to produce output
 			Thread.sleep(1500);
-			String output = shellTools.bashOutput(shellId, null, null);
+			String output = shellTools.bashOutput(shellId, null);
 			assertThat(output).contains("Start");
 
 			// Clean up
-			shellTools.killShell(shellId, null);
+			shellTools.killShell(shellId);
 		}
 
 		@Test
 		@DisplayName("Should track background process completion")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldTrackBackgroundProcessCompletion() throws InterruptedException {
-			String startResult = shellTools.bash("echo 'Quick task'", null, null, true, null);
+			String startResult = shellTools.bash("echo 'Quick task'", null, null, true);
 
 			String shellId = extractShellId(startResult);
 
 			// Wait for process to complete
 			Thread.sleep(1000);
-			String output = shellTools.bashOutput(shellId, null, null);
+			String output = shellTools.bashOutput(shellId, null);
 			assertThat(output).contains("Status: Completed");
 
 			// Clean up
-			shellTools.killShell(shellId, null);
+			shellTools.killShell(shellId);
 		}
 
 	}
@@ -251,23 +245,23 @@ class ShellToolsTest {
 		@DisplayName("Should retrieve output from background process")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldRetrieveOutputFromBackgroundProcess() throws InterruptedException {
-			String startResult = shellTools.bash("echo 'Test output'", null, null, true, null);
+			String startResult = shellTools.bash("echo 'Test output'", null, null, true);
 
 			String shellId = extractShellId(startResult);
 
 			Thread.sleep(1000);
-			String output = shellTools.bashOutput(shellId, null, null);
+			String output = shellTools.bashOutput(shellId, null);
 			assertThat(output).contains("Shell ID: " + shellId);
 			assertThat(output).contains("Test output");
 
 			// Clean up
-			shellTools.killShell(shellId, null);
+			shellTools.killShell(shellId);
 		}
 
 		@Test
 		@DisplayName("Should return error for non-existent shell ID")
 		void shouldReturnErrorForNonExistentShellId() {
-			String output = shellTools.bashOutput("shell_nonexistent", null, null);
+			String output = shellTools.bashOutput("shell_nonexistent", null);
 
 			assertThat(output).contains("Error: No background shell found with ID: shell_nonexistent");
 		}
@@ -276,45 +270,45 @@ class ShellToolsTest {
 		@DisplayName("Should show only new output on subsequent calls")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldShowOnlyNewOutputOnSubsequentCalls() throws InterruptedException {
-			String startResult = shellTools.bash(
-					"echo 'First'; sleep 1; echo 'Second'; sleep 1; echo 'Third'", null, null, true, null);
+			String startResult = shellTools.bash("echo 'First'; sleep 1; echo 'Second'; sleep 1; echo 'Third'", null,
+					null, true);
 
 			String shellId = extractShellId(startResult);
 
 			// Get first output
 			Thread.sleep(500);
-			String firstOutput = shellTools.bashOutput(shellId, null, null);
+			String firstOutput = shellTools.bashOutput(shellId, null);
 			assertThat(firstOutput).contains("First");
 
 			// Wait and get second output
 			Thread.sleep(1500);
-			String secondOutput = shellTools.bashOutput(shellId, null, null);
+			String secondOutput = shellTools.bashOutput(shellId, null);
 			// Second call should show new output
 			assertThat(secondOutput).containsAnyOf("Second", "Third", "No new output");
 
 			// Clean up
-			shellTools.killShell(shellId, null);
+			shellTools.killShell(shellId);
 		}
 
 		@Test
 		@DisplayName("Should handle no new output gracefully")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldHandleNoNewOutputGracefully() throws InterruptedException {
-			String startResult = shellTools.bash("echo 'Done'", null, null, true, null);
+			String startResult = shellTools.bash("echo 'Done'", null, null, true);
 
 			String shellId = extractShellId(startResult);
 
 			// Get first output
 			Thread.sleep(1000);
-			String firstOutput = shellTools.bashOutput(shellId, null, null);
+			String firstOutput = shellTools.bashOutput(shellId, null);
 			assertThat(firstOutput).contains("Done");
 
 			// Try to get output again - should show no new output
-			String secondOutput = shellTools.bashOutput(shellId, null, null);
+			String secondOutput = shellTools.bashOutput(shellId, null);
 			assertThat(secondOutput).contains("No new output since last check");
 
 			// Clean up
-			shellTools.killShell(shellId, null);
+			shellTools.killShell(shellId);
 		}
 
 	}
@@ -327,35 +321,36 @@ class ShellToolsTest {
 		@DisplayName("Should filter output with regex pattern")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldFilterOutputWithRegexPattern() throws InterruptedException {
-			String startResult = shellTools.bash("echo 'ERROR: Something failed'; echo 'INFO: All good'; echo 'ERROR: Another problem'",
-					null, null, true, null);
+			String startResult = shellTools.bash(
+					"echo 'ERROR: Something failed'; echo 'INFO: All good'; echo 'ERROR: Another problem'", null, null,
+					true);
 
 			String shellId = extractShellId(startResult);
 
 			Thread.sleep(1000);
-			String output = shellTools.bashOutput(shellId, "ERROR", null);
+			String output = shellTools.bashOutput(shellId, "ERROR");
 			assertThat(output).contains("ERROR");
 			// Filtered output should not contain INFO lines
 
 			// Clean up
-			shellTools.killShell(shellId, null);
+			shellTools.killShell(shellId);
 		}
 
 		@Test
 		@DisplayName("Should handle empty filter result")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldHandleEmptyFilterResult() throws InterruptedException {
-			String startResult = shellTools.bash("echo 'No errors here'", null, null, true, null);
+			String startResult = shellTools.bash("echo 'No errors here'", null, null, true);
 
 			String shellId = extractShellId(startResult);
 
 			Thread.sleep(1000);
-			String output = shellTools.bashOutput(shellId, "ERROR", null);
+			String output = shellTools.bashOutput(shellId, "ERROR");
 			// Should show shell info but no matching output
 			assertThat(output).contains("Shell ID: " + shellId);
 
 			// Clean up
-			shellTools.killShell(shellId, null);
+			shellTools.killShell(shellId);
 		}
 
 	}
@@ -368,12 +363,12 @@ class ShellToolsTest {
 		@DisplayName("Should kill running background process")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldKillRunningBackgroundProcess() {
-			String startResult = shellTools.bash("sleep 100", null, null, true, null);
+			String startResult = shellTools.bash("sleep 100", null, null, true);
 
 			String shellId = extractShellId(startResult);
 
 			// Kill the process
-			String killResult = shellTools.killShell(shellId, null);
+			String killResult = shellTools.killShell(shellId);
 
 			assertThat(killResult).contains("Successfully killed shell: " + shellId);
 		}
@@ -382,25 +377,24 @@ class ShellToolsTest {
 		@DisplayName("Should handle killing already terminated process")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldHandleKillingAlreadyTerminatedProcess() throws InterruptedException {
-			String startResult = shellTools.bash("echo 'Quick task'", null, null, true, null);
+			String startResult = shellTools.bash("echo 'Quick task'", null, null, true);
 
 			String shellId = extractShellId(startResult);
 
 			// Wait for process to complete naturally
 			Thread.sleep(1000);
-			String output = shellTools.bashOutput(shellId, null, null);
+			String output = shellTools.bashOutput(shellId, null);
 			assertThat(output).contains("Status: Completed");
 
 			// Try to kill already completed process
-			String killResult = shellTools.killShell(shellId, null);
-
+			String killResult = shellTools.killShell(shellId);
 			assertThat(killResult).contains("was already terminated");
 		}
 
 		@Test
 		@DisplayName("Should return error for non-existent shell ID")
 		void shouldReturnErrorForNonExistentShellIdWhenKilling() {
-			String killResult = shellTools.killShell("shell_nonexistent", null);
+			String killResult = shellTools.killShell("shell_nonexistent");
 
 			assertThat(killResult).contains("Error: No background shell found with ID: shell_nonexistent");
 		}
@@ -409,15 +403,15 @@ class ShellToolsTest {
 		@DisplayName("Should remove shell from background processes after kill")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldRemoveShellFromBackgroundProcessesAfterKill() {
-			String startResult = shellTools.bash("sleep 100", null, null, true, null);
+			String startResult = shellTools.bash("sleep 100", null, null, true);
 
 			String shellId = extractShellId(startResult);
 
 			// Kill the process
-			shellTools.killShell(shellId, null);
+			shellTools.killShell(shellId);
 
 			// Try to access killed process
-			String output = shellTools.bashOutput(shellId, null, null);
+			String output = shellTools.bashOutput(shellId, null);
 			assertThat(output).contains("Error: No background shell found with ID: " + shellId);
 		}
 
@@ -431,7 +425,7 @@ class ShellToolsTest {
 		@DisplayName("Should use bash on Unix-like systems")
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldUseBashOnUnixLikeSystems() {
-			String result = shellTools.bash("echo $SHELL", null, null, null, null);
+			String result = shellTools.bash("echo $SHELL", null, null, null);
 
 			assertThat(result).contains("bash_id: shell_");
 		}
@@ -440,7 +434,7 @@ class ShellToolsTest {
 		@DisplayName("Should use cmd.exe on Windows")
 		@EnabledOnOs(OS.WINDOWS)
 		void shouldUseCmdOnWindows() {
-			String result = shellTools.bash("echo %COMSPEC%", null, null, null, null);
+			String result = shellTools.bash("echo %COMSPEC%", null, null, null);
 
 			assertThat(result).contains("bash_id: shell_");
 			assertThat(result).containsIgnoringCase("cmd");
@@ -457,9 +451,10 @@ class ShellToolsTest {
 		@DisabledOnOs(OS.WINDOWS)
 		void shouldTruncateVeryLongOutput() {
 			// Generate output longer than 30000 characters
-			StringBuilder longCommand = new StringBuilder("for i in {1..2000}; do echo 'This is a long line of text that will be repeated many times'; done");
+			StringBuilder longCommand = new StringBuilder(
+					"for i in {1..2000}; do echo 'This is a long line of text that will be repeated many times'; done");
 
-			String result = shellTools.bash(longCommand.toString(), null, null, null, null);
+			String result = shellTools.bash(longCommand.toString(), null, null, null);
 
 			assertThat(result).contains("bash_id: shell_");
 			// Output should be truncated
@@ -477,8 +472,8 @@ class ShellToolsTest {
 		@Test
 		@DisplayName("Should generate unique shell IDs")
 		void shouldGenerateUniqueShellIds() {
-			String result1 = shellTools.bash("echo 'First'", null, null, null, null);
-			String result2 = shellTools.bash("echo 'Second'", null, null, null, null);
+			String result1 = shellTools.bash("echo 'First'", null, null, null);
+			String result2 = shellTools.bash("echo 'Second'", null, null, null);
 
 			String shellId1 = extractShellId(result1);
 			String shellId2 = extractShellId(result2);
@@ -489,7 +484,7 @@ class ShellToolsTest {
 		@Test
 		@DisplayName("Shell ID should follow expected pattern")
 		void shellIdShouldFollowExpectedPattern() {
-			String result = shellTools.bash("echo 'Test'", null, null, null, null);
+			String result = shellTools.bash("echo 'Test'", null, null, null);
 
 			String shellId = extractShellId(result);
 			assertThat(shellId).matches("shell_\\d+");

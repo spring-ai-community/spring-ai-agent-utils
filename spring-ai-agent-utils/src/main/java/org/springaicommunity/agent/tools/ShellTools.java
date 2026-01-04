@@ -23,14 +23,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 
 /**
  * @author Christian Tzolov
  */
-
 public class ShellTools {
 
 	// Storage for background processes
@@ -305,8 +303,7 @@ public class ShellTools {
 		@ToolParam(description = "The command to execute") String command,
 		@ToolParam(description = "Optional timeout in milliseconds (max 600000)", required = false) Long timeout,
 		@ToolParam(description = "Clear, concise description of what this command does in 5-10 words, in active voice. Examples:\nInput: ls\nOutput: List files in current directory\n\nInput: git status\nOutput: Show working tree status\n\nInput: npm install\nOutput: Install package dependencies\n\nInput: mkdir foo\nOutput: Create directory 'foo'", required = false) String description,
-		@ToolParam(description = "Set to true to run this command in the background. Use BashOutput to read the output later.", required = false) Boolean runInBackground,
-		ToolContext toolContext) { // @formatter:on
+		@ToolParam(description = "Set to true to run this command in the background. Use BashOutput to read the output later.", required = false) Boolean runInBackground) { // @formatter:on
 
 		// Generate unique shell ID for all executions
 		String shellId = "shell_" + System.currentTimeMillis();
@@ -445,8 +442,7 @@ public class ShellTools {
 		""")
 	public String bashOutput(
 		@ToolParam(description = "The ID of the background shell to retrieve output from") String bash_id,
-		@ToolParam(description = "Optional regular expression to filter the output lines. Only lines matching this regex will be included in the result. Any lines that do not match will no longer be available to read.", required = false) String filter,
-		ToolContext toolContext) { // @formatter:on
+		@ToolParam(description = "Optional regular expression to filter the output lines. Only lines matching this regex will be included in the result. Any lines that do not match will no longer be available to read.", required = false) String filter) { // @formatter:on
 
 		BackgroundProcess bgProcess = backgroundProcesses.get(bash_id);
 
@@ -488,8 +484,7 @@ public class ShellTools {
 		- Shell IDs can be found using the /bashes command
 		""")
 	public String killShell(
-		@ToolParam(description = "The ID of the background shell to kill") String bash_id,
-		ToolContext toolContext) { // @formatter:on
+		@ToolParam(description = "The ID of the background shell to kill") String bash_id) { // @formatter:on
 
 		BackgroundProcess bgProcess = backgroundProcesses.get(bash_id);
 

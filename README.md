@@ -24,7 +24,7 @@ spring-ai-agent-utils/
 ## Features
 
 - **FileSystemTools** - Read, write, and edit files with precise control
-- **ShellTools** - Execute shell commands with background process support
+- **ShellTools** - Execute shell commands with timeout control, background process management, and regex output filtering
 - **GrepTool** - Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes
 - **TodoWriteTool** - Structured task management with state tracking
 - **SmartWebFetchTool** - AI-powered web content summarization with caching

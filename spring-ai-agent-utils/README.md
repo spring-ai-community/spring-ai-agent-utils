@@ -11,7 +11,7 @@ Spring AI Agent Utils reimplements core [Claude Code](https://code.claude.com/do
 ### Tools
 
 - **FileSystemTools** - Read, write, and edit files with precise control
-- **ShellTools** - Execute shell commands with background process support
+- **ShellTools** - Execute shell commands with timeout control, background process management, and regex output filtering
 - **GrepTool** - Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes
 - **TodoWriteTool** - Structured task management with state tracking
 - **SmartWebFetchTool** - AI-powered web content summarization with caching
@@ -83,7 +83,7 @@ fileTools.edit(filePath, "oldValue", "newValue", null, toolContext);
 
 ### ShellTools
 
-Execute shell commands with background process support. Includes Bash for command execution, BashOutput for monitoring background processes, and KillShell for process termination.
+Execute shell commands with background process support. Includes Bash for command execution with optional timeout and background mode, BashOutput for monitoring background processes with regex filtering, and KillShell for graceful process termination.
 
 [**View Full Documentation →**](docs/ShellTools.md)
 
@@ -92,10 +92,14 @@ Execute shell commands with background process support. Includes Bash for comman
 ShellTools shellTools = new ShellTools();
 
 // Run command in background
-String result = shellTools.bash("npm run dev", null, "Start dev server", true, toolContext);
+String result = shellTools.bash("npm run dev", null, "Start dev server", true);
+// Returns: "bash_id: shell_1234567890\n\nBackground shell started..."
 
-// Monitor output
-String output = shellTools.bashOutput("shell_1234567890", null, toolContext);
+// Monitor output with optional filtering
+String output = shellTools.bashOutput("shell_1234567890", null);
+
+// Kill background process
+String killResult = shellTools.killShell("shell_1234567890");
 ```
 
 ### GrepTool

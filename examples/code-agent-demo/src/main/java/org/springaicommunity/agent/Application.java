@@ -42,23 +42,26 @@ public class Application {
 	@Bean
 	CommandLineRunner commandLineRunner(ChatClient.Builder chatClientBuilder) {
 
-		MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder().maxMessages(500).build();
-
 		return args -> {
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off
 				.defaultSystem(systemPrompt)
 				.defaultToolCallbacks(SkillsTool.builder().addSkillsDirectories(skillPaths).build()) // skills tool
 				.defaultTools( // Common agentic tools
-					new ShellTools(), // shell tools. needed by the skills to execute scripts
-					new FileSystemTools(),// file system tools. needed by the skills to read/write additional resources
+					new ShellTools(), // needed by the skills to execute scripts
+					new FileSystemTools(),// needed by the skills to read/write additional resources					
 					SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build(),
 					BraveWebSearchTool.builder(braveApiKey).resultCount(15).build(),
 					new TodoWriteTool(),
 					new GrepTool())
+
 				.defaultAdvisors(
-					ToolCallAdvisor.builder().conversationHistoryEnabled(false).build(), // tool calling advisor
-					MessageChatMemoryAdvisor.builder(chatMemory).order(Ordered.HIGHEST_PRECEDENCE + 1000).build(),
+					ToolCallAdvisor.builder()
+						.conversationHistoryEnabled(false)
+						.build(), // tool calling advisor
+					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build())
+						.order(Ordered.HIGHEST_PRECEDENCE + 1000)
+						.build(),
 					new MyLoggingAdvisor()) // logging advisor
 				.build();
 				// @formatter:on
