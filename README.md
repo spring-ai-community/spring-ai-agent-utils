@@ -22,17 +22,13 @@ spring-ai-agent-utils/
 
 ## Features
 
-### Core Tools
-
 - **FileSystemTools** - Read, write, and edit files with precise control
 - **ShellTools** - Execute shell commands with background process support
+- **GrepTool** - Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes
 - **TodoWriteTool** - Structured task management with state tracking
 - **SmartWebFetchTool** - AI-powered web content summarization with caching
 - **BraveWebSearchTool** - Web search with domain filtering
-
-### Agent Skills
-
-Extend agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter. Skills are automatically invoked through semantic matching, just like in Claude Code.
+- **SkillsTool** - Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter. Skills are automatically invoked through semantic matching, just like in Claude Code.
 
 ## Quick Start
 
@@ -64,6 +60,7 @@ public class Application {
                 // Register tools
                 .defaultTools(new ShellTools())
                 .defaultTools(new FileSystemTools())
+                .defaultTools(new GrepTool())
                 .defaultTools(SmartWebFetchTool.builder(chatClient).build())
                 .defaultTools(BraveWebSearchTool.builder(apiKey).build())
                 .defaultTools(new TodoWriteTool())
