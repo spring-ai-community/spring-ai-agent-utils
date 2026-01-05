@@ -54,7 +54,7 @@ public class MarkdownParser {
 	/**
 	 * Map containing the parsed front matter key-value pairs.
 	 */
-	private Map<String, String> frontMatter;
+	private Map<String, Object> frontMatter;
 
 	/**
 	 * The content of the markdown document (everything after the front matter).
@@ -147,7 +147,7 @@ public class MarkdownParser {
 	 * empty map.
 	 * @return a new map containing the front matter key-value pairs
 	 */
-	public Map<String, String> getFrontMatter() {
+	public Map<String, Object> getFrontMatter() {
 		return new HashMap<>(frontMatter);
 	}
 

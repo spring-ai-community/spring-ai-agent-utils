@@ -144,7 +144,7 @@ public class SkillsTool {
 	/**
 	 * Represents a SKILL.md file with its location and parsed content.
 	 */
-	private static record Skill(Path path, Map<String, String> frontMatter, String content) {
+	private static record Skill(Path path, Map<String, Object> frontMatter, String content) {
 
 		public String toXml() {
 			String frontMatterXml = this.frontMatter()
@@ -163,7 +163,7 @@ public class SkillsTool {
 		Map<String, Skill> skillsMap = new HashMap<>();
 
 		for (Skill skillFile : skills) {
-			skillsMap.put(skillFile.frontMatter().get("name"), skillFile);
+			skillsMap.put(skillFile.frontMatter().get("name").toString(), skillFile);
 		}
 
 		return skillsMap;

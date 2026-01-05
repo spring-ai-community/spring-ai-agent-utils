@@ -20,7 +20,6 @@ import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springaicommunity.agent.utils.MarkdownParser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,7 +49,7 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter = parser.getFrontMatter();
+			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			assertThat(frontMatter).hasSize(3)
 				.containsEntry("title", "My Blog Post")
@@ -71,7 +70,7 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter = parser.getFrontMatter();
+			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			assertThat(frontMatter).hasSize(2)
 				.containsEntry("title", "My Blog Post")
@@ -92,7 +91,7 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter = parser.getFrontMatter();
+			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			assertThat(frontMatter).hasSize(3)
 				.containsEntry("title", "My Blog Post")
@@ -114,7 +113,7 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter = parser.getFrontMatter();
+			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			assertThat(frontMatter).hasSize(3)
 				.containsEntry("title", "My Blog Post")
@@ -138,7 +137,7 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter = parser.getFrontMatter();
+			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			assertThat(frontMatter).hasSize(3)
 				.containsEntry("title", "My Title")
@@ -160,7 +159,7 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter = parser.getFrontMatter();
+			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			assertThat(frontMatter).hasSize(3)
 				.containsEntry("title", "Introduction: A Deep Dive")
@@ -182,7 +181,7 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter = parser.getFrontMatter();
+			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			assertThat(frontMatter).hasSize(2)
 				.containsEntry("title", "My Title")
@@ -203,7 +202,7 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter = parser.getFrontMatter();
+			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			assertThat(frontMatter).hasSize(2)
 				.containsEntry("title", "My Title")
@@ -375,7 +374,7 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter = parser.getFrontMatter();
+			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			assertThat(frontMatter).hasSize(2)
 				.containsEntry("title", "My Post")
@@ -430,7 +429,7 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter = parser.getFrontMatter();
+			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			// Single quote characters should not be removed
 			assertThat(frontMatter).containsEntry("title", "\"").containsEntry("author", "'");
@@ -449,7 +448,7 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter = parser.getFrontMatter();
+			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			// Mismatched quotes should not be removed
 			assertThat(frontMatter).containsEntry("title", "\"My Title'")
@@ -470,7 +469,7 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter = parser.getFrontMatter();
+			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			// Empty keys should be skipped (colonIndex > 0 check)
 			// Empty values should be stored as empty strings
@@ -494,15 +493,15 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter1 = parser.getFrontMatter();
-			Map<String, String> frontMatter2 = parser.getFrontMatter();
+			Map<String, Object> frontMatter1 = parser.getFrontMatter();
+			Map<String, Object> frontMatter2 = parser.getFrontMatter();
 
 			// Should be equal but not the same instance
 			assertThat(frontMatter1).isEqualTo(frontMatter2).isNotSameAs(frontMatter2);
 
 			// Modifying returned map should not affect subsequent calls
 			frontMatter1.put("new-key", "new-value");
-			Map<String, String> frontMatter3 = parser.getFrontMatter();
+			Map<String, Object> frontMatter3 = parser.getFrontMatter();
 
 			assertThat(frontMatter3).doesNotContainKey("new-key").hasSize(1);
 		}
@@ -537,7 +536,7 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter = parser.getFrontMatter();
+			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			assertThat(frontMatter).hasSize(6)
 				.containsEntry("title", "Understanding Spring AI")
@@ -571,7 +570,7 @@ class MarkdownParserTest {
 					""";
 
 			MarkdownParser parser = new MarkdownParser(markdown);
-			Map<String, String> frontMatter = parser.getFrontMatter();
+			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			assertThat(frontMatter).hasSize(4)
 				.containsEntry("version", "1.0.0")
