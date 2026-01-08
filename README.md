@@ -143,12 +143,6 @@ See the [Examples README](examples/README.md) for detailed setup, configuration,
 
 Apache License 2.0
 
-## Credits
-
-Created by Christian Tzolov ([@tzolov](https://github.com/tzolov))
-
-Inspired by [Claude Code](https://code.claude.com) by Anthropic.
-
 ## Links
 
 - [GitHub Repository](https://github.com/spring-ai-community/spring-ai-agent-utils)
