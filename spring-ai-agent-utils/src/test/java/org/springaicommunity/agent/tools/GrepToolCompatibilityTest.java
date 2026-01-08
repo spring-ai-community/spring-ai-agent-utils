@@ -604,6 +604,7 @@ class GrepToolCompatibilityTest {
 
 	@Nested
 	@DisplayName("Fallback Behavior When RipGrep Unavailable")
+	@EnabledIf("org.springaicommunity.agent.tools.GrepToolCompatibilityTest#isRipgrepAvailable")
 	class FallbackBehavior {
 
 		@Test
