@@ -23,13 +23,17 @@ spring-ai-agent-utils/
 
 ## Features
 
+### Tools
+
 - **FileSystemTools** - Read, write, and edit files with precise control
 - **ShellTools** - Execute shell commands with timeout control, background process management, and regex output filtering
 - **GrepTool** - Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes
+- **GlobTool** - Fast file pattern matching tool for finding files by name patterns with glob syntax
 - **TodoWriteTool** - Structured task management with state tracking
 - **SmartWebFetchTool** - AI-powered web content summarization with caching
 - **BraveWebSearchTool** - Web search with domain filtering
-- **SkillsTool** - Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter. Skills are automatically invoked through semantic matching, just like in Claude Code.
+- **SkillsTool** - Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter
+- **TaskTools** - Hierarchical autonomous sub-agent system for delegating complex tasks to specialized agents with dedicated context windows
 
 ## Quick Start
 
@@ -53,7 +57,7 @@ public class Application {
     CommandLineRunner demo(ChatClient.Builder chatClientBuilder) {
         return args -> {
             ChatClient chatClient = chatClientBuilder
-                // Load agent skills
+                // Load skills
                 .defaultToolCallbacks(SkillsTool.builder()
                     .addSkillsDirectory(".claude/skills")
                     .build())
@@ -62,6 +66,7 @@ public class Application {
                 .defaultTools(new ShellTools())
                 .defaultTools(new FileSystemTools())
                 .defaultTools(GrepTool.builder().build())
+                .defaultTools(GlobTool.builder().build())
                 .defaultTools(SmartWebFetchTool.builder(chatClient).build())
                 .defaultTools(BraveWebSearchTool.builder(apiKey).build())
                 .defaultTools(TodoWriteTool.builder().build())
@@ -112,13 +117,15 @@ mvn spring-boot:run
 
 ## Examples
 
-Two comprehensive examples demonstrate different use cases:
+Three comprehensive examples demonstrate different use cases:
 
-- **[code-agent-demo](examples/code-agent-demo)** - Full-featured AI coding assistant with interactive CLI, all 7 tools, conversation memory, and multi-model support. Best for understanding complete agent architectures.
+- **[code-agent-demo](examples/code-agent-demo)** - Full-featured AI coding assistant with interactive CLI, all tools, conversation memory, and multi-model support. Best for understanding complete agent architectures.
+
+- **[subagent-demo](examples/subagent-demo)** - Demonstrates hierarchical sub-agent system with custom Spring AI expert sub-agent and TaskTools integration. Best for learning hierarchical agent patterns.
 
 - **[skills-demo](examples/skills-demo)** - Focused demonstration of the SkillsTool system with custom skill development, helper scripts, and the ai-tuto educational skill example.
 
-See the [Examples README](examples/README.md) for detailed setup, configuration, and usage guide for both examples.
+See the [Examples README](examples/README.md) for detailed setup, configuration, and usage guide for all examples.
 
 ## License
 
