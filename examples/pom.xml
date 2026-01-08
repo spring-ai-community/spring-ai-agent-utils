@@ -6,23 +6,10 @@
 
     <groupId>org.springaicommunity</groupId>
     <artifactId>examples-parent</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
 
     <name>Tool Search Tool Examples Parent</name>
     <description>Parent project for Tool Search Tool examples</description>
-
-    <url>https://github.com/tzolov/spring-ai-tool-search-tool</url>
-
-    <scm>
-        <url>https://github.com/tzolov/spring-ai-tool-search-tool</url>
-        <connection>git://github.com/tzolov/spring-ai-tool-search-tool.git</connection>
-        <developerConnection>git@github.com:tzolov/spring-ai-tool-search-tool.git</developerConnection>
-    </scm>
-
-    <organization>
-        <name>Logaritex</name>
-        <url>https://github.com/tzolov</url>
-    </organization>
 
     <licenses>
         <license>
@@ -36,15 +23,6 @@
             <name>Christian Tzolov</name>
         </developer>
     </developers>
-
-    <issueManagement>
-        <system>Github Issues</system>
-        <url>https://github.com/tzolov/spring-ai-tool-search-tool/issues</url>
-    </issueManagement>
-    <ciManagement>
-        <system>Github Actions</system>
-        <url>https://github.com/tzolov/spring-ai-tool-search-tool/actions</url>
-    </ciManagement>
 
     <packaging>pom</packaging>
 
