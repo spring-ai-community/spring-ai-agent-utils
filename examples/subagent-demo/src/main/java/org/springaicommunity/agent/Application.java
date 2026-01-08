@@ -6,6 +6,7 @@ import java.util.Scanner;
 
 import org.springaicommunity.agent.tools.BraveWebSearchTool;
 import org.springaicommunity.agent.tools.FileSystemTools;
+import org.springaicommunity.agent.tools.GlobTool;
 import org.springaicommunity.agent.tools.GrepTool;
 import org.springaicommunity.agent.tools.ShellTools;
 import org.springaicommunity.agent.tools.SkillsTool;
@@ -46,11 +47,14 @@ public class Application {
 
 		return args -> {
 
-			var taskTools  = TaskToolCallbackProvider.builder()
-					.agentDirectories("/Users/christiantzolov/Dev/projects/spring-ai-agent-utils/examples/subagent-demo/src/main/resources/agents")
-					.skillsDirectories(skillPaths)
-					.chatClientBuilder(chatClientBuilder.clone().defaultToolContext(Map.of("foo", "bar")).defaultAdvisors(new MyLoggingAdvisor(0, "[TASK]")))
-					.build();
+			var taskTools = TaskToolCallbackProvider.builder()
+				.agentDirectories(
+						"/Users/christiantzolov/Dev/projects/spring-ai-agent-utils/examples/subagent-demo/src/main/resources/agents")
+				.skillsDirectories(skillPaths)
+				.chatClientBuilder(chatClientBuilder.clone()
+					.defaultToolContext(Map.of("foo", "bar"))
+					.defaultAdvisors(new MyLoggingAdvisor(0, "[TASK]")))
+				.build();
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off
 				.defaultSystem(systemPrompt)			
@@ -59,6 +63,7 @@ public class Application {
 
 				.defaultToolCallbacks(SkillsTool.builder().addSkillsDirectories(skillPaths).build()) // skills tool
 				.defaultTools( // Common agentic tools
+					GlobTool.builder().build(),
 					new ShellTools(), // needed by the skills to execute scripts
 					new FileSystemTools(),// needed by the skills to read/write additional resources					
 					SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build(),

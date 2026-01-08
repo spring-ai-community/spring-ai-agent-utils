@@ -13,6 +13,7 @@ Spring AI Agent Utils reimplements core [Claude Code](https://code.claude.com/do
 - **FileSystemTools** - Read, write, and edit files with precise control
 - **ShellTools** - Execute shell commands with timeout control, background process management, and regex output filtering
 - **GrepTool** - Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes
+- **GlobTool** - Fast file pattern matching tool for finding files by name patterns with glob syntax
 - **TodoWriteTool** - Structured task management with state tracking
 - **SmartWebFetchTool** - AI-powered web content summarization with caching
 - **BraveWebSearchTool** - Web search with domain filtering
@@ -48,6 +49,7 @@ public class Application {
                 .defaultTools(new ShellTools())
                 .defaultTools(new FileSystemTools())
                 .defaultTools(new GrepTool())
+                .defaultTools(GlobTool.builder().build())
                 .defaultTools(SmartWebFetchTool.builder(chatClient).build())
                 .defaultTools(BraveWebSearchTool.builder(apiKey).build())
                 .defaultTools(new TodoWriteTool())
@@ -115,6 +117,23 @@ GrepTool grepTool = new GrepTool();
 // Search Java files for pattern
 String result = grepTool.grep("public class.*", "./src", null,
     OutputMode.files_with_matches, null, null, null, null, null, "java", null, null, null);
+```
+
+### GlobTool
+
+Fast file pattern matching tool for finding files by name patterns. Uses pure Java implementation with glob syntax support, sorted by modification time.
+
+[**View Full Documentation →**](docs/GlobTool.md)
+
+**Quick Example:**
+```java
+GlobTool globTool = GlobTool.builder().build();
+
+// Find all Java files
+String files = globTool.glob("**/*.java", "./src");
+
+// Find TypeScript components
+String components = globTool.glob("**/*Component.tsx", "./src");
 ```
 
 ### SmartWebFetchTool

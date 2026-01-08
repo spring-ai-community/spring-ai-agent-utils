@@ -1,0 +1,207 @@
+/*
+* Copyright 2025 - 2025 the original author or authors.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* https://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+package org.springaicommunity.agent.tools;
+
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Stream;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
+/**
+ * Pure Java glob implementation that doesn't require external tools. Uses Java NIO.2 for
+ * file pattern matching and traversal.
+ *
+ * Generated with Claude Code AI assistant.
+ *
+ * @author Christian Tzolov
+ * @author Claude Code
+ */
+public class GlobTool {
+
+	private final int maxDepth;
+
+	private final int maxResults;
+
+	/**
+	 * Constructor with configurable parameters.
+	 * @param maxDepth Maximum directory traversal depth to prevent infinite recursion
+	 * (default: 100)
+	 * @param maxResults Maximum number of results to return (default: 1000)
+	 */
+	protected GlobTool(int maxDepth, int maxResults) {
+		this.maxDepth = maxDepth;
+		this.maxResults = maxResults;
+	}
+
+	// @formatter:off
+	@Tool(name = "Glob", description = """
+        - Fast file pattern matching tool that works with any codebase size
+        - Supports glob patterns like "**/*.js" or "src/**/*.ts"
+        - Returns matching file paths sorted by modification time
+        - Use this tool when you need to find files by name patterns
+        - When you are doing an open ended search that may require multiple rounds of globbing and grepping, use the Agent tool instead
+        - You can call multiple tools in a single response. It is always better to speculatively perform multiple searches in parallel if they are potentially useful.
+		""")
+	public String glob(
+		@ToolParam(description = "The glob pattern to match files against") String pattern,
+		@ToolParam(description = "The directory to search in. If not specified, the current working directory will be used. IMPORTANT: Omit this field to use the default directory. DO NOT enter \\\"undefined\\\" or \\\"null\\\" - simply omit it for the default behavior. Must be a valid directory path if provided.", required = false) String path) { // @formatter:on
+
+		Assert.hasText(pattern, "	The glob pattern must not be empty");
+
+		try {
+			// Determine search path
+			Path searchPath = StringUtils.hasText(path) ? Paths.get(path) : Paths.get(".");
+
+			if (!Files.exists(searchPath)) {
+				return "Error: Path does not exist: " + searchPath.toAbsolutePath();
+			}
+
+			if (!Files.isDirectory(searchPath)) {
+				return "Error: Path is not a directory: " + searchPath.toAbsolutePath();
+			}
+
+			// Build glob matcher
+			PathMatcher matcher = this.buildGlobMatcher(pattern);
+
+			// Find matching files
+			List<FileInfo> matchingFiles = new ArrayList<>();
+
+			try (Stream<Path> paths = Files.walk(searchPath, this.maxDepth, FileVisitOption.FOLLOW_LINKS)) {
+				paths.filter(Files::isRegularFile)
+					.filter(p -> !this.isIgnoredPath(p))
+					.filter(p -> this.matchesPattern(p, searchPath, matcher))
+					.limit(this.maxResults)
+					.forEach(file -> {
+						try {
+							BasicFileAttributes attrs = Files.readAttributes(file, BasicFileAttributes.class);
+							matchingFiles.add(new FileInfo(file, attrs.lastModifiedTime().toMillis()));
+						}
+						catch (IOException e) {
+							// Skip files that can't be read
+							matchingFiles.add(new FileInfo(file, 0));
+						}
+					});
+			}
+
+			if (matchingFiles.isEmpty()) {
+				return "No files found matching pattern: " + pattern;
+			}
+
+			// Sort by modification time (most recent first)
+			matchingFiles.sort(Comparator.comparingLong(FileInfo::modificationTime).reversed());
+
+			// Build result
+			StringBuilder result = new StringBuilder();
+			for (FileInfo fileInfo : matchingFiles) {
+				result.append(fileInfo.path().toString()).append("\n");
+			}
+
+			return result.toString().trim();
+
+		}
+		catch (Exception e) {
+			return "Error executing glob: " + e.getMessage();
+		}
+	}
+
+	/**
+	 * Build a PathMatcher from the glob pattern
+	 */
+	private PathMatcher buildGlobMatcher(String pattern) {
+		// Handle both simple globs (*.java) and complex globs (**/*.java)
+		String globPattern = pattern.startsWith("**/") ? pattern : "**/" + pattern;
+		return FileSystems.getDefault().getPathMatcher("glob:" + globPattern);
+	}
+
+	/**
+	 * Check if a path matches the glob pattern
+	 */
+	private boolean matchesPattern(Path file, Path searchPath, PathMatcher matcher) {
+		// Try matching against the full path
+		if (matcher.matches(file)) {
+			return true;
+		}
+
+		// Also try matching against the relative path from the search directory
+		try {
+			Path relativePath = searchPath.relativize(file);
+			return matcher.matches(relativePath);
+		}
+		catch (IllegalArgumentException e) {
+			// If we can't relativize, just use the matcher on the file itself
+			return false;
+		}
+	}
+
+	/**
+	 * Check if a file should be ignored (common ignore patterns)
+	 */
+	private boolean isIgnoredPath(Path path) {
+		String pathStr = path.toString();
+		return pathStr.contains("/.git/") || pathStr.contains("/node_modules/") || pathStr.contains("/target/")
+				|| pathStr.contains("/build/") || pathStr.contains("/.idea/") || pathStr.contains("/.vscode/")
+				|| pathStr.contains("/dist/") || pathStr.contains("/__pycache__/");
+	}
+
+	/**
+	 * Record to hold file information
+	 */
+	private record FileInfo(Path path, long modificationTime) {
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+
+		private int maxDepth = 100;
+
+		private int maxResults = 1000;
+
+		private Builder() {
+		}
+
+		public Builder maxDepth(int maxDepth) {
+			this.maxDepth = maxDepth;
+			return this;
+		}
+
+		public Builder maxResults(int maxResults) {
+			this.maxResults = maxResults;
+			return this;
+		}
+
+		public GlobTool build() {
+			return new GlobTool(maxDepth, maxResults);
+		}
+
+	}
+
+}

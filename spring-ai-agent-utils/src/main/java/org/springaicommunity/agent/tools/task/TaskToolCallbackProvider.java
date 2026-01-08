@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.springaicommunity.agent.tools.BraveWebSearchTool;
 import org.springaicommunity.agent.tools.FileSystemTools;
+import org.springaicommunity.agent.tools.GlobTool;
 import org.springaicommunity.agent.tools.GrepTool;
 import org.springaicommunity.agent.tools.ShellTools;
 import org.springaicommunity.agent.tools.SkillsTool;
@@ -115,8 +116,8 @@ public class TaskToolCallbackProvider implements ToolCallbackProvider {
 			List<ToolCallback> callbacks = new ArrayList<>();
 
 			List<ToolCallback> callbacks2 = List.of(MethodToolCallbackProvider.builder()
-				.toolObjects(new TodoWriteTool(), new GrepTool(), new ShellTools(), new FileSystemTools(),
-						SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build())
+				.toolObjects(new TodoWriteTool(), new GrepTool(), GlobTool.builder().build(), new ShellTools(),
+						new FileSystemTools(), SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build())
 				.build()
 				.getToolCallbacks());
 
