@@ -44,7 +44,7 @@ class FileSystemToolsTest {
 
 	@BeforeEach
 	void setUp() {
-		this.tools = new FileSystemTools();
+		this.tools = FileSystemTools.builder().build();
 	}
 
 	@Nested

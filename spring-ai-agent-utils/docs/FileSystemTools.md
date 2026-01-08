@@ -26,7 +26,7 @@ Reads a file from the local filesystem with optional line range support for hand
 **Basic Usage:**
 
 ```java
-FileSystemTools fileTools = new FileSystemTools();
+FileSystemTools fileTools = FileSystemTools.builder().build();
 
 // Read entire file (up to 2000 lines)
 String content = fileTools.read(
@@ -239,7 +239,7 @@ Incorrect old_string (includes line number):
 **Example Workflow:**
 
 ```java
-FileSystemTools fileTools = new FileSystemTools();
+FileSystemTools fileTools = FileSystemTools.builder().build();
 
 // 1. Read the file to see current content
 String content = fileTools.read(

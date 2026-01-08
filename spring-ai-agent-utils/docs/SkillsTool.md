@@ -31,13 +31,13 @@ description: Use when user asks to explain technical concepts
 [Detailed skill documentation...]
 ```
 
-Skills can include executable scripts and reference materials, loaded dynamically from `.claude/skills/` directories.
+Skills can include executable scripts and reference materials, loaded dynamically from `examples/.claude/skills/` directories.
 
 ## Basic Usage
 
 ### Create a Skill
 
-**File:** `.claude/skills/my-skill/SKILL.md`
+**File:** `examples/.claude/skills/my-skill/SKILL.md`
 
 ```markdown
 ---
@@ -60,7 +60,7 @@ Show concrete examples of using this skill.
 ```java
 ChatClient chatClient = chatClientBuilder
     .defaultToolCallbacks(SkillsTool.builder()
-        .addSkillsDirectory(".claude/skills")
+        .addSkillsDirectory("examples/.claude/skills")
         .build())
     .build();
 
@@ -77,7 +77,7 @@ String response = chatClient.prompt()
 Every skill requires a `SKILL.md` file. Supporting files are optional:
 
 ```
-.claude/skills/
+examples/.claude/skills/
 └── my-skill/
     ├── SKILL.md          # Required: Skill definition
     ├── reference.md      # Optional: Detailed documentation
@@ -183,7 +183,7 @@ Where you store a skill determines its scope:
 | Location | Path | Scope |
 |----------|------|-------|
 | **Personal** | `~/.claude/skills/` | User, across all projects |
-| **Project** | `.claude/skills/` | Team in this repository |
+| **Project** | `examples/.claude/skills/` | Team in this repository |
 
 **Tip:** Use project skills (`.claude/skills/`) for team collaboration by committing them to version control.
 
@@ -345,11 +345,11 @@ Skills often need to read files or run scripts. Register necessary tools:
 ```java
 ChatClient chatClient = chatClientBuilder
     .defaultToolCallbacks(SkillsTool.builder()
-        .addSkillsDirectory(".claude/skills")
+        .addSkillsDirectory("examples/.claude/skills")
         .build())
 
     // Required for skills to load reference files
-    .defaultTools(new FileSystemTools())
+    .defaultTools(FileSystemTools.builder().build())
 
     // Required for skills to execute scripts
     .defaultTools(new ShellTools())
@@ -486,11 +486,11 @@ public class SkillsConfig {
     public ChatClient chatClient(ChatClient.Builder chatClientBuilder) {
         return chatClientBuilder
             .defaultToolCallbacks(SkillsTool.builder()
-                .addSkillsDirectory(".claude/skills")
+                .addSkillsDirectory("examples/.claude/skills")
                 .build())
-            .defaultTools(new FileSystemTools())
+            .defaultTools(FileSystemTools.builder().build())
             .defaultTools(new ShellTools())
-            .defaultTools(new GrepTool())
+            .defaultTools(GrepTool.builder().build())
             .build();
     }
 }
@@ -611,7 +611,7 @@ public class SkillsConfiguration {
 
         return chatClientBuilder
             .defaultToolCallbacks(skillsTool)
-            .defaultTools(new FileSystemTools())
+            .defaultTools(FileSystemTools.builder().build())
             .defaultTools(new ShellTools())
             .build();
     }
@@ -643,7 +643,7 @@ logging.level.org.springaicommunity.agent.tools.SkillsTool=DEBUG
 ```java
 ChatClient chatClient = chatClientBuilder
     .defaultToolCallbacks(skillsTool)
-    .defaultTools(new FileSystemTools())  // Add this
+    .defaultTools(FileSystemTools.builder().build())  // Add this
     .build();
 ```
 

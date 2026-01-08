@@ -171,11 +171,11 @@ ChatClient chatClient = chatClientBuilder
     .defaultToolCallbacks(skillsTool)               // Skills tool (ToolCallback)
     .defaultTools(                                  // Standard tools
         new ShellTools(),
-        new FileSystemTools(),
+        FileSystemTools.builder().build(),
         smartWebFetchTool,
         braveWebSearchTool,
-        new TodoWriteTool(),
-        new GrepTool())
+        TodoWriteTool.builder().build(),
+        GrepTool.builder().build())
     .defaultAdvisors(                               // Advisor chain
         ToolCallAdvisor.builder()
             .conversationHistoryEnabled(false)

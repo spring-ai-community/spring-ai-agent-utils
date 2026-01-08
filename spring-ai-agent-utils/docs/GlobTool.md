@@ -320,8 +320,8 @@ public class AgentConfig {
     public ChatClient chatClient(ChatClient.Builder chatClientBuilder) {
         return chatClientBuilder
             .defaultTools(GlobTool.builder().build())
-            .defaultTools(new FileSystemTools())
-            .defaultTools(new GrepTool())
+            .defaultTools(FileSystemTools.builder().build())
+            .defaultTools(GrepTool.builder().build())
             .build();
     }
 }
@@ -764,7 +764,7 @@ globTool.glob("**/Dockerfile", ".");
 
 ```java
 GlobTool globTool = GlobTool.builder().build();
-FileSystemTools fileTools = new FileSystemTools();
+FileSystemTools fileTools = FileSystemTools.builder().build();
 
 // Find all config files
 String configs = globTool.glob("**/*.yml", "./config");
@@ -780,7 +780,7 @@ for (String configPath : configs.split("\n")) {
 
 ```java
 GlobTool globTool = GlobTool.builder().build();
-GrepTool grepTool = new GrepTool();
+GrepTool grepTool = GrepTool.builder().build();
 
 // Find all service files
 String serviceFiles = globTool.glob("**/*Service.java", "./src");
@@ -795,8 +795,8 @@ String todos = grepTool.grep("TODO", "./src", "**/*Service.java",
 ```java
 ChatClient chatClient = chatClientBuilder
     .defaultTools(GlobTool.builder().build())
-    .defaultTools(new FileSystemTools())
-    .defaultTools(new GrepTool())
+    .defaultTools(FileSystemTools.builder().build())
+    .defaultTools(GrepTool.builder().build())
     .build();
 
 // AI can now:

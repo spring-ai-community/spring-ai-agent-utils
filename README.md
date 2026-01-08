@@ -61,10 +61,10 @@ public class Application {
                 // Register tools
                 .defaultTools(new ShellTools())
                 .defaultTools(new FileSystemTools())
-                .defaultTools(new GrepTool())
+                .defaultTools(GrepTool.builder().build())
                 .defaultTools(SmartWebFetchTool.builder(chatClient).build())
                 .defaultTools(BraveWebSearchTool.builder(apiKey).build())
-                .defaultTools(new TodoWriteTool())
+                .defaultTools(TodoWriteTool.builder().build())
                 .build();
 
             String response = chatClient

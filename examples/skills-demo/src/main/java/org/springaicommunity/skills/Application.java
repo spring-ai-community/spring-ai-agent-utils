@@ -29,7 +29,7 @@ public class Application {
 	}
 
 	// static final String skillsDir = "/Users/christiantzolov/.claude/skills";
-	static final String skillsDir = "/Users/christiantzolov/Dev/projects/spring-ai-agent-utils/.claude/skills";
+	static final String skillsDir = "/Users/christiantzolov/Dev/projects/spring-ai-agent-utils/examples/.claude/skills";
 
 	// static final String skillsDir =
 	// "/Users/christiantzolov/Dev/projects/demo/test-skills/skills/skills/pdf";
@@ -45,11 +45,11 @@ public class Application {
 			ChatClient chatClient = chatClientBuilder // @formatter:off
 				.defaultSystem(systemPrompt)
 				.defaultToolCallbacks(SkillsTool.builder().addSkillsDirectory(skillsDir).build()) // skills tool
-				.defaultTools(new ShellTools())// built-in shell tools
-				.defaultTools(new FileSystemTools())// built-in file system tools
+				.defaultTools(ShellTools.builder().build())// built-in shell tools
+				.defaultTools(FileSystemTools.builder().build())// built-in file system tools
 				.defaultTools(SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build())
 				.defaultTools(BraveWebSearchTool.builder(System.getenv("BRAVE_API_KEY")).resultCount(15).build())
-				.defaultTools(new TodoWriteTool())
+				.defaultTools(TodoWriteTool.builder().build())
 
 				// .defaultToolCallbacks(toolCallbackProvider) // MCP tool provider
 				.defaultAdvisors(ToolCallAdvisor.builder().build()) // tool calling advisor

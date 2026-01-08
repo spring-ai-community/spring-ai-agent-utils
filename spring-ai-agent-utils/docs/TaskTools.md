@@ -148,8 +148,8 @@ TaskRepository taskRepository = new DefaultTaskRepository();
 
 // Core tools for sub-agents
 List<ToolCallback> subAgentTools = List.of(
-    new FileSystemTools(),
-    new GrepTool(),
+    FileSystemTools.builder().build(),
+    GrepTool.builder().build(),
     GlobTool.builder().build(),
     new ShellTools()
 );
@@ -435,11 +435,11 @@ public class Application {
             ChatClient chatClient = chatClientBuilder
                 .defaultToolCallbacks(taskTools)
                 .defaultTools(
-                    new FileSystemTools(),
-                    new GrepTool(),
+                    FileSystemTools.builder().build(),
+                    GrepTool.builder().build(),
                     GlobTool.builder().build(),
                     new ShellTools(),
-                    new TodoWriteTool()
+                    TodoWriteTool.builder().build()
                 )
                 .defaultAdvisors(
                     ToolCallAdvisor.builder().build(),
@@ -604,9 +604,9 @@ Sub-agents inherit only specified tools from parent:
 ```java
 // Parent has many tools
 List<ToolCallback> allTools = List.of(
-    new FileSystemTools(),
+    FileSystemTools.builder().build(),
     new ShellTools(),
-    new GrepTool(),
+    GrepTool.builder().build(),
     // ... many more
 );
 

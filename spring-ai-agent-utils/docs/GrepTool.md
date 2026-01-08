@@ -28,7 +28,7 @@ The `GrepTool` is a Spring AI tool that brings powerful code search capabilities
 
 ```java
 // Default configuration
-GrepTool grepTool = new GrepTool();
+GrepTool grepTool = GrepTool.builder().build();
 
 // Search for pattern in current directory
 String result = grepTool.grep(
@@ -496,7 +496,7 @@ String result = grepTool.grep(
 ### 1. Find All TODOs
 
 ```java
-GrepTool grepTool = new GrepTool();
+GrepTool grepTool = GrepTool.builder().build();
 
 // Count TODOs per file
 String counts = grepTool.grep(
@@ -635,7 +635,7 @@ public class ToolsConfig {
 
     @Bean
     public GrepTool grepTool() {
-        return new GrepTool();
+        return GrepTool.builder().build();
     }
 }
 ```
@@ -671,8 +671,8 @@ public class AgentConfig {
     @Bean
     public ChatClient chatClient(ChatClient.Builder chatClientBuilder) {
         return chatClientBuilder
-            .defaultTools(new GrepTool())
-            .defaultTools(new FileSystemTools())
+            .defaultTools(GrepTool.builder().build())
+            .defaultTools(FileSystemTools.builder().build())
             .build();
     }
 }
@@ -1008,7 +1008,7 @@ GrepTool longLineGrep = new GrepTool(100000, 100, 50000);
 ### Multi-Pattern Search with Post-Processing
 
 ```java
-GrepTool grepTool = new GrepTool();
+GrepTool grepTool = GrepTool.builder().build();
 
 // Find all service classes
 String services = grepTool.grep(
@@ -1066,7 +1066,7 @@ String testCount = grepTool.grep(
 
 ```java
 // Comprehensive security audit
-GrepTool grepTool = new GrepTool();
+GrepTool grepTool = GrepTool.builder().build();
 
 // 1. Find hardcoded credentials
 String credentials = grepTool.grep(

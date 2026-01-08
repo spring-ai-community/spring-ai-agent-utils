@@ -22,7 +22,7 @@ The tool enforces validation rules to ensure task lists remain organized and act
 ## Basic Usage
 
 ```java
-TodoWriteTool todoTool = new TodoWriteTool();
+TodoWriteTool todoTool = TodoWriteTool.builder().build();
 
 // Create a todo list
 Todos todos = new Todos(List.of(
@@ -334,18 +334,20 @@ Provide custom consumer for UI integration or logging:
 
 ```java
 // Custom consumer for UI updates
-TodoWriteTool todoTool = new TodoWriteTool(todos -> {
-    System.out.println("=== Updated Todo List ===");
-    for (int i = 0; i < todos.todos().size(); i++) {
-        var item = todos.todos().get(i);
-        String status = switch(item.status()) {
-            case pending -> "[ ]";
-            case in_progress -> "[→]";
-            case completed -> "[✓]";
-        };
-        System.out.println(status + " " + item.content());
-    }
-});
+TodoWriteTool todoTool = TodoWriteTool.builder()
+    .todoListConsumer(todos -> {
+        System.out.println("=== Updated Todo List ===");
+        for (int i = 0; i < todos.todos().size(); i++) {
+            var item = todos.todos().get(i);
+            String status = switch(item.status()) {
+                case pending -> "[ ]";
+                case in_progress -> "[→]";
+                case completed -> "[✓]";
+            };
+            System.out.println(status + " " + item.content());
+        }
+    })
+    .build();
 
 // Use the tool
 todoTool.todoWrite(new Todos(List.of(
@@ -371,7 +373,7 @@ public class ToolsConfig {
 
     @Bean
     public TodoWriteTool todoWriteTool() {
-        return new TodoWriteTool();
+        return TodoWriteTool.builder().build();
     }
 }
 ```
@@ -384,10 +386,12 @@ public class ToolsConfig {
 
     @Bean
     public TodoWriteTool todoWriteTool(TodoProgressService progressService) {
-        return new TodoWriteTool(todos -> {
-            progressService.updateProgress(todos);
-            logger.info("Todo list updated: {} tasks", todos.todos().size());
-        });
+        return TodoWriteTool.builder()
+            .todoListConsumer(todos -> {
+                progressService.updateProgress(todos);
+                logger.info("Todo list updated: {} tasks", todos.todos().size());
+            })
+            .build();
     }
 }
 ```
@@ -396,10 +400,12 @@ public class ToolsConfig {
 
 ```java
 ChatClient chatClient = chatClientBuilder
-    .defaultTools(new TodoWriteTool(todos -> {
-        // Custom handling of todo updates
-        eventPublisher.publishEvent(new TodoUpdatedEvent(todos));
-    }))
+    .defaultTools(TodoWriteTool.builder()
+        .todoListConsumer(todos -> {
+            // Custom handling of todo updates
+            eventPublisher.publishEvent(new TodoUpdatedEvent(todos));
+        })
+        .build())
     .build();
 
 String response = chatClient.prompt()

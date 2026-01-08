@@ -116,8 +116,8 @@ public class TaskToolCallbackProvider implements ToolCallbackProvider {
 			List<ToolCallback> callbacks = new ArrayList<>();
 
 			List<ToolCallback> callbacks2 = List.of(MethodToolCallbackProvider.builder()
-				.toolObjects(new TodoWriteTool(), new GrepTool(), GlobTool.builder().build(), new ShellTools(),
-						new FileSystemTools(), SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build())
+				.toolObjects(TodoWriteTool.builder().build(), GrepTool.builder().build(), GlobTool.builder().build(), ShellTools.builder().build(),
+						FileSystemTools.builder().build(), SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build())
 				.build()
 				.getToolCallbacks());
 

@@ -277,11 +277,11 @@ ChatClient chatClient = chatClientBuilder
     .defaultToolCallbacks(skillsTool)         // Skills (ToolCallback type)
     .defaultTools(                            // Standard tools
         new ShellTools(),
-        new FileSystemTools(),
-        new GrepTool(),
+        FileSystemTools.builder().build(),
+        GrepTool.builder().build(),
         smartWebFetchTool,
         braveWebSearchTool,
-        new TodoWriteTool())
+        TodoWriteTool.builder().build())
     .defaultAdvisors(                         // Processing pipeline
         toolCallAdvisor,
         memoryChatAdvisor,
@@ -293,9 +293,9 @@ ChatClient chatClient = chatClientBuilder
 ```java
 // Simple tools - instantiate directly
 new ShellTools()
-new FileSystemTools()
-new GrepTool()
-new TodoWriteTool()
+FileSystemTools.builder().build()
+GrepTool.builder().build()
+TodoWriteTool.builder().build()
 
 // Complex tools - use builders
 SmartWebFetchTool.builder(chatClient)

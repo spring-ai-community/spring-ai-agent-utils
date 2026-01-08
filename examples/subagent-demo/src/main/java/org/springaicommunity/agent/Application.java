@@ -64,12 +64,12 @@ public class Application {
 				.defaultToolCallbacks(SkillsTool.builder().addSkillsDirectories(skillPaths).build()) // skills tool
 				.defaultTools( // Common agentic tools
 					GlobTool.builder().build(),
-					new ShellTools(), // needed by the skills to execute scripts
-					new FileSystemTools(),// needed by the skills to read/write additional resources					
+					ShellTools.builder().build(), // needed by the skills to execute scripts
+					FileSystemTools.builder().build(),// needed by the skills to read/write additional resources
 					SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build(),
 					BraveWebSearchTool.builder(braveApiKey).resultCount(15).build(),
-					new TodoWriteTool(),
-					new GrepTool())
+					TodoWriteTool.builder().build(),
+					GrepTool.builder().build())
 
 				.defaultAdvisors(
 					ToolCallAdvisor.builder()
