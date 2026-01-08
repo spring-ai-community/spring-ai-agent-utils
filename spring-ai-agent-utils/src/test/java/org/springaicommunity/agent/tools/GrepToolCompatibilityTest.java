@@ -55,7 +55,7 @@ class GrepToolCompatibilityTest {
 
 	@BeforeEach
 	void setUp() {
-		this.pureJavaTool = new GrepTool();
+		this.pureJavaTool = GrepTool.builder().build();
 		this.ripgrepAvailable = isRipgrepAvailable();
 	}
 

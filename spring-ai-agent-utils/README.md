@@ -49,11 +49,11 @@ public class Application {
                 // Register tools
                 .defaultTools(new ShellTools())
                 .defaultTools(new FileSystemTools())
-                .defaultTools(new GrepTool())
+                .defaultTools(GrepTool.builder().build())
                 .defaultTools(GlobTool.builder().build())
                 .defaultTools(SmartWebFetchTool.builder(chatClient).build())
                 .defaultTools(BraveWebSearchTool.builder(apiKey).build())
-                .defaultTools(new TodoWriteTool())
+                .defaultTools(TodoWriteTool.builder().build())
                 .build();
 
             String response = chatClient
@@ -75,7 +75,7 @@ Read, write, and edit files with precise control. Provides three core operations
 
 **Quick Example:**
 ```java
-FileSystemTools fileTools = new FileSystemTools();
+FileSystemTools fileTools = FileSystemTools.builder().build();
 
 // Read a file
 String content = fileTools.read("/path/to/file.txt", null, null, toolContext);
@@ -113,7 +113,7 @@ Pure Java grep implementation for code search with regex, glob filtering, and mu
 
 **Quick Example:**
 ```java
-GrepTool grepTool = new GrepTool();
+GrepTool grepTool = GrepTool.builder().build();
 
 // Search Java files for pattern
 String result = grepTool.grep("public class.*", "./src", null,
@@ -167,7 +167,7 @@ Structured task list management for AI coding sessions. Helps AI agents track pr
 
 **Quick Example:**
 ```java
-TodoWriteTool todoTool = new TodoWriteTool();
+TodoWriteTool todoTool = TodoWriteTool.builder().build();
 
 // Create and manage task list
 Todos todos = new Todos(List.of(
@@ -216,7 +216,7 @@ ChatClient chatClient = chatClientBuilder
     .defaultToolCallbacks(SkillsTool.builder()
         .addSkillsDirectory(".claude/skills")
         .build())
-    .defaultTools(new FileSystemTools())  // For reading reference files
+    .defaultTools(FileSystemTools.builder().build())  // For reading reference files
     .defaultTools(new ShellTools())       // For executing scripts
     .build();
 ```
@@ -250,7 +250,7 @@ var taskTools = TaskToolCallbackProvider.builder()
 // Build main chat client with Task tools
 ChatClient chatClient = chatClientBuilder
     .defaultToolCallbacks(taskTools)
-    .defaultTools(new FileSystemTools(), new GrepTool())
+    .defaultTools(FileSystemTools.builder().build(), GrepTool.builder().build())
     .build();
 
 // Agent automatically delegates to appropriate sub-agents

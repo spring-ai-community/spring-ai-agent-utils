@@ -79,7 +79,9 @@ public class GrepTool {
 
 	/**
 	 * Default constructor with default values for all configuration parameters.
+	 * @deprecated Use {@link #builder()} instead.
 	 */
+	@Deprecated
 	public GrepTool() {
 		this(100000, 100, 10000);
 	}
@@ -92,7 +94,7 @@ public class GrepTool {
 	 * @param maxLineLength Maximum line length to process, longer lines are skipped
 	 * (default: 10000)
 	 */
-	public GrepTool(int maxOutputLength, int maxDepth, int maxLineLength) {
+	private GrepTool(int maxOutputLength, int maxDepth, int maxLineLength) {
 		this.maxOutputLength = maxOutputLength;
 		this.maxDepth = maxDepth;
 		this.maxLineLength = maxLineLength;
@@ -500,6 +502,35 @@ public class GrepTool {
 		 */
 		boolean process(Path file);
 
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+		private int maxOutputLength = 100000;
+		private int maxDepth = 100;
+		private int maxLineLength = 10000;
+
+		public Builder maxOutputLength(int maxOutputLength) {
+			this.maxOutputLength = maxOutputLength;
+			return this;
+		}
+
+		public Builder maxDepth(int maxDepth) {
+			this.maxDepth = maxDepth;
+			return this;
+		}
+
+		public Builder maxLineLength(int maxLineLength) {
+			this.maxLineLength = maxLineLength;
+			return this;
+		}
+
+		public GrepTool build() {
+			return new GrepTool(this.maxOutputLength, this.maxDepth, this.maxLineLength);
+		}
 	}
 
 }

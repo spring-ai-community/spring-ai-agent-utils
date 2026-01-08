@@ -40,7 +40,7 @@ class ShellToolsTest {
 
 	@BeforeEach
 	void setUp() {
-		this.shellTools = new ShellTools();
+		this.shellTools = ShellTools.builder().build();
 	}
 
 	@Nested

@@ -39,11 +39,15 @@ public class TodoWriteTool {
 
 	private final Consumer<Todos> todoListConsumer;
 
+	/**
+	 * @deprecated Use {@link Builder} to create an instance with custom behavior.
+	 */
+	@Deprecated
 	public TodoWriteTool() {
 		this(todos -> logger.debug("Updated Todos: {}", todos));
 	}
 
-	public TodoWriteTool(Consumer<Todos> todoListConsumer) {
+	protected TodoWriteTool(Consumer<Todos> todoListConsumer) {
 		this.todoListConsumer = todoListConsumer;
 	}
 
@@ -250,10 +254,9 @@ public class TodoWriteTool {
 	}
 
 	/**
-	 * Validates the todo list according to the following rules:
-	 * - Only one task can be in_progress at a time
-	 * - Task content and activeForm must not be empty or blank
-	 * - All tasks must have valid status values
+	 * Validates the todo list according to the following rules: - Only one task can be
+	 * in_progress at a time - Task content and activeForm must not be empty or blank -
+	 * All tasks must have valid status values
 	 * @param todos the todo list to validate
 	 * @throws IllegalArgumentException if validation fails
 	 */
@@ -283,20 +286,17 @@ public class TodoWriteTool {
 			}
 
 			if (item.status() == null) {
-				throw new IllegalArgumentException(
-						"Task at index " + i + " has null status. Status must be one of: pending, in_progress, completed");
+				throw new IllegalArgumentException("Task at index " + i
+						+ " has null status. Status must be one of: pending, in_progress, completed");
 			}
 		}
 
 		// Count in_progress tasks after validating all items
-		long inProgressCount = items.stream()
-			.filter(item -> item.status() == Todos.Status.in_progress)
-			.count();
+		long inProgressCount = items.stream().filter(item -> item.status() == Todos.Status.in_progress).count();
 
 		if (inProgressCount > 1) {
-			throw new IllegalArgumentException(
-					"Only ONE task can be in_progress at a time. Found " + inProgressCount + " in_progress tasks. "
-							+ "Please mark the current task as completed before starting a new one.");
+			throw new IllegalArgumentException("Only ONE task can be in_progress at a time. Found " + inProgressCount
+					+ " in_progress tasks. " + "Please mark the current task as completed before starting a new one.");
 		}
 	}
 
@@ -310,4 +310,24 @@ public class TodoWriteTool {
 
 		}
 	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+
+		private Consumer<Todos> todoListConsumer = todos -> logger.debug("Updated Todos: {}", todos);
+
+		public Builder todoListConsumer(Consumer<Todos> todoListConsumer) {
+			this.todoListConsumer = todoListConsumer;
+			return this;
+		}
+
+		public TodoWriteTool build() {
+			return new TodoWriteTool(this.todoListConsumer);
+		}
+
+	}
+
 }

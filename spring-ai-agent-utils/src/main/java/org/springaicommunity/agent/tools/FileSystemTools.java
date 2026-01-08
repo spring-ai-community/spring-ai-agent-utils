@@ -35,7 +35,6 @@ import org.springframework.ai.tool.annotation.ToolParam;
 /**
  * @author Christian Tzolov
  */
-
 public class FileSystemTools {
 
 	private static final String READ_SYSTEM_REMINDER_SUFFIX = """
@@ -383,6 +382,16 @@ public class FileSystemTools {
 		}
 
 		return snippet.toString();
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+		public FileSystemTools build() {
+			return new FileSystemTools();
+		}
 	}
 
 }

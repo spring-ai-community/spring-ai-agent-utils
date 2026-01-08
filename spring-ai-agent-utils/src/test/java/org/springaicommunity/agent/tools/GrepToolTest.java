@@ -45,7 +45,7 @@ class GrepToolTest {
 
 	@BeforeEach
 	void setUp() {
-		this.grepTool = new GrepTool();
+		this.grepTool = GrepTool.builder().build();
 	}
 
 	@Nested

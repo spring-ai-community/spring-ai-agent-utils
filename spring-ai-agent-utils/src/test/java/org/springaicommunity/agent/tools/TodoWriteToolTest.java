@@ -46,7 +46,9 @@ class TodoWriteToolTest {
 	@BeforeEach
 	void setUp() {
 		this.capturedTodos = new AtomicReference<>();
-		this.tool = new TodoWriteTool(this.capturedTodos::set);
+		this.tool = TodoWriteTool.builder()
+			.todoListConsumer(this.capturedTodos::set)
+			.build();
 	}
 
 	@Nested
@@ -56,7 +58,7 @@ class TodoWriteToolTest {
 		@Test
 		@DisplayName("Should create tool with default consumer")
 		void shouldCreateWithDefaultConsumer() {
-			TodoWriteTool defaultTool = new TodoWriteTool();
+			TodoWriteTool defaultTool = TodoWriteTool.builder().build();
 			assertThat(defaultTool).isNotNull();
 		}
 
@@ -64,7 +66,9 @@ class TodoWriteToolTest {
 		@DisplayName("Should create tool with custom consumer")
 		void shouldCreateWithCustomConsumer() {
 			AtomicReference<Todos> ref = new AtomicReference<>();
-			TodoWriteTool customTool = new TodoWriteTool(ref::set);
+			TodoWriteTool customTool = TodoWriteTool.builder()
+				.todoListConsumer(ref::set)
+				.build();
 			assertThat(customTool).isNotNull();
 		}
 

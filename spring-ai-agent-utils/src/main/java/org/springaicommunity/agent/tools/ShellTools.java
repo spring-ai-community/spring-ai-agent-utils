@@ -512,4 +512,14 @@ public class ShellTools {
 		return "Successfully killed shell: " + bash_id;
 	}
 
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static class Builder {
+		public ShellTools build() {
+			return new ShellTools();
+		}
+	}
+
 }
