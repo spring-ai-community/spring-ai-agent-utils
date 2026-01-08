@@ -259,7 +259,7 @@ Key dependencies from [pom.xml](pom.xml):
 
 - **Spring Boot 4.0.0** - Framework foundation
 - **Spring AI 2.0.0-SNAPSHOT** - AI integration
-- **spring-ai-agent-utils 2.0.0-SNAPSHOT** - Agent tools library
+- **spring-ai-agent-utils 0.1.0-SNAPSHOT** - Agent tools library
 - **spring-ai-starter-model-google-genai** - Google Gemini provider (active)
 - **netty-resolver-dns-native-macos** - macOS networking support
 
