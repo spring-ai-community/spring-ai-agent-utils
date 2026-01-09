@@ -8,17 +8,18 @@ Spring AI Agent Utils reimplements core [Claude Code](https://code.claude.com/do
 
 ## Features
 
-### Tools
+### Agentic Tools
 
-- **FileSystemTools** - Read, write, and edit files with precise control
-- **ShellTools** - Execute shell commands with timeout control, background process management, and regex output filtering
-- **GrepTool** - Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes
-- **GlobTool** - Fast file pattern matching tool for finding files by name patterns with glob syntax
-- **TodoWriteTool** - Structured task management with state tracking
-- **SmartWebFetchTool** - AI-powered web content summarization with caching
-- **BraveWebSearchTool** - Web search with domain filtering
-- **SkillsTool** - Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter
-- **TaskTools** - Hierarchical autonomous sub-agent system for delegating complex tasks to specialized agents with dedicated context windows
+- **[FileSystemTools](docs/FileSystemTools.md)** - Read, write, and edit files with precise control
+- **[ShellTools](docs/ShellTools.md)** - Execute shell commands with timeout control, background process management, and regex output filtering
+- **[GrepTool](docs/GrepTool.md)** - Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes
+- **[GlobTool](docs/GlobTool.md)** - Fast file pattern matching tool for finding files by name patterns with glob syntax
+- **[TodoWriteTool](docs/TodoWriteTool.md)** - Structured task management with state tracking
+- **[SmartWebFetchTool](docs/SmartWebFetchTool.md)** - AI-powered web content summarization with caching
+- **[BraveWebSearchTool](docs/BraveWebSearchTool.md)** - Web search with domain filtering
+- **[SkillsTool](docs/SkillsTool.md)** - Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter
+- **[TaskTools](docs/TaskTools.md)** - Hierarchical autonomous sub-agent system for delegating complex tasks to specialized agents with dedicated context windows
+
 
 ## Installation
 

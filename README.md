@@ -28,17 +28,23 @@ spring-ai-agent-utils/
 
 ## Features
 
-### Tools
+### Agentic Tools
 
-- **FileSystemTools** - Read, write, and edit files with precise control
-- **ShellTools** - Execute shell commands with timeout control, background process management, and regex output filtering
-- **GrepTool** - Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes
-- **GlobTool** - Fast file pattern matching tool for finding files by name patterns with glob syntax
-- **TodoWriteTool** - Structured task management with state tracking
-- **SmartWebFetchTool** - AI-powered web content summarization with caching
-- **BraveWebSearchTool** - Web search with domain filtering
-- **SkillsTool** - Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter
-- **TaskTools** - Hierarchical autonomous sub-agent system for delegating complex tasks to specialized agents with dedicated context windows
+- **[FileSystemTools](spring-ai-agent-utils/docs/FileSystemTools.md)** - Read, write, and edit files with precise control
+- **[ShellTools](spring-ai-agent-utils/docs/ShellTools.md)** - Execute shell commands with timeout control, background process management, and regex output filtering
+- **[GrepTool](spring-ai-agent-utils/docs/GrepTool.md)** - Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes
+- **[GlobTool](spring-ai-agent-utils/docs/GlobTool.md)** - Fast file pattern matching tool for finding files by name patterns with glob syntax
+- **[TodoWriteTool](spring-ai-agent-utils/docs/TodoWriteTool.md)** - Structured task management with state tracking
+- **[SmartWebFetchTool](spring-ai-agent-utils/docs/SmartWebFetchTool.md)** - AI-powered web content summarization with caching
+- **[BraveWebSearchTool](spring-ai-agent-utils/docs/BraveWebSearchTool.md)** - Web search with domain filtering
+- **[SkillsTool](spring-ai-agent-utils/docs/SkillsTool.md)** - Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter
+- **[TaskTools](spring-ai-agent-utils/docs/TaskTools.md)** - Hierarchical autonomous sub-agent system for delegating complex tasks to specialized agents with dedicated context windows
+
+For detailed documentation, see:
+
+- **[Agent Utils Library Documentation](spring-ai-agent-utils/README.md)** - Complete API reference, tool capabilities, and skills development guide
+- **[Example Applications](#examples)** - Working demos showcasing different use cases
+
 
 ## Quick Start
 
@@ -101,13 +107,7 @@ public class Application {
 }
 ```
 
-## Documentation
-
-For detailed documentation, see:
-
-- **[Library Documentation](spring-ai-agent-utils/README.md)** - Complete API reference, tool capabilities, and skills development guide
-- **[Example Applications](#examples)** - Working demos showcasing different use cases
-
+## References
 
 This project reimplements key Claude Code features based on:
 
