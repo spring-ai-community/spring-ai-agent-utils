@@ -25,10 +25,10 @@ The tool follows the question-answer workflow: AI generates questions with optio
 
 ```java
 AskUserQuestionTool askTool = AskUserQuestionTool.builder()
-    .questionAnswerFunction(questionsAnswers -> {
+    .questionAnswerFunction(questions -> {
         // Display questions to user via your UI
-        Map<String, String> answers = collectUserAnswers(questionsAnswers.questions());
-        return new QuestionsAnswers(questionsAnswers.questions(), answers);
+        Map<String, String> answers = collectUserAnswers(questions);
+        return answers;
     })
     .build();
 
@@ -83,7 +83,7 @@ Question featureSelection = new Question(
 
 ## Answer Format
 
-The `questionAnswerFunction` receives questions and should return answers as a map:
+The `questionAnswerFunction` receives a `List<Question>` and should return a `Map<String, String>` with answers:
 - **Keys:** The question text (from `Question.question` field)
 - **Values:** Selected option label(s)
   - Single-select: `"React"`
@@ -91,6 +91,17 @@ The `questionAnswerFunction` receives questions and should return answers as a m
   - Free-text: Any custom text the user provides
 
 ```java
+// Example function implementation
+Function<List<Question>, Map<String, String>> handler = questions -> {
+    Map<String, String> answers = new HashMap<>();
+    for (Question q : questions) {
+        // Collect user input for each question
+        String answer = promptUser(q);
+        answers.put(q.question(), answer);
+    }
+    return answers;
+};
+
 // Example answer map
 Map<String, String> answers = Map.of(
     "Which library should we use?", "Day.js",
@@ -111,11 +122,11 @@ public class ConsoleQuestionHandler {
             .build();
     }
 
-    private static QuestionsAnswers handleQuestions(QuestionsAnswers input) {
+    private static Map<String, String> handleQuestions(List<Question> questions) {
         Map<String, String> answers = new HashMap<>();
         Scanner scanner = new Scanner(System.in);
 
-        for (Question q : input.questions()) {
+        for (Question q : questions) {
             System.out.println("\n" + q.header() + ": " + q.question());
 
             List<Option> options = q.options();
@@ -134,7 +145,7 @@ public class ConsoleQuestionHandler {
             answers.put(q.question(), parseResponse(response, options));
         }
 
-        return new QuestionsAnswers(input.questions(), answers);
+        return answers;
     }
 
     private static String parseResponse(String response, List<Option> options) {
@@ -172,18 +183,18 @@ public class WebQuestionHandler {
             .build();
     }
 
-    private QuestionsAnswers handleQuestions(QuestionsAnswers input) {
+    private Map<String, String> handleQuestions(List<Question> questions) {
         // Store questions and create a future for the response
         CompletableFuture<Map<String, String>> future = new CompletableFuture<>();
         pendingResponse.set(future);
 
         // Notify frontend (WebSocket, SSE, or polling)
-        sendQuestionsToFrontend(input.questions());
+        sendQuestionsToFrontend(questions);
 
         try {
             // Wait for user to submit answers via /api/answers endpoint
             Map<String, String> answers = future.get(5, TimeUnit.MINUTES);
-            return new QuestionsAnswers(input.questions(), answers);
+            return answers;
         } catch (Exception e) {
             throw new RuntimeException("Timeout waiting for user response", e);
         }
@@ -347,10 +358,10 @@ The `AskUserQuestionTool` class is thread-safe and can be used concurrently by m
 ```java
 // Safe - no shared mutable state
 AskUserQuestionTool tool = AskUserQuestionTool.builder()
-    .questionAnswerFunction(qa -> {
+    .questionAnswerFunction(questions -> {
         // Each invocation is independent
-        Map<String, String> answers = promptUser(qa.questions());
-        return new QuestionsAnswers(qa.questions(), answers);
+        Map<String, String> answers = promptUser(questions);
+        return answers;
     })
     .build();
 ```
@@ -361,10 +372,10 @@ AskUserQuestionTool tool = AskUserQuestionTool.builder()
 private Map<String, String> sharedAnswers = new HashMap<>();
 
 AskUserQuestionTool tool = AskUserQuestionTool.builder()
-    .questionAnswerFunction(qa -> {
+    .questionAnswerFunction(questions -> {
         // Multiple threads modifying sharedAnswers = data race
-        sharedAnswers.put("lastQuestion", qa.questions().get(0).question());
-        return new QuestionsAnswers(qa.questions(), sharedAnswers);
+        sharedAnswers.put("lastQuestion", questions.get(0).question());
+        return sharedAnswers;
     })
     .build();
 ```
@@ -372,21 +383,22 @@ AskUserQuestionTool tool = AskUserQuestionTool.builder()
 ## Immutability
 
 All data structures are immutable with defensive copies:
-- `questions` list is copied on construction
-- `options` list is copied on construction
-- `answers` map is copied on construction
+- `options` list is copied on Question construction
 - Returned collections cannot be modified
 
 ```java
-List<Question> questions = new ArrayList<>(List.of(question));
-QuestionsAnswers qa = new QuestionsAnswers(questions, null);
+List<Option> options = new ArrayList<>(List.of(
+    new Option("A", "First"),
+    new Option("B", "Second")
+));
+Question question = new Question("Choose?", "Choice", options, false);
 
-// Modifying original list doesn't affect QuestionsAnswers
-questions.clear();
-assertThat(qa.questions()).hasSize(1);  // Still has 1 question
+// Modifying original list doesn't affect Question
+options.clear();
+assertThat(question.options()).hasSize(2);  // Still has 2 options
 
 // Cannot modify returned collections
-qa.questions().clear();  // Throws UnsupportedOperationException
+question.options().clear();  // Throws UnsupportedOperationException
 ```
 
 ## Integration with Chat Client
@@ -425,15 +437,8 @@ public class AgentConfig {
 
 | Method | Description |
 |--------|-------------|
-| `questionAnswerFunction(Function)` | Set the function to handle questions |
+| `questionAnswerFunction(Function<List<Question>, Map<String, String>>)` | Set the function to handle questions |
 | `build()` | Build the tool instance |
-
-### QuestionsAnswers
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `questions` | `List<Question>` | The list of questions |
-| `answers` | `Map<String, String>` | User answers mapped by question text |
 
 ### Question
 
@@ -502,8 +507,9 @@ new Question("Which database?", "Database", options, false)
 
 ```java
 try {
-    QuestionsAnswers result = askTool.askUserQuestion(questions, null);
-    // Process answers
+    String result = askTool.askUserQuestion(questions, null);
+    // Result contains JSON with user answers
+    logger.info("User responses: " + result);
 } catch (IllegalArgumentException e) {
     // Validation error (null questions, wrong size, etc.)
     logger.error("Invalid questions: " + e.getMessage());

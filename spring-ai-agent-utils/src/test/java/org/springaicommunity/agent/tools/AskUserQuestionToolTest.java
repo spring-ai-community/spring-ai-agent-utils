@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springaicommunity.agent.tools.AskUserQuestionTool.Question;
 import org.springaicommunity.agent.tools.AskUserQuestionTool.Question.Option;
-import org.springaicommunity.agent.tools.AskUserQuestionTool.QuestionsAnswers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -45,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DisplayName("AskUserQuestionTool Tests")
 class AskUserQuestionToolTest {
 
-	private AtomicReference<QuestionsAnswers> capturedInput;
+	private AtomicReference<List<Question>> capturedInput;
 
 	private AskUserQuestionTool tool;
 
@@ -53,15 +52,15 @@ class AskUserQuestionToolTest {
 	void setUp() {
 		this.capturedInput = new AtomicReference<>();
 		this.tool = AskUserQuestionTool.builder()
-			.questionAnswerFunction(input -> {
-				this.capturedInput.set(input);
+			.questionAnswerFunction(questions -> {
+				this.capturedInput.set(questions);
 				// Simulate user providing answers
 				Map<String, String> answers = new HashMap<>();
-				for (Question q : input.questions()) {
+				for (Question q : questions) {
 					// Select the first option by default
 					answers.put(q.question(), q.options().get(0).label());
 				}
-				return new QuestionsAnswers(input.questions(), answers);
+				return answers;
 			})
 			.build();
 	}
@@ -74,7 +73,7 @@ class AskUserQuestionToolTest {
 		@DisplayName("Should create tool with valid function")
 		void shouldCreateToolWithValidFunction() {
 			AskUserQuestionTool customTool = AskUserQuestionTool.builder()
-				.questionAnswerFunction(qa -> new QuestionsAnswers(qa.questions(), Map.of()))
+				.questionAnswerFunction(questions -> Map.of())
 				.build();
 			assertThat(customTool).isNotNull();
 		}
@@ -108,11 +107,10 @@ class AskUserQuestionToolTest {
 					new Option("Option 2", "Second option"));
 			List<Question> questions = List.of(new Question("Which option?", "Choice", options, false));
 
-			QuestionsAnswers result = AskUserQuestionToolTest.this.tool.askUserQuestion(questions, null);
+			String result = AskUserQuestionToolTest.this.tool.askUserQuestion(questions, null);
 
 			assertThat(result).isNotNull();
-			assertThat(result.questions()).hasSize(1);
-			assertThat(result.answers()).containsKey("Which option?");
+			assertThat(result).contains("Which option?");
 		}
 
 		@Test
@@ -128,11 +126,13 @@ class AskUserQuestionToolTest {
 					new Question("Question 4?", "Q4", List.of(new Option("G", "Answer G"), new Option("H", "Answer H")),
 							false));
 
-			QuestionsAnswers result = AskUserQuestionToolTest.this.tool.askUserQuestion(questions, null);
+			String result = AskUserQuestionToolTest.this.tool.askUserQuestion(questions, null);
 
 			assertThat(result).isNotNull();
-			assertThat(result.questions()).hasSize(4);
-			assertThat(result.answers()).hasSize(4);
+			assertThat(result).contains("Question 1?")
+				.contains("Question 2?")
+				.contains("Question 3?")
+				.contains("Question 4?");
 		}
 
 		@Test
@@ -150,10 +150,10 @@ class AskUserQuestionToolTest {
 			List<Option> options = List.of(new Option("A", "First"), new Option("B", "Second"));
 			List<Question> questions = List.of(new Question("Question?", "12Characters", options, false));
 
-			QuestionsAnswers result = AskUserQuestionToolTest.this.tool.askUserQuestion(questions, null);
+			String result = AskUserQuestionToolTest.this.tool.askUserQuestion(questions, null);
 
 			assertThat(result).isNotNull();
-			assertThat(result.questions().get(0).header()).hasSize(12);
+			assertThat(AskUserQuestionToolTest.this.capturedInput.get().get(0).header()).hasSize(12);
 		}
 
 	}
@@ -330,52 +330,6 @@ class AskUserQuestionToolTest {
 
 	}
 
-	@Nested
-	@DisplayName("QuestionsAnswers Record Tests")
-	class QuestionsAnswersRecordTests {
-
-		@Test
-		@DisplayName("Should reject QuestionsAnswers with null questions")
-		void shouldRejectQuestionsAnswersWithNullQuestions() {
-			assertThatThrownBy(() -> new QuestionsAnswers(null, Map.of()))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessageContaining("Questions list cannot be null");
-		}
-
-		@Test
-		@DisplayName("Should create immutable copy of questions list")
-		void shouldCreateImmutableCopyOfQuestionsList() {
-			List<Option> options = List.of(new Option("A", "First"), new Option("B", "Second"));
-			List<Question> questions = new ArrayList<>(
-					List.of(new Question("Question?", "Header", options, false)));
-
-			QuestionsAnswers qa = new QuestionsAnswers(questions, null);
-
-			// Modify original list
-			questions.clear();
-
-			// QuestionsAnswers should still have the question
-			assertThat(qa.questions()).hasSize(1);
-		}
-
-		@Test
-		@DisplayName("Should create immutable copy of answers map")
-		void shouldCreateImmutableCopyOfAnswersMap() {
-			List<Option> options = List.of(new Option("A", "First"), new Option("B", "Second"));
-			List<Question> questions = List.of(new Question("Question?", "Header", options, false));
-			Map<String, String> answers = new HashMap<>(Map.of("Question?", "A"));
-
-			QuestionsAnswers qa = new QuestionsAnswers(questions, answers);
-
-			// Modify original map
-			answers.clear();
-
-			// QuestionsAnswers should still have the answer
-			assertThat(qa.answers()).hasSize(1);
-			assertThat(qa.answers()).containsEntry("Question?", "A");
-		}
-
-	}
 
 	@Nested
 	@DisplayName("Question Record Tests")
@@ -413,28 +367,28 @@ class AskUserQuestionToolTest {
 	class FunctionInvocationTests {
 
 		@Test
-		@DisplayName("Should invoke function with questions and null answers initially")
-		void shouldInvokeFunctionWithQuestionsAndNullAnswersInitially() {
+		@DisplayName("Should invoke function with questions")
+		void shouldInvokeFunctionWithQuestions() {
 			List<Option> options = List.of(new Option("A", "First"), new Option("B", "Second"));
 			List<Question> questions = List.of(new Question("Question?", "Header", options, false));
 
 			AskUserQuestionToolTest.this.tool.askUserQuestion(questions, null);
 
 			assertThat(AskUserQuestionToolTest.this.capturedInput.get()).isNotNull();
-			assertThat(AskUserQuestionToolTest.this.capturedInput.get().questions()).hasSize(1);
-			assertThat(AskUserQuestionToolTest.this.capturedInput.get().answers()).isNull();
+			assertThat(AskUserQuestionToolTest.this.capturedInput.get()).hasSize(1);
 		}
 
 		@Test
-		@DisplayName("Should pass through provided answers")
-		void shouldPassThroughProvidedAnswers() {
+		@DisplayName("Should invoke function and return result")
+		void shouldInvokeFunctionAndReturnResult() {
 			List<Option> options = List.of(new Option("A", "First"), new Option("B", "Second"));
 			List<Question> questions = List.of(new Question("Question?", "Header", options, false));
-			Map<String, String> providedAnswers = Map.of("Question?", "A");
 
-			AskUserQuestionToolTest.this.tool.askUserQuestion(questions, providedAnswers);
+			String result = AskUserQuestionToolTest.this.tool.askUserQuestion(questions, null);
 
-			assertThat(AskUserQuestionToolTest.this.capturedInput.get().answers()).isEqualTo(providedAnswers);
+			assertThat(result).isNotNull();
+			assertThat(result).contains("User has answered your questions");
+			assertThat(AskUserQuestionToolTest.this.capturedInput.get()).hasSize(1);
 		}
 
 	}
@@ -446,11 +400,13 @@ class AskUserQuestionToolTest {
 		@Test
 		@DisplayName("Should handle single-select question workflow")
 		void shouldHandleSingleSelectQuestionWorkflow() {
+			AtomicReference<Map<String, String>> capturedAnswers = new AtomicReference<>();
 			AskUserQuestionTool customTool = AskUserQuestionTool.builder()
-				.questionAnswerFunction(qa -> {
+				.questionAnswerFunction(questions -> {
 					Map<String, String> answers = new HashMap<>();
 					answers.put("Which library should we use?", "React");
-					return new QuestionsAnswers(qa.questions(), answers);
+					capturedAnswers.set(answers);
+					return answers;
 				})
 				.build();
 
@@ -459,20 +415,23 @@ class AskUserQuestionToolTest {
 			List<Question> questions = List
 				.of(new Question("Which library should we use?", "Library", options, false));
 
-			QuestionsAnswers result = customTool.askUserQuestion(questions, null);
+			String result = customTool.askUserQuestion(questions, null);
 
-			assertThat(result.answers()).containsEntry("Which library should we use?", "React");
+			assertThat(result).contains("React");
+			assertThat(capturedAnswers.get()).containsEntry("Which library should we use?", "React");
 		}
 
 		@Test
 		@DisplayName("Should handle multi-select question workflow")
 		void shouldHandleMultiSelectQuestionWorkflow() {
+			AtomicReference<Map<String, String>> capturedAnswers = new AtomicReference<>();
 			AskUserQuestionTool customTool = AskUserQuestionTool.builder()
-				.questionAnswerFunction(qa -> {
+				.questionAnswerFunction(questions -> {
 					Map<String, String> answers = new HashMap<>();
 					// Join multiple selections with ", "
 					answers.put("Which features?", "Authentication, Database");
-					return new QuestionsAnswers(qa.questions(), answers);
+					capturedAnswers.set(answers);
+					return answers;
 				})
 				.build();
 
@@ -480,20 +439,23 @@ class AskUserQuestionToolTest {
 					new Option("Database", "Database integration"), new Option("API", "REST API"));
 			List<Question> questions = List.of(new Question("Which features?", "Features", options, true));
 
-			QuestionsAnswers result = customTool.askUserQuestion(questions, null);
+			String result = customTool.askUserQuestion(questions, null);
 
-			assertThat(result.answers()).containsEntry("Which features?", "Authentication, Database");
+			assertThat(result).contains("Authentication, Database");
+			assertThat(capturedAnswers.get()).containsEntry("Which features?", "Authentication, Database");
 		}
 
 		@Test
 		@DisplayName("Should handle free-text input")
 		void shouldHandleFreeTextInput() {
+			AtomicReference<Map<String, String>> capturedAnswers = new AtomicReference<>();
 			AskUserQuestionTool customTool = AskUserQuestionTool.builder()
-				.questionAnswerFunction(qa -> {
+				.questionAnswerFunction(questions -> {
 					Map<String, String> answers = new HashMap<>();
 					// User provides custom text instead of selecting an option
 					answers.put("Which database?", "PostgreSQL");
-					return new QuestionsAnswers(qa.questions(), answers);
+					capturedAnswers.set(answers);
+					return answers;
 				})
 				.build();
 
@@ -501,20 +463,23 @@ class AskUserQuestionToolTest {
 					new Option("MongoDB", "MongoDB database"));
 			List<Question> questions = List.of(new Question("Which database?", "Database", options, false));
 
-			QuestionsAnswers result = customTool.askUserQuestion(questions, null);
+			String result = customTool.askUserQuestion(questions, null);
 
-			assertThat(result.answers()).containsEntry("Which database?", "PostgreSQL");
+			assertThat(result).contains("PostgreSQL");
+			assertThat(capturedAnswers.get()).containsEntry("Which database?", "PostgreSQL");
 		}
 
 		@Test
 		@DisplayName("Should handle multiple questions with mixed types")
 		void shouldHandleMultipleQuestionsWithMixedTypes() {
+			AtomicReference<Map<String, String>> capturedAnswers = new AtomicReference<>();
 			AskUserQuestionTool customTool = AskUserQuestionTool.builder()
-				.questionAnswerFunction(qa -> {
+				.questionAnswerFunction(questions -> {
 					Map<String, String> answers = new HashMap<>();
 					answers.put("Which format?", "JSON");
 					answers.put("Which methods?", "GET, POST");
-					return new QuestionsAnswers(qa.questions(), answers);
+					capturedAnswers.set(answers);
+					return answers;
 				})
 				.build();
 
@@ -526,10 +491,11 @@ class AskUserQuestionToolTest {
 									new Option("PUT", "PUT method")),
 							true));
 
-			QuestionsAnswers result = customTool.askUserQuestion(questions, null);
+			String result = customTool.askUserQuestion(questions, null);
 
-			assertThat(result.answers()).containsEntry("Which format?", "JSON");
-			assertThat(result.answers()).containsEntry("Which methods?", "GET, POST");
+			assertThat(result).contains("JSON").contains("GET, POST");
+			assertThat(capturedAnswers.get()).containsEntry("Which format?", "JSON");
+			assertThat(capturedAnswers.get()).containsEntry("Which methods?", "GET, POST");
 		}
 
 	}
@@ -543,13 +509,13 @@ class AskUserQuestionToolTest {
 		void shouldHandleConcurrentInvocationsSafely() throws InterruptedException {
 			AtomicInteger callCount = new AtomicInteger(0);
 			AskUserQuestionTool threadSafeTool = AskUserQuestionTool.builder()
-				.questionAnswerFunction(qa -> {
+				.questionAnswerFunction(questions -> {
 					callCount.incrementAndGet();
 					Map<String, String> answers = new HashMap<>();
-					for (Question q : qa.questions()) {
+					for (Question q : questions) {
 						answers.put(q.question(), q.options().get(0).label());
 					}
-					return new QuestionsAnswers(qa.questions(), answers);
+					return answers;
 				})
 				.build();
 
@@ -563,9 +529,9 @@ class AskUserQuestionToolTest {
 			for (int i = 0; i < threadCount; i++) {
 				executor.submit(() -> {
 					try {
-						QuestionsAnswers result = threadSafeTool.askUserQuestion(questions, null);
+						String result = threadSafeTool.askUserQuestion(questions, null);
 						assertThat(result).isNotNull();
-						assertThat(result.answers()).isNotEmpty();
+						assertThat(result).contains("User has answered your questions");
 					}
 					finally {
 						latch.countDown();

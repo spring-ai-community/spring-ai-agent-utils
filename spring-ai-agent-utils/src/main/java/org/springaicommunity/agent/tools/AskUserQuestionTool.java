@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.ai.util.json.JsonParser;
 import org.springframework.util.Assert;
 
 /**
@@ -52,26 +53,22 @@ public class AskUserQuestionTool {
 	 * Function that handles the user question workflow.
 	 *
 	 * <p>
-	 * When invoked, this function receives a QuestionsAnswers object containing:
-	 * <ul>
-	 * <li>questions - The list of questions Claude wants to ask</li>
-	 * <li>answers - Initially null; should be populated by querying the user</li>
-	 * </ul>
+	 * When invoked, this function receives a list of {@link Question} objects that the
+	 * AI agent wants to ask the user.
 	 *
 	 * <p>
 	 * The function should:
 	 * <ol>
 	 * <li>Present the questions to the user through your application's UI</li>
 	 * <li>Collect the user's answers (option labels or free text)</li>
-	 * <li>Return a QuestionsAnswers object with the original questions and collected
-	 * answers</li>
+	 * <li>Return a Map containing the answers keyed by question text</li>
 	 * </ol>
 	 *
 	 * <p>
 	 * Answer format:
 	 * <ul>
-	 * <li>Keys: The question text (from Question.question field)</li>
-	 * <li>Values: The selected option's label (from Option.label field)</li>
+	 * <li>Keys: The question text (from {@link Question#question()} field)</li>
+	 * <li>Values: The selected option's label (from {@link Option#label()} field)</li>
 	 * <li>Multi-select: Join multiple labels with ", "</li>
 	 * <li>Free text: Use the user's custom text directly</li>
 	 * </ul>
@@ -81,36 +78,10 @@ public class AskUserQuestionTool {
 	 * multiple threads. Implementations must be thread-safe or use appropriate
 	 * synchronization if they maintain mutable shared state.
 	 */
-	private final Function<QuestionsAnswers, QuestionsAnswers> questionAnswerFunction;
+	private final Function<List<Question>, Map<String, String>> questionAnswerFunction;
 
-	protected AskUserQuestionTool(Function<QuestionsAnswers, QuestionsAnswers> questionAnswerFunction) {
+	protected AskUserQuestionTool(Function<List<Question>, Map<String, String>> questionAnswerFunction) {
 		this.questionAnswerFunction = questionAnswerFunction;
-	}
-
-	/**
-	 * Represents a set of questions and the corresponding user answers
-	 */
-	public record QuestionsAnswers(
-			/**
-			 * The list of questions that were asked to the user
-			 */
-			List<Question> questions,
-
-			/**
-			 * The user's answers mapped by question
-			 */
-			Map<String, String> answers) {
-
-		public QuestionsAnswers {
-			if (questions == null) {
-				throw new IllegalArgumentException("Questions list cannot be null");
-			}
-			// Make defensive copies for immutability
-			questions = List.copyOf(questions);
-			if (answers != null) {
-				answers = Map.copyOf(answers);
-			}
-		}
 	}
 
 	/**
@@ -212,7 +183,7 @@ public class AskUserQuestionTool {
 					- Use multiSelect: true to allow multiple answers to be selected for a question
 					- If you recommend a specific option, make that the first option in the list and add "(Recommended)" at the end of the label
 					""")
-	public QuestionsAnswers askUserQuestion(
+	public String askUserQuestion(
 			@ToolParam(description = "Questions to ask the user (1-4 questions)") List<Question> questions,
 			@ToolParam(description = "User answers collected by the permission component",
 					required = false) Map<String, String> answers) {
@@ -225,13 +196,13 @@ public class AskUserQuestionTool {
 			questions.forEach(q -> logger.trace("Question: {}", q.question()));
 		}
 
-		QuestionsAnswers result = this.questionAnswerFunction.apply(new QuestionsAnswers(questions, answers));
+		Map<String, String> result = this.questionAnswerFunction.apply(questions);		
 
-		if (logger.isDebugEnabled() && result.answers() != null) {
-			logger.debug("Received {} answer(s) from user", result.answers().size());
+		if (logger.isDebugEnabled() && result != null) {
+			logger.debug("Received {} answer(s) from user", result.size());
 		}
 
-		return result;
+		return "User has answered your questions: " + JsonParser.toJson(result);
 	}
 
 	/**
@@ -264,9 +235,9 @@ public class AskUserQuestionTool {
 
 	public static class Builder {
 
-		private Function<QuestionsAnswers, QuestionsAnswers> questionAnswerFunction;
+		private Function<List<Question>, Map<String, String>> questionAnswerFunction;
 
-		public Builder questionAnswerFunction(Function<QuestionsAnswers, QuestionsAnswers> questionAnswerFunction) {
+		public Builder questionAnswerFunction(Function<List<Question>, Map<String, String>> questionAnswerFunction) {
 			Assert.notNull(questionAnswerFunction, "questionAnswerFunction must not be null");
 			this.questionAnswerFunction = questionAnswerFunction;
 			return this;

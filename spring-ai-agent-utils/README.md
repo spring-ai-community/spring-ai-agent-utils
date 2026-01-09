@@ -220,10 +220,10 @@ Ask users clarifying questions during AI agent execution. Enables agents to gath
 **Quick Example:**
 ```java
 AskUserQuestionTool askTool = AskUserQuestionTool.builder()
-    .questionAnswerFunction(questionsAnswers -> {
+    .questionAnswerFunction(questions -> {
         // Display questions to user via your UI
-        Map<String, String> answers = collectUserAnswers(questionsAnswers.questions());
-        return new QuestionsAnswers(questionsAnswers.questions(), answers);
+        Map<String, String> answers = collectUserAnswers(questions);
+        return answers;
     })
     .build();
 

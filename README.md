@@ -100,7 +100,7 @@ public class Application {
                     BraveWebSearchTool.builder(apiKey).build(),
                     TodoWriteTool.builder().build(),
                     AskUserQuestionTool.builder()
-                        .questionAnswerFunction(this::handleUserQuestions)
+                        .questionAnswerFunction(questions -> handleUserQuestions(questions))
                         .build())
                 .build();
 
