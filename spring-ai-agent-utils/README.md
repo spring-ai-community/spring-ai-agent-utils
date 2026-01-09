@@ -15,6 +15,7 @@ These are the core tools needed to implement any agentic behavior:
 - **[GrepTool](docs/GrepTool.md)** - Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes
 - **[GlobTool](docs/GlobTool.md)** - Fast file pattern matching tool for finding files by name patterns with glob syntax
 - **[TodoWriteTool](docs/TodoWriteTool.md)** - Structured task management with state tracking
+- **[AskUserQuestionTool](docs/AskUserQuestionTool.md)** - Ask users clarifying questions with multiple-choice options during agent execution
 - **[SmartWebFetchTool](docs/SmartWebFetchTool.md)** - AI-powered web content summarization with caching
 - **[BraveWebSearchTool](docs/BraveWebSearchTool.md)** - Web search with domain filtering
 - **[SkillsTool](docs/SkillsTool.md)** - Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter
@@ -208,6 +209,26 @@ Todos todos = new Todos(List.of(
 ));
 
 todoTool.todoWrite(todos);
+```
+
+### AskUserQuestionTool
+
+Ask users clarifying questions during AI agent execution. Enables agents to gather user preferences, clarify ambiguous requirements, and get decisions on implementation choices with multiple-choice or free-text input.
+
+[**View Full Documentation →**](docs/AskUserQuestionTool.md)
+
+**Quick Example:**
+```java
+AskUserQuestionTool askTool = AskUserQuestionTool.builder()
+    .questionAnswerFunction(questionsAnswers -> {
+        // Display questions to user via your UI
+        Map<String, String> answers = collectUserAnswers(questionsAnswers.questions());
+        return new QuestionsAnswers(questionsAnswers.questions(), answers);
+    })
+    .build();
+
+// AI agent will automatically call this tool when it needs clarification
+// Example: "Which framework should we use?" with options like React, Vue, Angular
 ```
 
 ### BraveWebSearchTool

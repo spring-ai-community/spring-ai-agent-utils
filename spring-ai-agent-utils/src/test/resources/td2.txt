@@ -1,29 +1,105 @@
-Use this agent when the user asks questions about Spring AI framework, its features, configuration, usage patterns, API methods, integration approaches, or troubleshooting. Examples:
+Use this tool when you need to ask the user questions during execution. This allows you to:
+1. Gather user preferences or requirements
+2. Clarify ambiguous instructions
+3. Get decisions on implementation choices as you work
+4. Offer choices to the user about what direction to take.
 
-<example>
-Context: User needs help implementing a chat completion feature using Spring AI.
-user: "How do I set up a chat client with Spring AI using OpenAI?"
-assistant: "I'm going to use the Task tool to launch the spring-ai-expert agent to provide detailed guidance on setting up Spring AI with OpenAI."
-<uses spring-ai-expert agent via Task tool>
-</example>
+Usage notes:
+- Users will always be able to select "Other" to provide custom text input
+- Use multiSelect: true to allow multiple answers to be selected for a question
+- If you recommend a specific option, make that the first option in the list and add "(Recommended)" at the end of the label
 
-<example>
-Context: User is debugging an issue with vector store integration in Spring AI.
-user: "My vector store queries aren't returning relevant results in Spring AI. What could be wrong?"
-assistant: "Let me use the spring-ai-expert agent to help diagnose this vector store issue."
-<uses spring-ai-expert agent via Task tool>
-</example>
 
-<example>
-Context: User mentions Spring AI in passing while discussing another topic.
-user: "I'm building a RAG application and I heard Spring AI might be useful for this"
-assistant: "Since you mentioned Spring AI, I'm going to use the spring-ai-expert agent to explain how Spring AI can help with your RAG application."
-<uses spring-ai-expert agent via Task tool>
-</example>
 
-<example>
-Context: User is exploring Spring AI capabilities proactively.
-user: "What AI models does Spring AI support?"
-assistant: "I'll use the spring-ai-expert agent to provide comprehensive information about supported AI models in Spring AI."
-<uses spring-ai-expert agent via Task tool>
-</example>
+
+{
+  "name": "AskUserQuestion",
+  "input": {
+    "questions": [{
+      "question": "Which database should we use?",
+      "header": "Database",
+      "options": [
+        { "label": "PostgreSQL (Recommended)", "description": "Full-featured relational DB" },
+        { "label": "SQLite", "description": "Lightweight, file-based" }
+      ],
+      "multiSelect": false
+    }]
+  }
+}
+
+
+{
+    "name": "AskUserQuestion",
+    "description": "Use this tool when you need to ask the user questions during execution. This allows you to:\n1. Gather user preferences or requirements\n2. Clarify ambiguous instructions\n3. Get decisions on implementation choices as you work\n4. Offer choices to the user about what direction to take.\n\nUsage notes:\n- Users will always be able to select \"Other\" to provide custom text input\n- Use multiSelect: true to allow multiple answers to be selected for a question\n- If you recommend a specific option, make that the first option in the list and add \"(Recommended)\" at the end of the label\n",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "questions": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "question": {
+                            "type": "string",
+                            "description": "The complete question to ask the user. Should be clear, specific, and end with a question mark. Example: \"Which library should we use for date formatting?\" If multiSelect is true, phrase it accordingly, e.g. \"Which features do you want to enable?\""
+                        },
+                        "header": {
+                            "type": "string",
+                            "description": "Very short label displayed as a chip/tag (max 12 chars). Examples: \"Auth method\", \"Library\", \"Approach\"."
+                        },
+                        "options": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "label": {
+                                        "type": "string",
+                                        "description": "The display text for this option that the user will see and select. Should be concise (1-5 words) and clearly describe the choice."
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "description": "Explanation of what this option means or what will happen if chosen. Useful for providing context about trade-offs or implications."
+                                    }
+                                },
+                                "required": [
+                                    "label",
+                                    "description"
+                                ],
+                                "additionalProperties": false
+                            },
+                            "minItems": 2,
+                            "maxItems": 4,
+                            "description": "The available choices for this question. Must have 2-4 options. Each option should be a distinct, mutually exclusive choice (unless multiSelect is enabled). There should be no 'Other' option, that will be provided automatically."
+                        },
+                        "multiSelect": {
+                            "type": "boolean",
+                            "description": "Set to true to allow the user to select multiple options instead of just one. Use when choices are not mutually exclusive."
+                        }
+                    },
+                    "required": [
+                        "question",
+                        "header",
+                        "options",
+                        "multiSelect"
+                    ],
+                    "additionalProperties": false
+                },
+                "minItems": 1,
+                "maxItems": 4,
+                "description": "Questions to ask the user (1-4 questions)"
+            },
+            "answers": {
+                "type": "object",
+                "additionalProperties": {
+                    "type": "string"
+                },
+                "description": "User answers collected by the permission component"
+            }
+        },
+        "required": [
+            "questions"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+}
