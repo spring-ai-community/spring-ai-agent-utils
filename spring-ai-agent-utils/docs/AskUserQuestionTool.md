@@ -261,23 +261,6 @@ new Question(
 new Option("", "Description");  // Label cannot be blank
 ```
 
-## When to Use AskUserQuestionTool
-
-### Use This Tool When:
-
-1. **Multiple valid approaches exist** - Choice between frameworks, libraries, or patterns
-2. **Subjective decisions required** - Styling, naming conventions, project structure
-3. **Ambiguous requirements** - User request could be interpreted multiple ways
-4. **Implementation preferences needed** - Testing strategy, error handling approach
-5. **Configuration choices** - Deployment options, environment settings
-
-### Skip This Tool When:
-
-1. **Clear single solution** - Requirements are unambiguous
-2. **Industry standard exists** - Follow established conventions
-3. **Technical requirement** - One approach is technically superior
-4. **User already specified** - Instructions are detailed enough
-
 ## Examples
 
 ### Example 1: Framework Selection
@@ -455,69 +438,6 @@ public class AgentConfig {
 |-------|------|-------------|
 | `label` | `String` | Display text |
 | `description` | `String` | Explanation of option |
-
-## Best Practices
-
-### 1. Clear Question Text
-```java
-// ✅ Good - specific and clear
-"Which authentication method should we implement?"
-
-// ❌ Bad - vague
-"What about auth?"
-```
-
-### 2. Descriptive Options
-```java
-// ✅ Good - explains trade-offs
-new Option("JWT", "Stateless, good for distributed systems")
-
-// ❌ Bad - no context
-new Option("JWT", "JWT tokens")
-```
-
-### 3. Concise Headers
-```java
-// ✅ Good - fits in 12 chars
-"Auth Method"
-
-// ❌ Bad - too long
-"Authentication Method"
-```
-
-### 4. Logical Option Count
-```java
-// ✅ Good - reasonable choices
-2-4 options per question
-
-// ❌ Bad - too few or too many
-1 option (no choice) or 5+ options (overwhelming)
-```
-
-### 5. Multi-Select for Non-Exclusive Choices
-```java
-// ✅ Good - features can be combined
-new Question("Which features?", "Features", options, true)
-
-// ✅ Good - only one can be chosen
-new Question("Which database?", "Database", options, false)
-```
-
-## Error Handling
-
-```java
-try {
-    String result = askTool.askUserQuestion(questions, null);
-    // Result contains JSON with user answers
-    logger.info("User responses: " + result);
-} catch (IllegalArgumentException e) {
-    // Validation error (null questions, wrong size, etc.)
-    logger.error("Invalid questions: " + e.getMessage());
-} catch (Exception e) {
-    // Function execution error (timeout, user cancelled, etc.)
-    logger.error("Failed to get user input: " + e.getMessage());
-}
-```
 
 ## Related Tools
 
