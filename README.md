@@ -35,6 +35,7 @@ These are the core tools needed to implement any agentic behavior:
 - **[GrepTool](spring-ai-agent-utils/docs/GrepTool.md)** - Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes
 - **[GlobTool](spring-ai-agent-utils/docs/GlobTool.md)** - Fast file pattern matching tool for finding files by name patterns with glob syntax
 - **[TodoWriteTool](spring-ai-agent-utils/docs/TodoWriteTool.md)** - Structured task management with state tracking
+- **[AskUserQuestionTool](spring-ai-agent-utils/docs/AskUserQuestionTool.md)** - Ask users clarifying questions with multiple-choice options during agent execution
 - **[SmartWebFetchTool](spring-ai-agent-utils/docs/SmartWebFetchTool.md)** - AI-powered web content summarization with caching
 - **[BraveWebSearchTool](spring-ai-agent-utils/docs/BraveWebSearchTool.md)** - Web search with domain filtering
 - **[SkillsTool](spring-ai-agent-utils/docs/SkillsTool.md)** - Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter
@@ -97,7 +98,10 @@ public class Application {
                     GlobTool.builder().build(),
                     SmartWebFetchTool.builder(chatClient).build(),
                     BraveWebSearchTool.builder(apiKey).build(),
-                    TodoWriteTool.builder().build())
+                    TodoWriteTool.builder().build(),
+                    AskUserQuestionTool.builder()
+                        .questionAnswerFunction(this::handleUserQuestions)
+                        .build())
                 .build();
 
             String response = chatClient
