@@ -7,11 +7,11 @@
 	<parent>
 		<groupId>org.springaicommunity</groupId>
 		<artifactId>spring-ai-agent-utils-parent</artifactId>
-		<version>0.1.1</version>
+		<version>0.1.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>spring-ai-agent-utils</artifactId>
-	<version>0.1.1</version>
+	<version>0.1.2-SNAPSHOT</version>
 	<name>spring-ai-agent-utils</name>
 	<description>Spring AI Agent Utilities</description>
 
