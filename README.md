@@ -166,9 +166,7 @@ mvn spring-boot:run
 Three comprehensive examples demonstrate different use cases:
 
 - **[code-agent-demo](examples/code-agent-demo)** - Full-featured AI coding assistant with interactive CLI, all tools, conversation memory, and multi-model support. Best for understanding complete agent architectures.
-
 - **[subagent-demo](examples/subagent-demo)** - Demonstrates hierarchical sub-agent system with custom Spring AI expert sub-agent and TaskTools integration. Best for learning hierarchical agent patterns.
-
 - **[skills-demo](examples/skills-demo)** - Focused demonstration of the SkillsTool system with custom skill development, helper scripts, and the ai-tuto educational skill example.
 
 See the [Examples README](examples/README.md) for detailed setup, configuration, and usage guide for all examples.
