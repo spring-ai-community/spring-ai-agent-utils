@@ -131,9 +131,9 @@ See the [Examples README](../examples/README.md) for detailed setup, configurati
 
 ## Agent Tool Details
 
-### Core Tools
+### CORE TOOLS
 
-#### AgentEnvironment - Dynamic Agent Context
+### AgentEnvironment
 
 Provide AI agents with runtime environment information and git repository context through dynamic system prompt parameters. Makes agents context-aware by injecting environment metadata and git status into system prompts.
 
@@ -189,7 +189,7 @@ agent.model.knowledge.cutoff=2025-09-29
 - Model-specific prompts with accurate knowledge cutoff dates
 - Easy multi-model support through configuration
 
-#### FileSystemTools
+### FileSystemTools
 
 Read, write, and edit files with precise control. Provides three core operations: Read for reading files with pagination, Write for creating/overwriting files, and Edit for precise string replacement with safety checks.
 
@@ -206,7 +206,7 @@ String content = fileTools.read("/path/to/file.txt", null, null, toolContext);
 fileTools.edit(filePath, "oldValue", "newValue", null, toolContext);
 ```
 
-#### ShellTools
+### ShellTools
 
 Execute shell commands with background process support. Includes Bash for command execution with optional timeout and background mode, BashOutput for monitoring background processes with regex filtering, and KillShell for graceful process termination.
 
@@ -227,7 +227,7 @@ String output = shellTools.bashOutput("shell_1234567890", null);
 String killResult = shellTools.killShell("shell_1234567890");
 ```
 
-#### GrepTool
+### GrepTool
 
 Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes. No external ripgrep dependency required.
 
@@ -242,7 +242,7 @@ String result = grepTool.grep("public class.*", "./src", null,
     OutputMode.files_with_matches, null, null, null, null, null, "java", null, null, null);
 ```
 
-#### GlobTool
+### GlobTool
 
 Fast file pattern matching tool for finding files by name patterns. Uses pure Java implementation with glob syntax support, sorted by modification time.
 
@@ -259,7 +259,7 @@ String files = globTool.glob("**/*.java", "./src");
 String components = globTool.glob("**/*Component.tsx", "./src");
 ```
 
-#### SmartWebFetchTool
+### SmartWebFetchTool
 
 AI-powered web content fetching and summarization tool with intelligent caching and safety features. Fetches web pages, converts HTML to Markdown, and uses AI to extract relevant information based on a user prompt.
 
@@ -281,7 +281,7 @@ String result = webFetch.webFetch(
 );
 ```
 
-#### BraveWebSearchTool
+### BraveWebSearchTool
 
 Web search capabilities using the Brave Search API. Provides up-to-date information from the web with optional domain filtering.
 
@@ -304,10 +304,11 @@ String results = searchTool.webSearch(
 // Or use search operators for efficiency
 String results2 = searchTool.webSearch("Spring AI site:spring.io", null, null);
 ```
+---
 
-### User feedback
+### USER FEEDBACK
 
-#### AskUserQuestionTool
+### AskUserQuestionTool
 
 Ask users clarifying questions during AI agent execution. Enables agents to gather user preferences, clarify ambiguous requirements, and get decisions on implementation choices with multiple-choice or free-text input.
 
@@ -326,10 +327,11 @@ AskUserQuestionTool askTool = AskUserQuestionTool.builder()
 // AI agent will automatically call this tool when it needs clarification
 // Example: "Which framework should we use?" with options like React, Vue, Angular
 ```
+---
 
-### Agent Skills
+### AGENT SKILLS
 
-#### SkillsTool
+### SkillsTool
 
 Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter. Based on [Claude Code's Agent Skills](https://code.claude.com/docs/en/skills#agent-skills), skills enable specialized task handling through semantic matching.
 
@@ -357,10 +359,11 @@ description: What this skill does and when to use it. Include trigger keywords.
 # My Skill
 Instructions for the AI agent to follow...
 ```
+---
 
-### Task Orchestration & Multi-Agents
+### TASK ORCHESTRATION & SUB-AGENTS
 
-#### TodoWriteTool
+### TodoWriteTool
 
 Structured task list management for AI coding sessions. Helps AI agents track progress, organize complex tasks, and provide visibility into task execution.
 
@@ -380,7 +383,7 @@ Todos todos = new Todos(List.of(
 todoTool.todoWrite(todos);
 ```
 
-#### TaskTools - Hierarchical Sub-Agent System
+### TaskTools - Hierarchical Sub-Agent System
 
 Enable your AI agent to delegate complex, multi-step tasks to specialized sub-agents with dedicated context windows. Based on [Claude Code's sub-agents](https://code.claude.com/docs/en/sub-agents), this system provides autonomous task execution with specialized expertise.
 
