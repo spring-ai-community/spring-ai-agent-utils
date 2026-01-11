@@ -15,7 +15,7 @@ The `AskUserQuestionTool` is a Spring AI implementation of [Claude Code's AskUse
 
 The tool follows the question-answer workflow: AI generates questions with options, user provides answers, and AI continues with the collected input.
 
-**Basic Usage:**
+## Basic Usage
 
 ```java
 AskUserQuestionTool askTool = AskUserQuestionTool.builder()
@@ -35,6 +35,12 @@ ChatClient chatClient = chatClientBuilder
 
 You have to provide a `questionAnswerFunction(Function<List<Question>, Map<String, String>>)` function to handle the AI questions.
 
+The `AskUserQuestionTool` class is thread-safe and can be used concurrently by multiple threads. However, the provided `questionAnswerFunction` must also be thread-safe if shared state is maintained.
+
+All data structures are immutable with defensive copies:
+- `options` list is copied on Question construction
+- Returned collections cannot be modified
+
 ## Question Format
 
 The input  Questions list cannot be null or empty and can contain 1-4 questions.
@@ -51,33 +57,32 @@ Each [Options](https://github.com/spring-ai-community/spring-ai-agent-utils/blob
 
 **Example Questions:**
 
-```json
-// Single-select question
-{
-    "question": "Which library should we use for date formatting?",
-    "header": "Library",
-    "options": [
-        { "label": "Moment.js", "description": "Popular but large library" },
-        { "label": "Day.js", "description": "Lightweight Moment.js alternative" },
-        { "label": "date-fns", "description": "Modular and tree-shakeable" }
-    ],
-    "multiSelect": false
-}
-```
-
-```json
-// Multi-select question
-{
-    "question": "Which features do you want to enable?",
-    "header": "Features",
-    "options": [
-        { "label": "Authentication", "description": "User login and registration" },
-        { "label": "Database", "description": "PostgreSQL integration" },
-        { "label": "Caching", "description": "Redis caching layer" }
-    ],
-    "multiSelect": true
-}
-```
+- Single-select question
+    ```json
+    {
+        "question": "Which library should we use for date formatting?",
+        "header": "Library",
+        "options": [
+            { "label": "Moment.js", "description": "Popular but large library" },
+            { "label": "Day.js", "description": "Lightweight Moment.js alternative" },
+            { "label": "date-fns", "description": "Modular and tree-shakeable" }
+        ],
+        "multiSelect": false
+    }
+    ```
+- Multi-select question
+    ```json
+    {
+        "question": "Which features do you want to enable?",
+        "header": "Features",
+        "options": [
+            { "label": "Authentication", "description": "User login and registration" },
+            { "label": "Database", "description": "PostgreSQL integration" },
+            { "label": "Caching", "description": "Redis caching layer" }
+        ],
+        "multiSelect": true
+    }
+    ```
 
 ## Answer Format
 
@@ -105,6 +110,48 @@ Map<String, String> answers = Map.of(
     "Which library should we use?", "Day.js",
     "Which features do you want?", "Authentication, Database"
 );
+```
+
+### Answer Error Handling
+
+The `questionAnswerFunction` should handle errors appropriately:
+
+**Return Value Requirements:**
+- Must return a non-null `Map<String, String>`
+- Map keys should match the `question` text from each `Question` object
+- Missing answers for questions may cause the AI agent to behave unexpectedly
+- Empty strings are valid answers, but `null` values should be avoided
+
+**Exception Handling:**
+- If the function throws an exception, the tool execution will fail
+- The AI agent may retry or handle the failure based on the Spring AI configuration
+- For timeout scenarios (e.g., user doesn't respond), consider throwing a descriptive exception or implementing a retry mechanism
+
+**Example with error handling:**
+```java
+AskUserQuestionTool tool = AskUserQuestionTool.builder()
+    .questionAnswerFunction(questions -> {
+        try {
+            Map<String, String> answers = promptUser(questions);
+
+            // Validate all questions have answers
+            for (Question q : questions) {
+                if (!answers.containsKey(q.question())) {
+                    throw new IllegalStateException(
+                        "Missing answer for question: " + q.question()
+                    );
+                }
+            }
+
+            return answers;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("User input interrupted", e);
+        } catch (TimeoutException e) {
+            throw new RuntimeException("User did not respond in time", e);
+        }
+    })
+    .build();
 ```
 
 ## Implementation Example
@@ -206,86 +253,6 @@ public class WebQuestionHandler {
         }
     }
 }
-```
-
-## Implementation Details
-
-### Thread Safety
-
-The `AskUserQuestionTool` class is thread-safe and can be used concurrently by multiple threads. However, the provided `questionAnswerFunction` must also be thread-safe if shared state is maintained.
-
-**Thread-safe function example:**
-```java
-// Safe - no shared mutable state
-AskUserQuestionTool tool = AskUserQuestionTool.builder()
-    .questionAnswerFunction(questions -> {
-        // Each invocation is independent
-        Map<String, String> answers = promptUser(questions);
-        return answers;
-    })
-    .build();
-```
-
-**Unsafe function example:**
-```java
-// Unsafe - shared mutable state without synchronization
-private Map<String, String> sharedAnswers = new HashMap<>();
-
-AskUserQuestionTool tool = AskUserQuestionTool.builder()
-    .questionAnswerFunction(questions -> {
-        // Multiple threads modifying sharedAnswers = data race
-        sharedAnswers.put("lastQuestion", questions.get(0).question());
-        return sharedAnswers;
-    })
-    .build();
-```
-
-### Immutability
-
-All data structures are immutable with defensive copies:
-- `options` list is copied on Question construction
-- Returned collections cannot be modified
-
-### Error Handling
-
-The `questionAnswerFunction` should handle errors appropriately:
-
-**Return Value Requirements:**
-- Must return a non-null `Map<String, String>`
-- Map keys should match the `question` text from each `Question` object
-- Missing answers for questions may cause the AI agent to behave unexpectedly
-- Empty strings are valid answers, but `null` values should be avoided
-
-**Exception Handling:**
-- If the function throws an exception, the tool execution will fail
-- The AI agent may retry or handle the failure based on the Spring AI configuration
-- For timeout scenarios (e.g., user doesn't respond), consider throwing a descriptive exception or implementing a retry mechanism
-
-**Example with error handling:**
-```java
-AskUserQuestionTool tool = AskUserQuestionTool.builder()
-    .questionAnswerFunction(questions -> {
-        try {
-            Map<String, String> answers = promptUser(questions);
-
-            // Validate all questions have answers
-            for (Question q : questions) {
-                if (!answers.containsKey(q.question())) {
-                    throw new IllegalStateException(
-                        "Missing answer for question: " + q.question()
-                    );
-                }
-            }
-
-            return answers;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("User input interrupted", e);
-        } catch (TimeoutException e) {
-            throw new RuntimeException("User did not respond in time", e);
-        }
-    })
-    .build();
 ```
 
 ## See Also
