@@ -6,8 +6,10 @@ A tool for asking users clarifying questions during AI agent execution. Enables 
 - Multiple-choice questions with 2-4 options per question
 - Support for single-select and multi-select questions
 - Free-text input support beyond predefined options
-- 1-4 questions per interaction
+- 1-10 questions per interaction
 - Custom function callbacks for UI integration
+- Optional answer validation with configurable behavior
+- Enhanced AI model integration with @JsonPropertyDescription annotations
 
 ## Overview
 
@@ -20,6 +22,8 @@ The tool follows the question-answer workflow: AI generates questions with optio
 ## Basic Usage
 
 ```java
+// The AI agent will call this tool automatically when it needs input
+// For example, when asked: "Help me choose a database for my app"
 AskUserQuestionTool askTool = AskUserQuestionTool.builder()
     .questionAnswerFunction(questions -> {
         // Display questions to user via your UI
@@ -29,13 +33,11 @@ AskUserQuestionTool askTool = AskUserQuestionTool.builder()
     .build();
 
 ChatClient chatClient = chatClientBuilder
-            .defaultTools(askTool)
-            .build();
-// The AI agent will call this tool automatically when it needs input
-// For example, when asked: "Help me choose a database for my app"
+    .defaultTools(askTool)
+    .build();
 ```
 
-You have to provide a `questionAnswerFunction(Function<List<Question>, Map<String, String>>)` function to handle the AI questions.
+You have to provide a custom `questionAnswerFunction(Function<List<Question>, Map<String, String>>)` function to handle the AI questions.
 
 The `AskUserQuestionTool` class is thread-safe and can be used concurrently by multiple threads. However, the provided `questionAnswerFunction` must also be thread-safe if shared state is maintained.
 
@@ -43,7 +45,7 @@ All data structures are immutable with defensive copies. The `options` list is c
 
 ## Question Format
 
-The input  Questions list cannot be null or empty and can contain 1-4 questions.
+The input Questions list cannot be null or empty and can contain 1-10 questions.
 Each [Question](https://github.com/spring-ai-community/spring-ai-agent-utils/blob/main/spring-ai-agent-utils/src/main/java/org/springaicommunity/agent/tools/AskUserQuestionTool.java#L90C16-L90C24) received from the AI consists of:
 
 - `question` - The complete question text. Required, not blank, should end with "?"
@@ -112,17 +114,30 @@ Map<String, String> answers = Map.of(
 
 ### Error Handling
 
-The tool automatically validates the answers returned by `questionAnswerFunction`:
+By default, the tool automatically validates the answers returned by `questionAnswerFunction`:
 
 - The returned map is non-null and all questions have corresponding answers (keys match question text)
 - No answer values are null (empty strings are acceptable)
 
 If validation fails, an `InvalidUserAnswerException` is thrown with a descriptive error message.
-This exception indicates user input errors and should be propagated to the user, not the AI agent
+This exception indicates user input errors and should be propagated to the user, not the AI agent.
 
-> **Tip:**  Configure Spring AI to handle this: `spring.ai.tools.throw-exception-on-error=org.springaicommunity.agent.tools.AskUserQuestionTool$InvalidUserAnswerException`
+> **Tip:** Configure Spring AI to handle this: `spring.ai.tools.throw-exception-on-error=org.springaicommunity.agent.tools.AskUserQuestionTool$InvalidUserAnswerException`
 
 If the answer map contains keys that don't match any question, a warning is logged but execution continues. This allows flexibility while alerting developers to potential issues.
+
+#### Disabling Answer Validation
+
+You can disable answer validation by setting `answersValidation(false)` when building the tool:
+
+```java
+AskUserQuestionTool askTool = AskUserQuestionTool.builder()
+    .questionAnswerFunction(questions -> collectUserAnswers(questions))
+    .answersValidation(false)  // Disable validation
+    .build();
+```
+
+This is useful when you want to allow partial answers or handle validation in your own custom logic.
 
 ## Implementation Example
 
@@ -224,6 +239,14 @@ public class WebQuestionHandler {
     }
 }
 ```
+
+## Demo Application
+
+See the [ask-user-question-demo](../../../examples/ask-user-question-demo) for a complete working example of a console-based AI chat application using the AskUserQuestionTool. The demo shows how to:
+- Implement a custom question handler for console interaction
+- Parse user responses (numeric selections or free text)
+- Handle both single-select and multi-select questions
+- Configure the tool with answer validation options
 
 ## See Also
 

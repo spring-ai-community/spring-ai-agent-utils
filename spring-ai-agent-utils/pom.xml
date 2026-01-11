@@ -56,21 +56,24 @@
 	</properties>
 
 	<dependencies>
+		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-			<version>7.0.1</version>
+			<version>${spring-framework.version}</version>
+			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-client-chat</artifactId>
+			<scope>provided</scope>
 		</dependency>
-
 
 		<dependency>
 			<groupId>com.vladsch.flexmark</groupId>
 			<artifactId>flexmark-html2md-converter</artifactId>
-			<version>0.64.8</version>
+			<version>${flexmark.version}</version>
 		</dependency>
 
 

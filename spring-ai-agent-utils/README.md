@@ -120,11 +120,12 @@ public class Application {
 
 ### Examples
 
-Three comprehensive examples demonstrate different use cases:
+Four examples demonstrate different use cases:
 
 - **[code-agent-demo](../examples/code-agent-demo)** - Full-featured AI coding assistant with interactive CLI, all tools, conversation memory, and multi-model support
 - **[skills-demo](../examples/skills-demo)** - Focused demonstration of the SkillsTool system with custom skill development and helper scripts
 - **[subagent-demo](../examples/subagent-demo)** - Demonstrates hierarchical sub-agent system with custom Spring AI expert sub-agent and TaskTools integration
+- **[ask-user-question-demo](../examples/ask-user-question-demo)** - Console-based chat application demonstrating the AskUserQuestionTool with single/multi-select questions and custom answer handling
 
 See the [Examples README](../examples/README.md) for detailed setup, configuration, and usage guide.
 
@@ -327,6 +328,11 @@ AskUserQuestionTool askTool = AskUserQuestionTool.builder()
 // AI agent will automatically call this tool when it needs clarification
 // Example: "Which framework should we use?" with options like React, Vue, Angular
 ```
+
+**Demo Application:**
+
+See the [ask-user-question-demo](../examples/ask-user-question-demo) for a complete console-based implementation.
+
 ---
 
 ### AGENT SKILLS
