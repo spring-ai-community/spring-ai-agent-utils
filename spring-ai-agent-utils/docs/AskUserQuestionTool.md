@@ -7,21 +7,15 @@ A tool for asking users clarifying questions during AI agent execution. Enables 
 - Support for single-select and multi-select questions
 - Free-text input support beyond predefined options
 - 1-4 questions per interaction
-- Immutable data structures with defensive copies
-- Thread-safe implementation
 - Custom function callbacks for UI integration
 
 ## Overview
 
-The `AskUserQuestionTool` is a Spring AI implementation of [Claude Code's AskUserQuestion tool](https://platform.claude.com/docs/en/agent-sdk/user-input#question-format). It enables AI agents to:
-- Request clarification when requirements are ambiguous
-- Offer multiple approaches and let users choose
-- Gather user preferences for subjective decisions
-- Get approval or input on implementation choices
+The `AskUserQuestionTool` is a Spring AI implementation of [Claude Code's AskUserQuestion tool](https://platform.claude.com/docs/en/agent-sdk/user-input#question-format).
 
 The tool follows the question-answer workflow: AI generates questions with options, user provides answers, and AI continues with the collected input.
 
-## Basic Usage
+**Basic Usage:**
 
 ```java
 AskUserQuestionTool askTool = AskUserQuestionTool.builder()
@@ -32,53 +26,57 @@ AskUserQuestionTool askTool = AskUserQuestionTool.builder()
     })
     .build();
 
+ChatClient chatClient = chatClientBuilder
+            .defaultTools(askTool)
+            .build();
 // The AI agent will call this tool automatically when it needs input
 // For example, when asked: "Help me choose a database for my app"
 ```
 
+You have to provide a `questionAnswerFunction(Function<List<Question>, Map<String, String>>)` function to handle the AI questions.
+
 ## Question Format
 
-Each question consists of:
+The input  Questions list cannot be null or empty and can contain 1-4 questions.
+Each [Question](https://github.com/spring-ai-community/spring-ai-agent-utils/blob/main/spring-ai-agent-utils/src/main/java/org/springaicommunity/agent/tools/AskUserQuestionTool.java#L90C16-L90C24) received from the AI consists of:
 
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| `question` | String | The complete question text | Required, not blank, should end with "?" |
-| `header` | String | Short label for UI display | Required, max 12 characters |
-| `options` | List<Option> | Available choices | 2-4 options required |
-| `multiSelect` | Boolean | Allow multiple selections | Defaults to false if null |
+- `question` - The complete question text. Required, not blank, should end with "?"
+- `header` - Short label for UI display. Required, max 12 characters
+- `options` - List of the available [Options](https://github.com/spring-ai-community/spring-ai-agent-utils/blob/main/spring-ai-agent-utils/src/main/java/org/springaicommunity/agent/tools/AskUserQuestionTool.java#L118).
+- `multiSelect` - Flag indicating if multiple selections are allowed. Defaults to false if null.
 
-### Option Format
-
-Each option has:
+Each [Options](https://github.com/spring-ai-community/spring-ai-agent-utils/blob/main/spring-ai-agent-utils/src/main/java/org/springaicommunity/agent/tools/AskUserQuestionTool.java#L118) has:
 - `label` - Display text (e.g., "React", "Vue", "Angular")
 - `description` - Explanation of what this option means
 
-## Creating Questions
+**Example Questions:**
 
-```java
+```json
 // Single-select question
-Question libraryChoice = new Question(
-    "Which library should we use for date formatting?",
-    "Library",
-    List.of(
-        new Option("Moment.js", "Popular but large library"),
-        new Option("Day.js", "Lightweight Moment.js alternative"),
-        new Option("date-fns", "Modular and tree-shakeable")
-    ),
-    false  // single-select
-);
+{
+    "question": "Which library should we use for date formatting?",
+    "header": "Library",
+    "options": [
+        { "label": "Moment.js", "description": "Popular but large library" },
+        { "label": "Day.js", "description": "Lightweight Moment.js alternative" },
+        { "label": "date-fns", "description": "Modular and tree-shakeable" }
+    ],
+    "multiSelect": false
+}
+```
 
+```json
 // Multi-select question
-Question featureSelection = new Question(
-    "Which features do you want to enable?",
-    "Features",
-    List.of(
-        new Option("Authentication", "User login and registration"),
-        new Option("Database", "PostgreSQL integration"),
-        new Option("Caching", "Redis caching layer")
-    ),
-    true  // multi-select
-);
+{
+    "question": "Which features do you want to enable?",
+    "header": "Features",
+    "options": [
+        { "label": "Authentication", "description": "User login and registration" },
+        { "label": "Database", "description": "PostgreSQL integration" },
+        { "label": "Caching", "description": "Redis caching layer" }
+    ],
+    "multiSelect": true
+}
 ```
 
 ## Answer Format
@@ -210,130 +208,9 @@ public class WebQuestionHandler {
 }
 ```
 
-## Validation Rules
+## Implementation Details
 
-The tool enforces strict validation:
-
-### Questions List
-- Must contain 1-4 questions
-- Cannot be null or empty
-
-### Question Fields
-- `question` - Cannot be null or blank
-- `header` - Cannot be null/blank, max 12 characters
-- `options` - Must have 2-4 options
-- `multiSelect` - Defaults to false if null
-
-### Option Fields
-- `label` - Cannot be null or blank
-- `description` - Cannot be null or blank
-
-**Validation Examples:**
-```java
-// ✅ Valid question
-new Question(
-    "Choose a framework?",
-    "Framework",
-    List.of(
-        new Option("React", "Component-based UI"),
-        new Option("Vue", "Progressive framework")
-    ),
-    false
-);
-
-// ❌ Invalid - header too long
-new Question(
-    "Choose a framework?",
-    "FrameworkChoice",  // 15 chars > 12 max
-    options,
-    false
-);
-
-// ❌ Invalid - only 1 option
-new Question(
-    "Choose a framework?",
-    "Framework",
-    List.of(new Option("React", "Only option")),  // Need 2-4 options
-    false
-);
-
-// ❌ Invalid - blank option label
-new Option("", "Description");  // Label cannot be blank
-```
-
-## Examples
-
-### Example 1: Framework Selection
-
-```java
-// AI detects user needs help choosing a framework
-Question frameworkQuestion = new Question(
-    "Which frontend framework should we use?",
-    "Framework",
-    List.of(
-        new Option("React (Recommended)", "Most popular, huge ecosystem"),
-        new Option("Vue", "Gentle learning curve, progressive"),
-        new Option("Svelte", "No virtual DOM, smaller bundles"),
-        new Option("Angular", "Full-featured, enterprise-ready")
-    ),
-    false
-);
-
-// User selects: "React (Recommended)"
-// AI continues with React setup
-```
-
-### Example 2: Multiple Configuration Choices
-
-```java
-// AI needs multiple decisions for project setup
-List<Question> setupQuestions = List.of(
-    new Question(
-        "Which database do you prefer?",
-        "Database",
-        List.of(
-            new Option("PostgreSQL", "Robust relational database"),
-            new Option("MongoDB", "Flexible document database")
-        ),
-        false
-    ),
-    new Question(
-        "Which features should we include?",
-        "Features",
-        List.of(
-            new Option("Authentication", "User login system"),
-            new Option("API Rate Limiting", "Protect against abuse"),
-            new Option("Logging", "Application logs"),
-            new Option("Caching", "Redis caching layer")
-        ),
-        true  // multi-select
-    )
-);
-
-// User answers:
-// - Database: "PostgreSQL"
-// - Features: "Authentication, Logging, Caching"
-```
-
-### Example 3: Free-Text Input
-
-```java
-// User provides custom input not in options
-Question customQuestion = new Question(
-    "Which testing library do you prefer?",
-    "Testing",
-    List.of(
-        new Option("Jest", "Popular JavaScript testing"),
-        new Option("Vitest", "Fast Vite-native testing")
-    ),
-    false
-);
-
-// User types: "Playwright for E2E tests"
-// AI adapts to use Playwright instead of predefined options
-```
-
-## Thread Safety
+### Thread Safety
 
 The `AskUserQuestionTool` class is thread-safe and can be used concurrently by multiple threads. However, the provided `questionAnswerFunction` must also be thread-safe if shared state is maintained.
 
@@ -363,86 +240,53 @@ AskUserQuestionTool tool = AskUserQuestionTool.builder()
     .build();
 ```
 
-## Immutability
+### Immutability
 
 All data structures are immutable with defensive copies:
 - `options` list is copied on Question construction
 - Returned collections cannot be modified
 
+### Error Handling
+
+The `questionAnswerFunction` should handle errors appropriately:
+
+**Return Value Requirements:**
+- Must return a non-null `Map<String, String>`
+- Map keys should match the `question` text from each `Question` object
+- Missing answers for questions may cause the AI agent to behave unexpectedly
+- Empty strings are valid answers, but `null` values should be avoided
+
+**Exception Handling:**
+- If the function throws an exception, the tool execution will fail
+- The AI agent may retry or handle the failure based on the Spring AI configuration
+- For timeout scenarios (e.g., user doesn't respond), consider throwing a descriptive exception or implementing a retry mechanism
+
+**Example with error handling:**
 ```java
-List<Option> options = new ArrayList<>(List.of(
-    new Option("A", "First"),
-    new Option("B", "Second")
-));
-Question question = new Question("Choose?", "Choice", options, false);
+AskUserQuestionTool tool = AskUserQuestionTool.builder()
+    .questionAnswerFunction(questions -> {
+        try {
+            Map<String, String> answers = promptUser(questions);
 
-// Modifying original list doesn't affect Question
-options.clear();
-assertThat(question.options()).hasSize(2);  // Still has 2 options
+            // Validate all questions have answers
+            for (Question q : questions) {
+                if (!answers.containsKey(q.question())) {
+                    throw new IllegalStateException(
+                        "Missing answer for question: " + q.question()
+                    );
+                }
+            }
 
-// Cannot modify returned collections
-question.options().clear();  // Throws UnsupportedOperationException
+            return answers;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("User input interrupted", e);
+        } catch (TimeoutException e) {
+            throw new RuntimeException("User did not respond in time", e);
+        }
+    })
+    .build();
 ```
-
-## Integration with Chat Client
-
-```java
-@Configuration
-public class AgentConfig {
-
-    @Bean
-    public AskUserQuestionTool askUserQuestionTool(QuestionHandlerService handler) {
-        return AskUserQuestionTool.builder()
-            .questionAnswerFunction(handler::handleQuestions)
-            .build();
-    }
-
-    @Bean
-    public ChatClient chatClient(ChatClient.Builder builder,
-                                  AskUserQuestionTool askUserQuestionTool) {
-        return builder
-            .defaultTools(askUserQuestionTool)
-            .build();
-    }
-}
-```
-
-## API Reference
-
-### AskUserQuestionTool
-
-| Method | Description |
-|--------|-------------|
-| `builder()` | Create a new builder instance |
-| `askUserQuestion(questions, answers)` | Tool method called by AI agent |
-
-### Builder
-
-| Method | Description |
-|--------|-------------|
-| `questionAnswerFunction(Function<List<Question>, Map<String, String>>)` | Set the function to handle questions |
-| `build()` | Build the tool instance |
-
-### Question
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `question` | `String` | The question text |
-| `header` | `String` | Short label (max 12 chars) |
-| `options` | `List<Option>` | Available choices (2-4) |
-| `multiSelect` | `Boolean` | Allow multiple selections |
-
-### Option
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `label` | `String` | Display text |
-| `description` | `String` | Explanation of option |
-
-## Related Tools
-
-- **[TodoWriteTool](TodoWriteTool.md)** - For tracking tasks and progress
-- **[TaskTools](TaskTools.md)** - For delegating complex decisions to sub-agents
 
 ## See Also
 
