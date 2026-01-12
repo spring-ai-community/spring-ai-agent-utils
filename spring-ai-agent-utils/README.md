@@ -1,10 +1,8 @@
 # Spring AI Agent Utils
 
+<img style="display: block; margin: auto;" align="left" src="./docs/spring-ai-agent-utils-logo.png" width="200" />
+
 A Spring AI library that brings Claude Code-inspired tools and skills to your AI agents.
-
-## Overview
-
-<img style="display: block; margin: auto;" align="right" src="./docs/spring-ai-agent-utils-logo.png" width="200" />
 
 [Spring AI](https://docs.spring.io/spring-ai/reference/2.0-SNAPSHOT/index.html) Agent Utils reimplements core [Claude Code](https://code.claude.com/docs/en/settings#tools-available-to-claude) capabilities as Spring AI tools, enabling sophisticated agentic workflows with file operations, shell execution, web access, task management, and extensible skills.
 
