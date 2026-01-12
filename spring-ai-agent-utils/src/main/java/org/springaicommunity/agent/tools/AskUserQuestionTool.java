@@ -143,12 +143,12 @@ public class AskUserQuestionTool {
 				throw new IllegalArgumentException("Header cannot be null or blank");
 			}
 			if (header.length() > 12) {
-				throw new IllegalArgumentException("Header must be max 12 characters, got: " + header.length());
+				logger.warn("Header length is greater than 12 characters: {}", header);
 			}
 
 			// Validate options
 			if (options == null || options.size() < 2 || options.size() > 4) {
-				throw new IllegalArgumentException("Options must have 2-4 items");
+				logger.warn("Options size must be between 2 and 4, got: {}", options == null ? 0 : options.size());
 			}
 
 			// Default multiSelect to false if null

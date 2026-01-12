@@ -14,32 +14,14 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.Ordered;
-import org.springframework.core.io.Resource;
 
 @SpringBootApplication
 public class Application {
-
-	@Value("${agent.skills.paths}")
-	List<String> skillPaths;
-
-	@Value("${agent.model:Unknown}")
-	String agentModel;
-
-	@Value("${agent.model.knowledge.cutoff:Unknown}")
-	String agentModelKnowledgeCutoff;
-
-	@Value("classpath:/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md")
-	Resource systemPrompt;
-
-	@Value("${BRAVE_API_KEY:#{null}}")
-	String braveApiKey;
-
+	
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}

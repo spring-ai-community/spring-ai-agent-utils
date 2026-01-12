@@ -251,43 +251,45 @@ class AskUserQuestionToolTest {
 		}
 
 		@Test
-		@DisplayName("Should reject question with header exceeding 12 characters")
-		void shouldRejectQuestionWithHeaderExceeding12Characters() {
+		@DisplayName("Should accept question with header exceeding 12 characters (logs warning)")
+		void shouldAcceptQuestionWithHeaderExceeding12Characters() {
 			List<Option> options = List.of(new Option("A", "First"), new Option("B", "Second"));
 
-			assertThatThrownBy(() -> new Question("Question?", "ThisIsTooLong", options, false))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessageContaining("Header must be max 12 characters")
-				.hasMessageContaining("got: 13");
+			// Header validation only logs a warning, doesn't throw exception
+			Question question = new Question("Question?", "ThisIsTooLong", options, false);
+
+			assertThat(question.header()).isEqualTo("ThisIsTooLong");
+			assertThat(question.header()).hasSize(13);
 		}
 
 		@Test
 		@DisplayName("Should reject question with null options")
 		void shouldRejectQuestionWithNullOptions() {
 			assertThatThrownBy(() -> new Question("Question?", "Header", null, false))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessageContaining("Options must have 2-4 items");
+				.isInstanceOf(NullPointerException.class);
 		}
 
 		@Test
-		@DisplayName("Should reject question with only one option")
-		void shouldRejectQuestionWithOnlyOneOption() {
+		@DisplayName("Should accept question with only one option (logs warning)")
+		void shouldAcceptQuestionWithOnlyOneOption() {
 			List<Option> options = List.of(new Option("Only", "Single option"));
 
-			assertThatThrownBy(() -> new Question("Question?", "Header", options, false))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessageContaining("Options must have 2-4 items");
+			// Options validation only logs a warning, doesn't throw exception
+			Question question = new Question("Question?", "Header", options, false);
+
+			assertThat(question.options()).hasSize(1);
 		}
 
 		@Test
-		@DisplayName("Should reject question with more than 4 options")
-		void shouldRejectQuestionWithMoreThanFourOptions() {
+		@DisplayName("Should accept question with more than 4 options (logs warning)")
+		void shouldAcceptQuestionWithMoreThanFourOptions() {
 			List<Option> options = List.of(new Option("A", "First"), new Option("B", "Second"),
 					new Option("C", "Third"), new Option("D", "Fourth"), new Option("E", "Fifth"));
 
-			assertThatThrownBy(() -> new Question("Question?", "Header", options, false))
-				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessageContaining("Options must have 2-4 items");
+			// Options validation only logs a warning, doesn't throw exception
+			Question question = new Question("Question?", "Header", options, false);
+
+			assertThat(question.options()).hasSize(5);
 		}
 
 	}
