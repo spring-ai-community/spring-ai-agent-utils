@@ -73,7 +73,7 @@ While these tools can be used standalone, truly agentic behavior emerges when th
 <dependency>
     <groupId>org.springaicommunity</groupId>
     <artifactId>spring-ai-agent-utils</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
