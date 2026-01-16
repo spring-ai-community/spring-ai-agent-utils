@@ -36,20 +36,20 @@
 			<artifactId>spring-ai-starter-mcp-client-webflux</artifactId>
 		</dependency> -->
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-anthropic</artifactId>
-		</dependency>
+		</dependency> -->
 
 		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-openai-sdk</artifactId>
 		</dependency> -->
 
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-google-genai</artifactId>
-		</dependency> -->
+		</dependency>
 
 		<!-- Netty DNS resolver for macOS -->
 		<dependency>
