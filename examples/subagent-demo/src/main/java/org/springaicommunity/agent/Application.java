@@ -13,6 +13,7 @@ import org.springaicommunity.agent.tools.SkillsTool;
 import org.springaicommunity.agent.tools.SmartWebFetchTool;
 import org.springaicommunity.agent.tools.TodoWriteTool;
 import org.springaicommunity.agent.tools.task.TaskToolCallbackProvider;
+import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentReferences;
 import org.springaicommunity.agent.utils.AgentEnvironment;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -46,12 +47,20 @@ public class Application {
 		return args -> {
 
 			var taskTools = TaskToolCallbackProvider.builder()
-				.agentResources(agentPaths)
-				.skillsResources(skillPaths)
-				.chatClientBuilder(chatClientBuilder.clone()
+				.subagentReferences(ClaudeSubagentReferences.fromResources(agentPaths))
+				.chatClientBuilder("default", chatClientBuilder.clone()
 					.defaultToolContext(Map.of("foo", "bar"))
 					.defaultAdvisors(new MyLoggingAdvisor(0, "[TASK]")))
+				.skillsResources(skillPaths)
 				.build();
+
+			// var taskTools = TaskToolCallbackProvider.builder()
+			// 	.agentResources(agentPaths)
+			// 	.skillsResources(skillPaths)
+			// 	.chatClientBuilder(chatClientBuilder.clone()
+			// 		.defaultToolContext(Map.of("foo", "bar"))
+			// 		.defaultAdvisors(new MyLoggingAdvisor(0, "[TASK]")))
+			// 	.build();
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off
 				// system prompt

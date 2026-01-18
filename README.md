@@ -26,8 +26,9 @@ spring-ai-agent-utils/
 │
 └── examples/
     ├── code-agent-demo/            # Full-featured AI coding assistant
+    ├── ask-user-question-demo/     # Interactive question-answer demo
     ├── skills-demo/                # Focused skills system demo
-    └── subagent-demo/              # Hierarchical sub-agent example
+    └── subagent-demo/              # Extensible sub-agent example
 ```
 
 ## Agentic Utils
@@ -55,7 +56,7 @@ These are the agent tools needed to implement any agentic behavior
 #### Task orchestration & multi-agent
 
 - **[TodoWriteTool](spring-ai-agent-utils/docs/TodoWriteTool.md)** - Structured task management with state tracking
-- **[TaskTools](spring-ai-agent-utils/docs/TaskTools.md)** - Hierarchical autonomous sub-agent system for delegating complex tasks to specialized agents with dedicated context windows
+- **[TaskTools](spring-ai-agent-utils/docs/TaskTools.md)** - Extensible sub-agent system for delegating complex tasks to specialized agents with multi-model routing and pluggable backends
 
 While these tools can be used standalone, truly agentic behavior emerges when they are combined. SkillsTool naturally pairs with FileSystemTools and ShellTools to execute domain-specific workflows. BraveWebSearchTool and SmartWebFetchTool provide your AI application with access to real-world information. TaskTools orchestrates complex operations by delegating to specialized sub-agents, each equipped with a tailored subset of these tools.
 
@@ -102,11 +103,11 @@ public class Application {
 					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, "2025-01-01"))
                 
 
-                // Sub-Agents
+                // Sub-Agents (with multi-model support)
                 .defaultToolCallbacks(TaskToolCallbackProvider.builder()
-                    .agentDirectories(".claude/agents")
+                    .chatClientBuilder("default", chatClientBuilder.clone())
+                    .subagentReferences(ClaudeSubagentReferences.fromRootDirectory(".claude/agents"))
                     .skillsDirectories(".claude/skills")
-                    .chatClientBuilder(chatClientBuilder.clone().defaultToolContext(Map.of("foo", "bar")))
                     .build())
 
                 // Skills

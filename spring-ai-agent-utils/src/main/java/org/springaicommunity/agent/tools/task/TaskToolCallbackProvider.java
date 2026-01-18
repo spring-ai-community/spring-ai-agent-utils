@@ -18,6 +18,8 @@ package org.springaicommunity.agent.tools.task;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springaicommunity.agent.tools.BraveWebSearchTool;
 import org.springaicommunity.agent.tools.FileSystemTools;
@@ -29,6 +31,9 @@ import org.springaicommunity.agent.tools.SmartWebFetchTool;
 import org.springaicommunity.agent.tools.TodoWriteTool;
 import org.springaicommunity.agent.tools.task.repository.DefaultTaskRepository;
 import org.springaicommunity.agent.tools.task.repository.TaskRepository;
+import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
+import org.springaicommunity.agent.tools.task.subagent.SubagentResolver;
+import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentExecutor;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.tool.ToolCallback;
@@ -61,15 +66,18 @@ public class TaskToolCallbackProvider implements ToolCallbackProvider {
 
 	public static class Builder {
 
+		private String braveApiKey = System.getenv("BRAVE_API_KEY");
+
 		private TaskRepository taskRepository = new DefaultTaskRepository();
 
-		private ChatClient.Builder chatClientBuilder;
+		private Map<String, ChatClient.Builder> chatClientBuilderMap = new ConcurrentHashMap<>();
 
-		private List<String> agentDirectories = new ArrayList<>();
+		private List<SubagentReference> subagentReferences = new ArrayList<>();
 
+		private List<SubagentResolver> subagentResolvers = new ArrayList<>();
+
+		//
 		private List<String> skillsDirectories = new ArrayList<>();
-
-		private String braveApiKey = System.getenv("BRAVE_API_KEY");
 
 		public Builder braveApiKey(String braveApiKey) {
 			Assert.notNull(braveApiKey, "braveApiKey must not be null");
@@ -83,43 +91,44 @@ public class TaskToolCallbackProvider implements ToolCallbackProvider {
 			return this;
 		}
 
-		public Builder chatClientBuilder(ChatClient.Builder chatClientBuilder) {
+		public Builder chatClientBuilder(String modelId, ChatClient.Builder chatClientBuilder) {
+			Assert.notNull(modelId, "modelId must not be null");
 			Assert.notNull(chatClientBuilder, "chatClientBuilder must not be null");
-			this.chatClientBuilder = chatClientBuilder;
+			this.chatClientBuilderMap.put(modelId, chatClientBuilder);
 			return this;
 		}
 
-		public Builder agentResources(List<Resource> agentRootPaths) {
-			for (Resource agentRootPath : agentRootPaths) {
-				this.agentResource(agentRootPath);
-			}
+		public Builder chatClientBuilders(Map<String, ChatClient.Builder> chatClientBuilderMap) {
+			Assert.notNull(chatClientBuilderMap, "chatClientBuilderMap must not be null");
+			this.chatClientBuilderMap.putAll(chatClientBuilderMap);
 			return this;
 		}
 
-		public Builder agentResource(Resource agentRootPath) {
-			try {
-				String path = agentRootPath.getFile().toPath().toAbsolutePath().toString();
-				this.agentDirectories(path);
-			}
-			catch (IOException ex) {
-				throw new RuntimeException("Failed to load tasks from directory: " + agentRootPath, ex);
-			}
+		public Builder subagentReferences(List<SubagentReference> subagentReferences) {
+			Assert.notNull(subagentReferences, "subagentReferences must not be null");
+			this.subagentReferences.addAll(subagentReferences);
 			return this;
 		}
 
-		public Builder agentDirectories(List<String> agentDirectories) {
-			Assert.notNull(agentDirectories, "agentDirectories must not be null");
-			this.agentDirectories.addAll(agentDirectories);
+		public Builder subagentReferences(SubagentReference... subagentReferences) {
+			Assert.notNull(subagentReferences, "subagentReferences must not be null");
+			this.subagentReferences.addAll(List.of(subagentReferences));
 			return this;
 		}
 
-		public Builder agentDirectories(String agentDirectory) {
-			Assert.notNull(agentDirectory, "agentDirectory must not be null");
-			this.agentDirectories.add(agentDirectory);
+		public Builder subagentResolvers(List<SubagentResolver> subagentResolvers) {
+			Assert.notNull(subagentResolvers, "subagentResolvers must not be null");
+			this.subagentResolvers.addAll(subagentResolvers);
 			return this;
 		}
 
+		public Builder subagentResolvers(SubagentResolver... subagentResolvers) {
+			Assert.notNull(subagentResolvers, "subagentResolvers must not be null");
+			this.subagentResolvers.addAll(List.of(subagentResolvers));
+			return this;
+		}
 
+		// Skills directories
 		public Builder skillsResources(List<Resource> skillsRootPaths) {
 			for (Resource skillsRootPath : skillsRootPaths) {
 				this.skillsResource(skillsRootPath);
@@ -150,7 +159,23 @@ public class TaskToolCallbackProvider implements ToolCallbackProvider {
 			return this;
 		}
 
-		private List<ToolCallback> coreToolCallbacks() {
+		public TaskToolCallbackProvider build() {
+
+			ToolCallback taskToolCallback2 = TaskTool.builder()
+				.subagentReferences(this.subagentReferences)
+				.subagentResolvers(this.subagentResolvers)
+				.subagentExecutors(new ClaudeSubagentExecutor(this.chatClientBuilderMap,
+						this.defaultCoreToolCallbacks(this.chatClientBuilderMap.get("default"))))
+				.taskRepository(this.taskRepository)
+				// .taskDescriptionTemplate(null)
+				.build();
+
+			ToolCallback taskOutputToolCallback = TaskOutputTool.builder().taskRepository(this.taskRepository).build();
+
+			return new TaskToolCallbackProvider(new ToolCallback[] { taskToolCallback2, taskOutputToolCallback });
+		}
+
+		private List<ToolCallback> defaultCoreToolCallbacks(ChatClient.Builder chatClientBuilder) {
 
 			List<ToolCallback> callbacks = new ArrayList<>();
 
@@ -176,21 +201,6 @@ public class TaskToolCallbackProvider implements ToolCallbackProvider {
 
 			return callbacks;
 		}
-
-		public TaskToolCallbackProvider build() {
-
-			ToolCallback taskToolCallback = TaskTool.builder()
-				.tools(this.coreToolCallbacks())
-				.addTaskDirectories(this.agentDirectories)
-				.chatClientBuilder(this.chatClientBuilder)
-				.taskRepository(this.taskRepository)
-				.build();
-
-			ToolCallback taskOutputToolCallback = TaskOutputTool.builder().taskRepository(this.taskRepository).build();
-
-			return new TaskToolCallbackProvider(new ToolCallback[] { taskToolCallback, taskOutputToolCallback });
-		}
-
 	}
 
 }

@@ -15,35 +15,27 @@
 */
 package org.springaicommunity.agent.tools.task;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springaicommunity.agent.tools.task.repository.TaskRepository;
-import org.springaicommunity.agent.utils.MarkdownParser;
+import org.springaicommunity.agent.tools.task.subagent.Kind;
+import org.springaicommunity.agent.tools.task.subagent.Subagent;
+import org.springaicommunity.agent.tools.task.subagent.SubagentExecutor;
+import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
+import org.springaicommunity.agent.tools.task.subagent.SubagentResolver;
+import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentResolver;
 
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.ai.tool.function.FunctionToolCallback;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Christian Tzolov
@@ -138,36 +130,41 @@ public class TaskTool {
 
 		private static final Logger logger = LoggerFactory.getLogger(TaskFunction.class);
 
-		private final Map<String, TaskType> tasksMap;
-
-		private final ChatClient.Builder chatClientBuilder;
-
-		private final List<ToolCallback> tools;
-
 		// Storage for background tasks
 		private final TaskRepository taskRepository;
 
-		public TaskFunction(Map<String, TaskType> tasksMap, ChatClient.Builder chatClientBuilder,
-				TaskRepository taskRepository, List<ToolCallback> tools) {
-			this.tasksMap = tasksMap;
-			this.chatClientBuilder = chatClientBuilder;
+		private final Map<String, Subagent> subagents;
+
+		private final Map<String, SubagentExecutor> subagentExecutors;
+
+		public TaskFunction(List<Subagent> subagents, List<SubagentExecutor> subagentExecutors,
+				TaskRepository taskRepository) {
 			this.taskRepository = taskRepository;
-			this.tools = tools;
+			this.subagents = subagents.stream().collect(Collectors.toMap(sa -> sa.getName(), sa -> sa));
+			this.subagentExecutors = subagentExecutors.stream().collect(Collectors.toMap(se -> se.getKind(), se -> se));
 		}
 
 		@Override
 		public String apply(TaskCall taskCall) {
 
-			TaskType taskType = this.tasksMap.get(taskCall.subagent_type);
+			String subagentName = taskCall.subagent_type();
 
-			if (taskType == null) {
-				return "Error: Unknown subagent type: " + taskCall.subagent_type();
+			if (!this.subagents.containsKey(subagentName)) {
+				throw new RuntimeException("No subagent found with name: " + subagentName);
+			}
+
+			Subagent subagent = this.subagents.get(subagentName);
+
+			SubagentExecutor subagentExecutor = this.subagentExecutors.get(subagent.getKind());
+
+			if (subagentExecutor == null) {
+				throw new RuntimeException("No subagent executor found for subagent kind: " + subagent.getKind());
 			}
 
 			if (Boolean.TRUE.equals(taskCall.run_in_background())) {
 				// Create background task using CompletableFuture
 				var bgTask = this.taskRepository.putTask("task_" + UUID.randomUUID(),
-						() -> this.executeTaskChatClient(taskCall, taskType));
+						() -> subagentExecutor.execute(taskCall, subagent));
 
 				return String.format(
 						"task_id: %s\n\nBackground task started with ID: %s\nUse TaskOutput tool with task_id='%s' to retrieve results.",
@@ -175,53 +172,7 @@ public class TaskTool {
 			}
 
 			// Synchronous execution (existing behavior)
-			return this.executeTaskChatClient(taskCall, taskType);
-
-		}
-
-		private String executeTaskChatClient(TaskCall taskCall, TaskType taskType) {
-
-			var taskChatClient = this.createTaskChatClient(taskType);
-
-			return taskChatClient.prompt()
-				.user(taskCall.prompt)
-				.system(taskType.content()) // Todo add the system suffix
-				// Todo set model if provided.
-				.call()
-				.content();
-		}
-
-		private ChatClient createTaskChatClient(TaskType taskType) {
-
-			var builder = this.chatClientBuilder.clone();
-
-			if (!CollectionUtils.isEmpty(this.tools)) {
-				if (CollectionUtils.isEmpty(taskType.tools())) {
-					builder.defaultToolCallbacks(this.tools);
-				}
-				else {
-					List<ToolCallback> taskTools = this.tools.stream()
-						.filter(tc -> taskType.tools().contains(tc.getToolDefinition().name()))
-						.toList();
-					builder.defaultToolCallbacks(taskTools);
-				}
-			}
-
-			if (!taskType.permissionMode().equals("default")) {
-				logger.warn(
-						"The task permissionMode is not supported yet. permissionMode = " + taskType.permissionMode());
-			}
-
-			if (!CollectionUtils.isEmpty(taskType.skills())) {
-				logger.warn("The task skills filtering are not supported yet. skills = "
-						+ String.join(",", taskType.skills()));
-			}
-
-			if (StringUtils.hasText(taskType.model())) {
-				logger.warn("The task model override is not supported yet. model = " + taskType.model());
-			}
-
-			return builder.defaultAdvisors(ToolCallAdvisor.builder().build()).build();
+			return subagentExecutor.execute(taskCall, subagent);
 		}
 
 	}
@@ -232,30 +183,55 @@ public class TaskTool {
 
 	public static class Builder {
 
-		private List<TaskType> taskTypes = new ArrayList<>();
+		private List<SubagentReference> subagentReferences = new ArrayList<>();
+
+		private List<SubagentExecutor> subagentExecutors = new ArrayList<>();
+
+		private List<SubagentResolver> subagentResolvers = new ArrayList<>();
 
 		private String taskDescriptionTemplate = TASK_DESCRIPTION_TEMPLATE;
 
-		private ChatClient.Builder chatClientBuilder;
-
 		private TaskRepository taskRepository;
 
-		private List<ToolCallback> tools = new ArrayList<>();
-
 		private Builder() {
-			// Load the built-in task types (e.g. subagents)
-			this.taskTypes
-				.add(from(new DefaultResourceLoader().getResource("classpath:/agent/GENERAL_PURPOSE_SUBAGENT.md")));
-			this.taskTypes.add(from(new DefaultResourceLoader().getResource("classpath:/agent/EXPLORE_SUBAGENT.md")));
+
+			// Register built-in Claude subagent references
+			this.subagentReferences.add(new SubagentReference("classpath:/agent/GENERAL_PURPOSE_SUBAGENT.md",
+					Kind.CLAUDE_SUBAGENT.name(), null));
+			this.subagentReferences.add(new SubagentReference("classpath:/agent/EXPLORE_SUBAGENT.md",
+					Kind.CLAUDE_SUBAGENT.name(), null));
+
+			// Register built-in Claude subagent resolvers
+			this.subagentResolvers.add(new ClaudeSubagentResolver());
 		}
 
-		public Builder tools(List<ToolCallback> tools) {
-			this.tools.addAll(tools);
+		public Builder subagentReferences(List<SubagentReference> subagentReferences) {
+			this.subagentReferences.addAll(subagentReferences);
 			return this;
 		}
 
-		public Builder tools(ToolCallback tool) {
-			this.tools.add(tool);
+		public Builder subagentReferences(SubagentReference... subagentReference) {
+			this.subagentReferences.addAll(List.of(subagentReference));
+			return this;
+		}
+
+		public Builder subagentExecutors(List<SubagentExecutor> subagentExecutors) {
+			this.subagentExecutors.addAll(subagentExecutors);
+			return this;
+		}
+
+		public Builder subagentExecutors(SubagentExecutor... subagentExecutors) {
+			this.subagentExecutors.addAll(List.of(subagentExecutors));
+			return this;
+		}
+
+		public Builder subagentResolvers(List<SubagentResolver> subagentResolvers) {
+			this.subagentResolvers.addAll(subagentResolvers);
+			return this;
+		}
+
+		public Builder subagentResolvers(SubagentResolver... subagentResolvers) {
+			this.subagentResolvers.addAll(List.of(subagentResolvers));
 			return this;
 		}
 
@@ -265,180 +241,39 @@ public class TaskTool {
 			return this;
 		}
 
-		public Builder chatClientBuilder(ChatClient.Builder chatClientBuilder) {
-			Assert.notNull(chatClientBuilder, "chatClientBuilder must not be null");
-			this.chatClientBuilder = chatClientBuilder;
-			return this;
-		}
-
 		public Builder taskDescriptionTemplate(String template) {
 			Assert.hasText(template, "template must not be empty");
 			this.taskDescriptionTemplate = template;
 			return this;
 		}
 
-		public Builder addTasksResources(List<Resource> tasksRootPaths) {
-			for (Resource tasksRootPath : tasksRootPaths) {
-				this.addTasksResource(tasksRootPath);
-			}
-			return this;
-		}
-
-		public Builder addTasksResource(Resource tasksRootPath) {
-			try {
-				String path = tasksRootPath.getFile().toPath().toAbsolutePath().toString();
-				this.addTaskDirectory(path);
-			}
-			catch (IOException ex) {
-				throw new RuntimeException("Failed to load tasks from directory: " + tasksRootPath, ex);
-			}
-			return this;
-		}
-
-		public Builder addTaskDirectory(String taskRootDirectory) {
-			this.addTaskDirectories(List.of(taskRootDirectory));
-			return this;
-		}
-
-		public Builder addTaskDirectories(List<String> taskRootDirectories) {
-
-			for (String taskRootDirectory : taskRootDirectories) {
-				try {
-					this.taskTypes.addAll(taskTypes(taskRootDirectory));
-				}
-				catch (IOException ex) {
-					throw new RuntimeException("Failed to load tasks from directory: " + taskRootDirectory, ex);
+		private Subagent resolve(SubagentReference subagentReference) {
+			for (SubagentResolver subagentResolver : this.subagentResolvers) {
+				if (subagentResolver.canResolve(subagentReference)) {
+					return subagentResolver.resolve(subagentReference);
 				}
 			}
-			return this;
+			throw new RuntimeException(
+					"No SubagentResolver found that can resolve subagent reference: " + subagentReference);
 		}
 
 		public ToolCallback build() {
 			Assert.notNull(this.taskRepository, "taskRepository must be provided");
-			Assert.notEmpty(this.taskTypes, "At least one task must be configured");
-			Assert.notNull(this.chatClientBuilder, "chatClientBuilder must be provided");
+			Assert.notEmpty(this.subagentExecutors, "At least one subagentExecutor must be provided");
 
-			String tasks = this.taskTypes.stream().map(s -> s.toPromptContent()).collect(Collectors.joining("\n"));
+			List<Subagent> subagents = this.subagentReferences.stream().map(sr -> this.resolve(sr)).toList();
+
+			String subagentRegistrations = subagents.stream()
+				.map(sa -> sa.toSubagentRegistrations())
+				.collect(Collectors.joining("\n"));
 
 			return FunctionToolCallback
-				.builder("Task",
-						new TaskFunction(toTasksMap(this.taskTypes), this.chatClientBuilder, this.taskRepository,
-								this.tools))
-				.description(this.taskDescriptionTemplate.formatted(tasks))
+				.builder("Task", new TaskFunction(subagents, this.subagentExecutors, this.taskRepository))
+				.description(this.taskDescriptionTemplate.formatted(subagentRegistrations))
 				.inputType(TaskCall.class)
 				.build();
 		}
 
-	}
-
-	private static Map<String, TaskType> toTasksMap(List<TaskType> tasks) {
-
-		Map<String, TaskType> tasksMap = new HashMap<>();
-
-		for (TaskType taskFile : tasks) {
-			tasksMap.put(taskFile.frontMatter().get("name").toString(), taskFile);
-		}
-
-		return tasksMap;
-	}
-
-	/**
-	 * Represents a agent md file with its location and parsed content.
-	 * https://code.claude.com/docs/en/sub-agents#configuration-fields
-	 */
-	private static record TaskType(Path path, Map<String, Object> frontMatter, String content) {
-
-		public String name() {
-			return this.frontMatter().get("name").toString();
-		}
-
-		public String description() {
-			return this.frontMatter().get("description").toString();
-		}
-
-		public String model() {
-			return this.frontMatter().containsKey("model") ? this.frontMatter().get("model").toString() : null;
-		}
-
-		public String permissionMode() {
-			return this.frontMatter().containsKey("permissionMode")
-					? this.frontMatter().get("permissionMode").toString() : "default";
-		}
-
-		public List<String> tools() {
-			if (!this.frontMatter().containsKey("tools")) {
-				return List.of();
-			}
-			String[] toolNames = this.frontMatter().get("tools").toString().split(",");
-			return Stream.of(toolNames).map(tn -> tn.trim()).filter(tn -> StringUtils.hasText(tn)).toList();
-		}
-
-		public List<String> skills() {
-			if (!this.frontMatter().containsKey("skills")) {
-				return List.of();
-			}
-			String[] skillNames = this.frontMatter().get("skills").toString().split(",");
-			return Stream.of(skillNames).map(tn -> tn.trim()).filter(tn -> StringUtils.hasText(tn)).toList();
-		}
-
-		public String toPromptContent() {
-			return this.frontMatter()
-				.entrySet()
-				.stream()
-				.map(e -> "-%s: /%s".formatted(e.getKey(), e.getValue(), e.getKey()))
-				.collect(Collectors.joining("\n"));
-		}
-
-	}
-
-	/**
-	 * Recursively finds all subagent (Task) markdown files in the given root directory
-	 * and returns their parsed contents.
-	 * @param rootDirectory the root directory to search for tasks files
-	 * @return a list of Task objects containing the path, front-matter, and content of
-	 * each task markdown file
-	 * @throws IOException if an I/O error occurs while reading the directory or files
-	 */
-	private static List<TaskType> taskTypes(String rootDirectory) throws IOException {
-		Path rootPath = Paths.get(rootDirectory);
-
-		if (!Files.exists(rootPath)) {
-			throw new IOException("Root directory does not exist: " + rootDirectory);
-		}
-
-		if (!Files.isDirectory(rootPath)) {
-			throw new IOException("Path is not a directory: " + rootDirectory);
-		}
-
-		List<TaskType> taskFiles = new ArrayList<>();
-
-		try (Stream<Path> paths = Files.walk(rootPath)) {
-			paths.filter(Files::isRegularFile)
-				.filter(path -> path.getFileName().toString().endsWith(".md"))
-				.forEach(path -> {
-					try {
-						String markdown = Files.readString(path, StandardCharsets.UTF_8);
-						MarkdownParser parser = new MarkdownParser(markdown);
-						taskFiles.add(new TaskType(path, parser.getFrontMatter(), parser.getContent()));
-					}
-					catch (IOException e) {
-						throw new RuntimeException("Failed to read task file: " + path, e);
-					}
-				});
-		}
-
-		return taskFiles;
-	}
-
-	private static TaskType from(Resource resource) {
-		try {
-			String markdown = resource.getContentAsString(StandardCharsets.UTF_8);
-			MarkdownParser parser = new MarkdownParser(markdown);
-			return new TaskType(resource.getFile().toPath(), parser.getFrontMatter(), parser.getContent());
-		}
-		catch (IOException e) {
-			throw new RuntimeException("Failed to read task file: " + resource.getFilename(), e);
-		}
 	}
 
 }

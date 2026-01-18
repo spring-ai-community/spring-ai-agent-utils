@@ -25,6 +25,25 @@ See the [Code Agent Demo README](code-agent-demo/README.md) for full documentati
 
 ---
 
+### [Ask User Question Demo](ask-user-question-demo)
+
+Demonstrates the AskUserQuestionTool for interactive agent-user communication with structured questions and multiple-choice options.
+
+**Best for:**
+- Learning how to build interactive AI agents that ask clarifying questions
+- Understanding structured question-answer patterns
+- Implementing user preference gathering
+- Building agents that validate assumptions before proceeding
+
+**Quick Start:**
+```bash
+cd ask-user-question-demo
+export ANTHROPIC_API_KEY=your-anthropic-key  # or use other providers
+mvn spring-boot:run
+```
+
+---
+
 ### [Sub-Agent Demo](subagent-demo)
 
 Demonstrates the hierarchical sub-agent system with custom sub-agent creation and TaskTools integration.
