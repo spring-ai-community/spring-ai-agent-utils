@@ -17,6 +17,7 @@ package org.springaicommunity.agent.tools.task;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +33,7 @@ import org.springaicommunity.agent.tools.TodoWriteTool;
 import org.springaicommunity.agent.tools.task.repository.DefaultTaskRepository;
 import org.springaicommunity.agent.tools.task.repository.TaskRepository;
 import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
-import org.springaicommunity.agent.tools.task.subagent.SubagentResolver;
+import org.springaicommunity.agent.tools.task.subagent.SubagentType;
 import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentExecutor;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -49,19 +50,62 @@ import org.springframework.util.StringUtils;
 
 public class TaskToolCallbackProvider implements ToolCallbackProvider {
 
-	private final ToolCallback[] toolCallbacks;
+	private final String braveApiKey;
 
-	private TaskToolCallbackProvider(ToolCallback[] toolCallbacks) {
-		this.toolCallbacks = toolCallbacks;
+	private final TaskRepository taskRepository;
+
+	private final Map<String, ChatClient.Builder> chatClientBuilderMap;
+
+	private final List<SubagentReference> subagentReferences;
+
+	private final List<SubagentType> subagentTypes;
+
+	private final List<String> skillsDirectories;
+
+	private volatile ToolCallback[] toolCallbacks;
+
+	private TaskToolCallbackProvider(String braveApiKey, TaskRepository taskRepository,
+			Map<String, ChatClient.Builder> chatClientBuilderMap, List<SubagentReference> subagentReferences,
+			List<SubagentType> subagentTypes, List<String> skillsDirectories) {
+		this.braveApiKey = braveApiKey;
+		this.taskRepository = taskRepository;
+		this.chatClientBuilderMap = Map.copyOf(chatClientBuilderMap);
+		this.subagentReferences = List.copyOf(subagentReferences);
+		this.subagentTypes = List.copyOf(subagentTypes);
+		this.skillsDirectories = List.copyOf(skillsDirectories);
 	}
 
 	@Override
 	public ToolCallback[] getToolCallbacks() {
-		return toolCallbacks;
+		if (toolCallbacks == null) {
+			synchronized (this) {
+				if (toolCallbacks == null) {
+					this.deferredBuild();
+				}
+			}
+		}
+		return Arrays.copyOf(this.toolCallbacks, this.toolCallbacks.length);
 	}
 
 	public static Builder builder() {
 		return new Builder();
+	}
+
+	private void deferredBuild() {
+
+		ToolCallback taskToolCallback2 = TaskTool.builder()
+			.subagentReferences(this.subagentReferences)
+			.subagentResolvers(this.subagentTypes.stream().map(SubagentType::resolver).toList())
+			.subagentExecutors(new ClaudeSubagentExecutor(this.chatClientBuilderMap,
+					this.defaultCoreToolCallbacks(this.chatClientBuilderMap.get("default"))))
+			.subagentExecutors(this.subagentTypes.stream().map(SubagentType::executor).toList())
+			.taskRepository(this.taskRepository)
+			// .taskDescriptionTemplate(null)
+			.build();
+
+		ToolCallback taskOutputToolCallback = TaskOutputTool.builder().taskRepository(this.taskRepository).build();
+
+		this.toolCallbacks = new ToolCallback[] { taskToolCallback2, taskOutputToolCallback };
 	}
 
 	public static class Builder {
@@ -74,9 +118,8 @@ public class TaskToolCallbackProvider implements ToolCallbackProvider {
 
 		private List<SubagentReference> subagentReferences = new ArrayList<>();
 
-		private List<SubagentResolver> subagentResolvers = new ArrayList<>();
+		private List<SubagentType> subagentTypes = new ArrayList<>();
 
-		//
 		private List<String> skillsDirectories = new ArrayList<>();
 
 		public Builder braveApiKey(String braveApiKey) {
@@ -116,15 +159,15 @@ public class TaskToolCallbackProvider implements ToolCallbackProvider {
 			return this;
 		}
 
-		public Builder subagentResolvers(List<SubagentResolver> subagentResolvers) {
-			Assert.notNull(subagentResolvers, "subagentResolvers must not be null");
-			this.subagentResolvers.addAll(subagentResolvers);
+		public Builder subagentTypes(List<SubagentType> subagentTypes) {
+			Assert.notNull(subagentTypes, "subagentTypes must not be null");
+			this.subagentTypes.addAll(subagentTypes);
 			return this;
 		}
 
-		public Builder subagentResolvers(SubagentResolver... subagentResolvers) {
-			Assert.notNull(subagentResolvers, "subagentResolvers must not be null");
-			this.subagentResolvers.addAll(List.of(subagentResolvers));
+		public Builder subagentTypes(SubagentType... subagentTypes) {
+			Assert.notNull(subagentTypes, "subagentTypes must not be null");
+			this.subagentTypes.addAll(List.of(subagentTypes));
 			return this;
 		}
 
@@ -160,47 +203,39 @@ public class TaskToolCallbackProvider implements ToolCallbackProvider {
 		}
 
 		public TaskToolCallbackProvider build() {
-
-			ToolCallback taskToolCallback2 = TaskTool.builder()
-				.subagentReferences(this.subagentReferences)
-				.subagentResolvers(this.subagentResolvers)
-				.subagentExecutors(new ClaudeSubagentExecutor(this.chatClientBuilderMap,
-						this.defaultCoreToolCallbacks(this.chatClientBuilderMap.get("default"))))
-				.taskRepository(this.taskRepository)
-				// .taskDescriptionTemplate(null)
-				.build();
-
-			ToolCallback taskOutputToolCallback = TaskOutputTool.builder().taskRepository(this.taskRepository).build();
-
-			return new TaskToolCallbackProvider(new ToolCallback[] { taskToolCallback2, taskOutputToolCallback });
+			Assert.isTrue(this.chatClientBuilderMap.containsKey("default"),
+					"chatClientBuilderMap must contain a 'default' entry");
+			return new TaskToolCallbackProvider(this.braveApiKey, this.taskRepository, this.chatClientBuilderMap,
+					this.subagentReferences, this.subagentTypes, this.skillsDirectories);
 		}
 
-		private List<ToolCallback> defaultCoreToolCallbacks(ChatClient.Builder chatClientBuilder) {
+	}
 
-			List<ToolCallback> callbacks = new ArrayList<>();
+	private List<ToolCallback> defaultCoreToolCallbacks(ChatClient.Builder chatClientBuilder) {
 
-			List<ToolCallback> callbacks2 = List.of(MethodToolCallbackProvider.builder()
-				.toolObjects(TodoWriteTool.builder().build(), GrepTool.builder().build(), GlobTool.builder().build(),
-						ShellTools.builder().build(), FileSystemTools.builder().build(),
-						SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build())
+		List<ToolCallback> callbacks = new ArrayList<>();
+
+		List<ToolCallback> callbacks2 = List.of(MethodToolCallbackProvider.builder()
+			.toolObjects(TodoWriteTool.builder().build(), GrepTool.builder().build(), GlobTool.builder().build(),
+					ShellTools.builder().build(), FileSystemTools.builder().build(),
+					SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build())
+			.build()
+			.getToolCallbacks());
+
+		callbacks.addAll(callbacks2);
+
+		if (!this.skillsDirectories.isEmpty()) {
+			callbacks.add(SkillsTool.builder().addSkillsDirectories(this.skillsDirectories).build());
+		}
+
+		if (StringUtils.hasText(this.braveApiKey)) {
+			callbacks.add(MethodToolCallbackProvider.builder()
+				.toolObjects(BraveWebSearchTool.builder(braveApiKey).resultCount(15).build())
 				.build()
-				.getToolCallbacks());
-
-			callbacks.addAll(callbacks2);
-
-			if (!this.skillsDirectories.isEmpty()) {
-				callbacks.add(SkillsTool.builder().addSkillsDirectories(this.skillsDirectories).build());
-			}
-
-			if (StringUtils.hasText(this.braveApiKey)) {
-				callbacks.add(MethodToolCallbackProvider.builder()
-					.toolObjects(BraveWebSearchTool.builder(braveApiKey).resultCount(15).build())
-					.build()
-					.getToolCallbacks()[0]);
-			}
-
-			return callbacks;
+				.getToolCallbacks()[0]);
 		}
+
+		return callbacks;
 	}
 
 }

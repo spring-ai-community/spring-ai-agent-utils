@@ -22,8 +22,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springaicommunity.agent.tools.task.TaskTool.TaskCall;
-import org.springaicommunity.agent.tools.task.subagent.Kind;
-import org.springaicommunity.agent.tools.task.subagent.Subagent;
+import org.springaicommunity.agent.tools.task.subagent.SubagentDefinition;
 import org.springaicommunity.agent.tools.task.subagent.SubagentExecutor;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -56,13 +55,13 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 
 	@Override
 	public String getKind() {
-		return Kind.CLAUDE_SUBAGENT.name();
+		return ClaudeSubagentDefinition.KIND;
 	}
 
 	@Override
-	public String execute(TaskCall taskCall, Subagent subagent) {
+	public String execute(TaskCall taskCall, SubagentDefinition subagent) {
 
-		var claudeSubagent = (ClaudeSubagent) subagent;
+		var claudeSubagent = (ClaudeSubagentDefinition) subagent;
 		var taskChatClient = this.createTaskChatClient(claudeSubagent);
 
 		return taskChatClient.prompt()
@@ -73,7 +72,7 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 			.content();
 	}
 
-	private ChatClient createTaskChatClient(ClaudeSubagent claudeSubagent) {
+	private ChatClient createTaskChatClient(ClaudeSubagentDefinition claudeSubagent) {
 
 		var builder = this.findChatClientBuilder(claudeSubagent).clone();
 
@@ -117,7 +116,7 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 		return builder.defaultAdvisors(ToolCallAdvisor.builder().build()).build();
 	}
 
-	private ChatClient.Builder findChatClientBuilder(ClaudeSubagent claudeSubagent) {
+	private ChatClient.Builder findChatClientBuilder(ClaudeSubagentDefinition claudeSubagent) {
 
 		if (StringUtils.hasText(claudeSubagent.getModel())
 				&& this.chatClientBuilderMap.containsKey(claudeSubagent.getModel())) {

@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.springaicommunity.agent.tools.task.subagent.Kind;
 import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
 
 import org.springframework.core.io.Resource;
@@ -47,7 +46,7 @@ public class ClaudeSubagentReferences {
 					.filter(path -> path.getFileName().toString().endsWith(".md"))
 					.forEach(path -> {
 						subagentReferences.add(new SubagentReference(path.toAbsolutePath().toString(),
-								Kind.CLAUDE_SUBAGENT.name(), null));
+								ClaudeSubagentDefinition.KIND, null));
 					});
 			}
 		}
@@ -73,7 +72,7 @@ public class ClaudeSubagentReferences {
 				return fromRootDirectory(path);
 			}
 
-			return List.of(new SubagentReference(path, Kind.CLAUDE_SUBAGENT.name(), null));
+			return List.of(new SubagentReference(path, ClaudeSubagentDefinition.KIND, null));
 		}
 		catch (IOException ex) {
 			throw new RuntimeException("Failed to load tasks from directory: " + agentRootPath, ex);

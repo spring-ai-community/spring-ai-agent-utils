@@ -22,4 +22,7 @@ import java.util.Map;
  */
 public record SubagentReference(String uri, String kind, Map<String, String> metadata) {
 
+	public SubagentReference(String uri, String kind) {
+		this(uri, kind, Map.of());
+	}
 }

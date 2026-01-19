@@ -15,16 +15,16 @@
  */
 package org.springaicommunity.agent.tools;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import java.util.Collections;
 
-import org.junit.jupiter.api.Test;
-import org.springaicommunity.agent.tools.BraveWebSearchTool;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
 import org.springframework.ai.util.json.JsonParser;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Unit tests for {@link BraveWebSearchTool}.

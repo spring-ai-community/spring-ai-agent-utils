@@ -19,7 +19,7 @@ package org.springaicommunity.agent.tools.task.subagent;
  * @author Christian Tzolov
  */
 
-public interface Subagent {
+public interface SubagentDefinition {
 
 	String getName();
 

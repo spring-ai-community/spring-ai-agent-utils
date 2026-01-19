@@ -24,6 +24,6 @@ public interface SubagentExecutor {
 
 	String getKind();
 
-	String execute(TaskCall taskCall, Subagent subagent);
+	String execute(TaskCall taskCall, SubagentDefinition subagent);
 	
 }

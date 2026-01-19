@@ -25,17 +25,49 @@ The most important finding is that "Agents" in this system are not just a concep
     *   **`run_in_background`**: The main agent can start a task with this flag set to `true`.
     *   **`TaskOutputTool`**: The main agent receives a `task_id` immediately and can use this separate tool to check the status or retrieve the result later.
 
+5.  **Extensible Subagent Types**:
+    The system supports multiple subagent backends through the `SubagentType` abstraction:
+    *   **Claude-based subagents**: Defined in Markdown files, executed via Spring AI ChatClient
+    *   **A2A (Agent-to-Agent) subagents**: Connect to external agents via the A2A protocol
+    *   **Custom implementations**: Implement `SubagentResolver` and `SubagentExecutor` interfaces
+
 ### Updated Code Breakdown
 
-*   **`TaskToolCallbackProvider` (Lines 49-53)**:
-    This is the builder that scans your directories for those Markdown agent definitions. It wires up the `TaskTool` and `TaskOutputTool`.
+*   **`TaskToolCallbackProvider` (Lines 54-66)**:
+    This is the builder that configures the task tool system with subagent references and types:
     ```java
-    .agentDirectories(".../resources/agents") // Scans for .md files
+    var taskTools = TaskToolCallbackProvider.builder()
+        // Load Claude-based subagents from Markdown files
+        .subagentReferences(ClaudeSubagentReferences.fromResources(agentPaths))
+
+        // Add A2A Subagent support (extensible architecture)
+        .subagentReferences(new SubagentReference("http://localhost:10001", A2ASubagentDefinition.KIND))
+        .subagentTypes(new SubagentType(new A2ASubagentResolver(), new A2ASubagentExecutor()))
+
+        // Configure ChatClient builder for subagent execution
+        .chatClientBuilder("default", chatClientBuilder.clone())
+        .skillsResources(skillPaths)
+        .build();
     ```
 
+*   **Key Abstractions**:
+    *   `SubagentDefinition`: Interface representing a subagent (name, description, kind)
+    *   `SubagentReference`: URI + kind pointing to where a subagent definition lives
+    *   `SubagentResolver`: Parses references into `SubagentDefinition` instances
+    *   `SubagentExecutor`: Executes tasks against a specific subagent kind
+    *   `SubagentType`: Bundles a resolver and executor together for a specific kind
+
 *   **`ChatClient` Configuration**:
-    *   The main client is equipped with `taskTools` (Line 57). This gives it the ability to spawn the sub-agents defined in the directories above.
+    *   The main client is equipped with `taskTools` (Line 77). This gives it the ability to spawn the sub-agents defined in the directories above.
     *   It is also equipped with the raw tools (`ShellTools`, `BraveWebSearchTool`, etc.) so it can perform actions itself if needed (or pass them down to sub-agents).
 
+### A2A Subagent Example
+
+This demo includes an example of extending the system with A2A (Agent-to-Agent) protocol support:
+
+*   `A2ASubagentDefinition`: Implements `SubagentDefinition` with `KIND = "A2A"`
+*   `A2ASubagentResolver`: Resolves A2A references by fetching agent cards from endpoints
+*   `A2ASubagentExecutor`: Executes tasks by sending requests to A2A-compatible agents
+
 ### Summary
-This application demonstrates a **Dispatcher-Worker** pattern. The `Application.java` sets up a "Manager" (the main ChatClient). The `TaskTool` allows this Manager to hire "Specialists" (Sub-agents defined in Markdown) on demand, give them a specific set of tools, and wait for their report.
+This application demonstrates a **Dispatcher-Worker** pattern with an **extensible architecture**. The `Application.java` sets up a "Manager" (the main ChatClient). The `TaskTool` allows this Manager to hire "Specialists" (Sub-agents) on demand—either from Markdown definitions (Claude-based) or external services (A2A)—give them a specific set of tools, and wait for their report.

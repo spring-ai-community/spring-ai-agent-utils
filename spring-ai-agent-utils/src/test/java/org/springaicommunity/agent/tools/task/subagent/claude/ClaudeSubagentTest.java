@@ -18,13 +18,12 @@ package org.springaicommunity.agent.tools.task.subagent.claude;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.springaicommunity.agent.tools.task.subagent.Kind;
 import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link ClaudeSubagent}.
+ * Tests for {@link ClaudeSubagentDefinition}.
  *
  * @author Christian Tzolov
  */
@@ -33,22 +32,22 @@ class ClaudeSubagentTest {
 	@Test
 	void shouldParseBasicFrontmatter() {
 		Map<String, Object> frontMatter = Map.of("name", "test-agent", "description", "Test description");
-		SubagentReference ref = new SubagentReference("file:test.md", Kind.CLAUDE_SUBAGENT.name(), null);
+		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, null);
 
-		ClaudeSubagent subagent = new ClaudeSubagent(ref, frontMatter, "System prompt content");
+		ClaudeSubagentDefinition subagent = new ClaudeSubagentDefinition(ref, frontMatter, "System prompt content");
 
 		assertThat(subagent.getName()).isEqualTo("test-agent");
 		assertThat(subagent.getDescription()).isEqualTo("Test description");
-		assertThat(subagent.getKind()).isEqualTo(Kind.CLAUDE_SUBAGENT.name());
+		assertThat(subagent.getKind()).isEqualTo(ClaudeSubagentDefinition.KIND);
 		assertThat(subagent.getContent()).isEqualTo("System prompt content");
 	}
 
 	@Test
 	void shouldParseToolsFromFrontmatter() {
 		Map<String, Object> frontMatter = Map.of("name", "test", "description", "desc", "tools", "Read, Grep, Glob");
-		SubagentReference ref = new SubagentReference("file:test.md", Kind.CLAUDE_SUBAGENT.name(), null);
+		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, null);
 
-		ClaudeSubagent subagent = new ClaudeSubagent(ref, frontMatter, "");
+		ClaudeSubagentDefinition subagent = new ClaudeSubagentDefinition(ref, frontMatter, "");
 
 		assertThat(subagent.tools()).containsExactly("Read", "Grep", "Glob");
 	}
@@ -57,9 +56,9 @@ class ClaudeSubagentTest {
 	void shouldParseDisallowedToolsFromFrontmatter() {
 		Map<String, Object> frontMatter = Map.of("name", "test", "description", "desc", "disallowedTools",
 				"Bash, Shell");
-		SubagentReference ref = new SubagentReference("file:test.md", Kind.CLAUDE_SUBAGENT.name(), null);
+		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, null);
 
-		ClaudeSubagent subagent = new ClaudeSubagent(ref, frontMatter, "");
+		ClaudeSubagentDefinition subagent = new ClaudeSubagentDefinition(ref, frontMatter, "");
 
 		assertThat(subagent.disallowedTools()).containsExactly("Bash", "Shell");
 	}
@@ -67,9 +66,9 @@ class ClaudeSubagentTest {
 	@Test
 	void shouldReturnEmptyListWhenNoToolsSpecified() {
 		Map<String, Object> frontMatter = Map.of("name", "test", "description", "desc");
-		SubagentReference ref = new SubagentReference("file:test.md", Kind.CLAUDE_SUBAGENT.name(), null);
+		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, null);
 
-		ClaudeSubagent subagent = new ClaudeSubagent(ref, frontMatter, "");
+		ClaudeSubagentDefinition subagent = new ClaudeSubagentDefinition(ref, frontMatter, "");
 
 		assertThat(subagent.tools()).isEmpty();
 		assertThat(subagent.disallowedTools()).isEmpty();
@@ -78,9 +77,9 @@ class ClaudeSubagentTest {
 	@Test
 	void shouldParseModelFromFrontmatter() {
 		Map<String, Object> frontMatter = Map.of("name", "test", "description", "desc", "model", "opus");
-		SubagentReference ref = new SubagentReference("file:test.md", Kind.CLAUDE_SUBAGENT.name(), null);
+		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, null);
 
-		ClaudeSubagent subagent = new ClaudeSubagent(ref, frontMatter, "");
+		ClaudeSubagentDefinition subagent = new ClaudeSubagentDefinition(ref, frontMatter, "");
 
 		assertThat(subagent.getModel()).isEqualTo("opus");
 	}
@@ -88,9 +87,9 @@ class ClaudeSubagentTest {
 	@Test
 	void shouldReturnDefaultPermissionMode() {
 		Map<String, Object> frontMatter = Map.of("name", "test", "description", "desc");
-		SubagentReference ref = new SubagentReference("file:test.md", Kind.CLAUDE_SUBAGENT.name(), null);
+		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, null);
 
-		ClaudeSubagent subagent = new ClaudeSubagent(ref, frontMatter, "");
+		ClaudeSubagentDefinition subagent = new ClaudeSubagentDefinition(ref, frontMatter, "");
 
 		assertThat(subagent.permissionMode()).isEqualTo("default");
 	}

@@ -18,8 +18,7 @@ package org.springaicommunity.agent.tools.task.subagent.claude;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import org.springaicommunity.agent.tools.task.subagent.Kind;
-import org.springaicommunity.agent.tools.task.subagent.Subagent;
+import org.springaicommunity.agent.tools.task.subagent.SubagentDefinition;
 import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
 import org.springaicommunity.agent.tools.task.subagent.SubagentResolver;
 import org.springaicommunity.agent.utils.MarkdownParser;
@@ -36,14 +35,14 @@ public class ClaudeSubagentResolver implements SubagentResolver {
 	@Override
 	public boolean canResolve(SubagentReference subagentRef) {
 		Assert.notNull(subagentRef, "SubagentReference must not be null");
-		return subagentRef.kind().equals(Kind.CLAUDE_SUBAGENT.name());
+		return subagentRef.kind().equals(ClaudeSubagentDefinition.KIND);
 	}
 
 	@Override
-	public Subagent resolve(SubagentReference subagentRef) {
+	public SubagentDefinition resolve(SubagentReference subagentRef) {
 		Assert.notNull(subagentRef, "SubagentReference must not be null");
-		Assert.isTrue(subagentRef.kind().equals(Kind.CLAUDE_SUBAGENT.name()),
-				"ClaudeSubagentResolver can resolve only subagents of kind: " + Kind.CLAUDE_SUBAGENT.name());
+		Assert.isTrue(subagentRef.kind().equals(ClaudeSubagentDefinition.KIND),
+				"ClaudeSubagentResolver can resolve only subagents of kind: " + ClaudeSubagentDefinition.KIND);
 
 		try {
 			String uri = (subagentRef.uri().startsWith("/"))? "file:" + subagentRef.uri() : subagentRef.uri();
@@ -51,7 +50,7 @@ public class ClaudeSubagentResolver implements SubagentResolver {
 			String markdown = resource.getContentAsString(StandardCharsets.UTF_8);
 			MarkdownParser parser = new MarkdownParser(markdown);
 
-			return new ClaudeSubagent(subagentRef, parser.getFrontMatter(), parser.getContent());
+			return new ClaudeSubagentDefinition(subagentRef, parser.getFrontMatter(), parser.getContent());
 		}
 		catch (IOException e) {
 			throw new RuntimeException("Failed to read task file: " + subagentRef.uri(), e);

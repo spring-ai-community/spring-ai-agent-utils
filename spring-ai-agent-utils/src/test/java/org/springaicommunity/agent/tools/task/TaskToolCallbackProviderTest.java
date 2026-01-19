@@ -16,6 +16,10 @@
 package org.springaicommunity.agent.tools.task;
 
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +51,8 @@ class TaskToolCallbackProviderTest {
 	void shouldFailWhenNoDefaultChatClientBuilder() {
 		assertThatThrownBy(() -> TaskToolCallbackProvider.builder()
 			.chatClientBuilder("sonnet", chatClientBuilder)
-			.build()).isInstanceOf(RuntimeException.class);
+			.build()).isInstanceOf(IllegalArgumentException.class)
+			.hasMessageContaining("default");
 	}
 
 	@Test
@@ -95,6 +100,72 @@ class TaskToolCallbackProviderTest {
 			.build();
 
 		assertThat(provider.getToolCallbacks()).hasSize(2);
+	}
+
+	@Test
+	void shouldReturnDefensiveCopyOfToolCallbacks() {
+		TaskToolCallbackProvider provider = TaskToolCallbackProvider.builder()
+			.chatClientBuilder("default", chatClientBuilder)
+			.build();
+
+		ToolCallback[] callbacks1 = provider.getToolCallbacks();
+		ToolCallback[] callbacks2 = provider.getToolCallbacks();
+
+		// Should return different array instances (defensive copy)
+		assertThat(callbacks1).isNotSameAs(callbacks2);
+		// But with same content
+		assertThat(callbacks1).containsExactly(callbacks2);
+	}
+
+	@Test
+	void shouldBeLazyInitialized() {
+		TaskToolCallbackProvider provider = TaskToolCallbackProvider.builder()
+			.chatClientBuilder("default", chatClientBuilder)
+			.build();
+
+		// First call initializes
+		ToolCallback[] callbacks1 = provider.getToolCallbacks();
+		// Second call returns same underlying data
+		ToolCallback[] callbacks2 = provider.getToolCallbacks();
+
+		assertThat(callbacks1).hasSize(2);
+		assertThat(callbacks2).hasSize(2);
+	}
+
+	@Test
+	void shouldBeThreadSafeOnConcurrentAccess() throws InterruptedException {
+		TaskToolCallbackProvider provider = TaskToolCallbackProvider.builder()
+			.chatClientBuilder("default", chatClientBuilder)
+			.build();
+
+		int threadCount = 10;
+		CountDownLatch startLatch = new CountDownLatch(1);
+		CountDownLatch doneLatch = new CountDownLatch(threadCount);
+		AtomicReference<Throwable> error = new AtomicReference<>();
+
+		ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+		for (int i = 0; i < threadCount; i++) {
+			executor.submit(() -> {
+				try {
+					startLatch.await();
+					ToolCallback[] callbacks = provider.getToolCallbacks();
+					assertThat(callbacks).hasSize(2);
+				}
+				catch (Throwable t) {
+					error.compareAndSet(null, t);
+				}
+				finally {
+					doneLatch.countDown();
+				}
+			});
+		}
+
+		// Start all threads simultaneously
+		startLatch.countDown();
+		doneLatch.await();
+		executor.shutdown();
+
+		assertThat(error.get()).isNull();
 	}
 
 }

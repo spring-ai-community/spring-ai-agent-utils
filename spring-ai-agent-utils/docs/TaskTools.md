@@ -40,11 +40,14 @@ The system is built on pluggable abstractions that allow:
 ### Core Components
 
 ```
-TaskTool
+TaskToolCallbackProvider
     ├── SubagentReference[] ──────► (URIs pointing to subagent definitions)
-    ├── SubagentResolver[] ───────► (parse references into Subagent instances)
-    │   └── ClaudeSubagentResolver
-    └── SubagentExecutor[] ───────► (execute subagents)
+    ├── SubagentType[] ───────────► (bundles resolver + executor per kind)
+    │   └── SubagentType
+    │       ├── SubagentResolver ─► (parse references into SubagentDefinition)
+    │       └── SubagentExecutor ─► (execute subagents)
+    └── Built-in Claude support
+        ├── ClaudeSubagentResolver
         └── ClaudeSubagentExecutor
             └── Map<String, ChatClient.Builder> (model routing)
 ```
@@ -53,11 +56,11 @@ TaskTool
 
 | Interface | Purpose |
 |-----------|---------|
-| `Subagent` | Core interface representing a subagent with name, description, kind, and reference |
+| `SubagentDefinition` | Core interface representing a subagent with name, description, kind, and reference |
 | `SubagentReference` | Record holding URI, kind, and metadata for locating a subagent definition |
-| `SubagentResolver` | Strategy for resolving `SubagentReference` → `Subagent` |
-| `SubagentExecutor` | Strategy for executing a `TaskCall` against a `Subagent` |
-| `Kind` | Enum defining subagent types: `CLAUDE_SUBAGENT`, `A2A_SUBAGENT` |
+| `SubagentResolver` | Strategy for resolving `SubagentReference` → `SubagentDefinition` |
+| `SubagentExecutor` | Strategy for executing a `TaskCall` against a `SubagentDefinition` |
+| `SubagentType` | Record bundling a `SubagentResolver` and `SubagentExecutor` together for a specific kind |
 
 ### Main Components
 
@@ -111,7 +114,7 @@ description: Fast agent specialized for exploring codebases. Use for finding fil
 ### Basic Setup
 
 ```java
-import org.springaicommunity.agent.tools.task.TaskToolCallbackProvider2;
+import org.springaicommunity.agent.tools.task.TaskToolCallbackProvider;
 import org.springframework.ai.chat.client.ChatClient;
 
 @Configuration
@@ -121,7 +124,7 @@ public class AgentConfig {
     CommandLineRunner demo(ChatClient.Builder chatClientBuilder) {
         return args -> {
             // Configure Task tools with multi-model support
-            var taskTools = TaskToolCallbackProvider2.builder()
+            var taskTools = TaskToolCallbackProvider.builder()
                 .chatClientBuilder("default", chatClientBuilder)
                 .build();
 
@@ -156,11 +159,11 @@ TaskToolCallbackProvider taskTools = TaskToolCallbackProvider.builder()
     .chatClientBuilder("opus", opusChatClientBuilder)
     .chatClientBuilder("haiku", haikuChatClientBuilder)
 
-    // Optional: Custom subagent references
+    // Optional: Custom subagent references (for Claude-based subagents)
     .subagentReferences(ClaudeSubagentReferences.fromRootDirectory("/path/to/agents"))
 
-    // Optional: Custom subagent resolvers
-    .subagentResolvers(new MyCustomSubagentResolver())
+    // Optional: Custom subagent types (bundles resolver + executor for new kinds)
+    .subagentTypes(new SubagentType(myResolver, myExecutor))
 
     // Optional: Skills for sub-agents
     .skillsDirectories(".claude/skills")
@@ -184,7 +187,7 @@ ChatClient.Builder sonnetBuilder = ChatClient.builder(sonnetModel);
 ChatClient.Builder opusBuilder = ChatClient.builder(opusModel);
 ChatClient.Builder haikuBuilder = ChatClient.builder(haikuModel);
 
-TaskToolCallbackProvider2 taskTools = TaskToolCallbackProvider2.builder()
+TaskToolCallbackProvider taskTools = TaskToolCallbackProvider.builder()
     .chatClientBuilder("default", sonnetBuilder)  // Fallback
     .chatClientBuilder("sonnet", sonnetBuilder)
     .chatClientBuilder("opus", opusBuilder)
@@ -203,7 +206,7 @@ import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentRefe
 
 List<SubagentReference> refs = ClaudeSubagentReferences.fromRootDirectory("/path/to/agents");
 
-TaskToolCallbackProvider2 taskTools = TaskToolCallbackProvider2.builder()
+TaskToolCallbackProvider taskTools = TaskToolCallbackProvider.builder()
     .chatClientBuilder("default", chatClientBuilder)
     .subagentReferences(refs)
     .build();
@@ -219,12 +222,12 @@ import org.springframework.core.io.ResourceLoader;
 private ResourceLoader resourceLoader;
 
 @Bean
-public TaskToolCallbackProvider2 taskTools(ChatClient.Builder chatClientBuilder) {
+public TaskToolCallbackProvider taskTools(ChatClient.Builder chatClientBuilder) {
     Resource agentsResource = resourceLoader.getResource("classpath:.claude/agents");
 
     List<SubagentReference> refs = ClaudeSubagentReferences.fromResource(agentsResource);
 
-    return TaskToolCallbackProvider2.builder()
+    return TaskToolCallbackProvider.builder()
         .chatClientBuilder("default", chatClientBuilder)
         .subagentReferences(refs)
         .build();
@@ -373,7 +376,9 @@ To add support for a new subagent type (e.g., A2A protocol):
 #### 1. Define the Subagent Implementation
 
 ```java
-public class A2ASubagent implements Subagent {
+public class A2ASubagentDefinition implements SubagentDefinition {
+
+    public static final String KIND = "A2A";
 
     private final String name;
     private final String description;
@@ -387,7 +392,7 @@ public class A2ASubagent implements Subagent {
     public String getDescription() { return description; }
 
     @Override
-    public String getKind() { return Kind.A2A_SUBAGENT.name(); }
+    public String getKind() { return KIND; }
 
     @Override
     public SubagentReference getReference() { return reference; }
@@ -403,14 +408,14 @@ public class A2ASubagentResolver implements SubagentResolver {
 
     @Override
     public boolean canResolve(SubagentReference ref) {
-        return ref.kind().equals(Kind.A2A_SUBAGENT.name());
+        return ref.kind().equals(A2ASubagentDefinition.KIND);
     }
 
     @Override
-    public Subagent resolve(SubagentReference ref) {
+    public SubagentDefinition resolve(SubagentReference ref) {
         // Load A2A agent card from endpoint
         String agentCard = fetchAgentCard(ref.uri());
-        return parseA2ASubagent(ref, agentCard);
+        return parseA2ASubagentDefinition(ref, agentCard);
     }
 }
 ```
@@ -424,23 +429,41 @@ public class A2ASubagentExecutor implements SubagentExecutor {
 
     @Override
     public String getKind() {
-        return Kind.A2A_SUBAGENT.name();
+        return A2ASubagentDefinition.KIND;
     }
 
     @Override
-    public String execute(TaskCall taskCall, Subagent subagent) {
-        A2ASubagent a2a = (A2ASubagent) subagent;
+    public String execute(TaskCall taskCall, SubagentDefinition subagent) {
+        A2ASubagentDefinition a2a = (A2ASubagentDefinition) subagent;
         return a2aClient.sendTask(a2a.getEndpoint(), taskCall.prompt());
     }
 }
 ```
 
-#### 4. Register with TaskTool
+#### 4. Register with TaskToolCallbackProvider
+
+```java
+// Create SubagentType that bundles resolver + executor
+SubagentType a2aType = new SubagentType(
+    new A2ASubagentResolver(),
+    new A2ASubagentExecutor(a2aClient)
+);
+
+TaskToolCallbackProvider taskTools = TaskToolCallbackProvider.builder()
+    .chatClientBuilder("default", chatClientBuilder)
+    .subagentReferences(
+        new SubagentReference("http://agent.example.com", A2ASubagentDefinition.KIND)
+    )
+    .subagentTypes(a2aType)
+    .build();
+```
+
+Alternatively, register directly with TaskTool for more control:
 
 ```java
 TaskTool.builder()
     .subagentReferences(
-        new SubagentReference("http://agent.example.com", Kind.A2A_SUBAGENT.name(), null)
+        new SubagentReference("http://agent.example.com", A2ASubagentDefinition.KIND)
     )
     .subagentResolvers(new A2ASubagentResolver())
     .subagentExecutors(new A2ASubagentExecutor(a2aClient))
@@ -568,7 +591,7 @@ public class Application {
 
         return args -> {
             // Configure Task tools with custom agents and multi-model support
-            var taskTools = TaskToolCallbackProvider2.builder()
+            var taskTools = TaskToolCallbackProvider.builder()
                 .chatClientBuilder("default", defaultBuilder)
                 .chatClientBuilder("sonnet", sonnetBuilder)
                 .chatClientBuilder("opus", opusBuilder)
@@ -686,7 +709,7 @@ public class TaskTool {
 }
 ```
 
-### TaskToolCallbackProvider2
+### TaskToolCallbackProvider
 
 ```java
 public class TaskToolCallbackProvider implements ToolCallbackProvider {
@@ -698,8 +721,8 @@ public class TaskToolCallbackProvider implements ToolCallbackProvider {
         Builder chatClientBuilders(Map<String, ChatClient.Builder> builders);
         Builder subagentReferences(List<SubagentReference> refs);
         Builder subagentReferences(SubagentReference... refs);
-        Builder subagentResolvers(List<SubagentResolver> resolvers);
-        Builder subagentResolvers(SubagentResolver... resolvers);
+        Builder subagentTypes(List<SubagentType> types);
+        Builder subagentTypes(SubagentType... types);
         Builder skillsDirectories(List<String> dirs);
         Builder skillsDirectories(String dir);
         Builder skillsResource(Resource resource);
@@ -707,7 +730,7 @@ public class TaskToolCallbackProvider implements ToolCallbackProvider {
         Builder braveApiKey(String apiKey);
         Builder taskRepository(TaskRepository repository);
 
-        TaskToolCallbackProvider2 build();
+        TaskToolCallbackProvider build();
     }
 }
 ```
@@ -715,28 +738,48 @@ public class TaskToolCallbackProvider implements ToolCallbackProvider {
 ### Subagent Interfaces
 
 ```java
-public interface Subagent {
+public interface SubagentDefinition {
     String getName();
     String getDescription();
     String getKind();
     SubagentReference getReference();
+    default String toSubagentRegistrations() { ... }
 }
 
 public interface SubagentResolver {
     boolean canResolve(SubagentReference ref);
-    Subagent resolve(SubagentReference ref);
+    SubagentDefinition resolve(SubagentReference ref);
 }
 
 public interface SubagentExecutor {
     String getKind();
-    String execute(TaskCall taskCall, Subagent subagent);
+    String execute(TaskCall taskCall, SubagentDefinition subagent);
 }
 
-public record SubagentReference(String uri, String kind, Map<String, String> metadata) {}
+public record SubagentReference(String uri, String kind, Map<String, String> metadata) {
+    public SubagentReference(String uri, String kind) { this(uri, kind, Map.of()); }
+}
 
-public enum Kind {
-    CLAUDE_SUBAGENT,
-    A2A_SUBAGENT
+public record SubagentType(SubagentResolver resolver, SubagentExecutor executor) {
+    public String kind() { return executor.getKind(); }
+}
+```
+
+### ClaudeSubagentDefinition
+
+The built-in Claude subagent definition uses the kind constant `"CLAUDE"`:
+
+```java
+public class ClaudeSubagentDefinition implements SubagentDefinition {
+    public static final String KIND = "CLAUDE";
+
+    // Additional Claude-specific methods:
+    public String getModel();           // Model override (sonnet, opus, haiku)
+    public List<String> tools();        // Allowed tool names
+    public List<String> disallowedTools(); // Tools to deny
+    public List<String> skills();       // Skills to load
+    public String permissionMode();     // Permission handling mode
+    public String getContent();         // System prompt content
 }
 ```
 

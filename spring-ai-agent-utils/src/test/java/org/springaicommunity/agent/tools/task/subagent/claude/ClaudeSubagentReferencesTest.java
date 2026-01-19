@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.springaicommunity.agent.tools.task.subagent.Kind;
 import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +43,7 @@ class ClaudeSubagentReferencesTest {
 		List<SubagentReference> refs = ClaudeSubagentReferences.fromRootDirectory(tempDir.toString());
 
 		assertThat(refs).hasSize(2);
-		assertThat(refs).allMatch(r -> r.kind().equals(Kind.CLAUDE_SUBAGENT.name()));
+		assertThat(refs).allMatch(r -> r.kind().equals(ClaudeSubagentDefinition.KIND));
 		assertThat(refs).allMatch(r -> r.uri().endsWith(".md"));
 	}
 

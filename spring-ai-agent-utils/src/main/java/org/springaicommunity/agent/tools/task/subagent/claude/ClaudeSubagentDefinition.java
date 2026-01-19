@@ -21,8 +21,7 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springaicommunity.agent.tools.task.subagent.Kind;
-import org.springaicommunity.agent.tools.task.subagent.Subagent;
+import org.springaicommunity.agent.tools.task.subagent.SubagentDefinition;
 import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
 
 import org.springframework.util.StringUtils;
@@ -30,12 +29,11 @@ import org.springframework.util.StringUtils;
 /**
  * @author Christian Tzolov
  */
+public class ClaudeSubagentDefinition implements SubagentDefinition {
 
-public class ClaudeSubagent implements Subagent {
+	private static final Logger logger = LoggerFactory.getLogger(ClaudeSubagentDefinition.class);
 
-	private static final Logger logger = LoggerFactory.getLogger(ClaudeSubagent.class);
-
-	private static final String CLAUDE_SUBAGENT_KIND = Kind.CLAUDE_SUBAGENT.name();
+	public static final String KIND = "CLAUDE";
 
 	private static final String FRONTMATTER_NAME_KEY = "name";
 
@@ -57,7 +55,7 @@ public class ClaudeSubagent implements Subagent {
 
 	private final SubagentReference reference;
 
-	public ClaudeSubagent(SubagentReference reference, Map<String, Object> frontMatter, String content) {
+	public ClaudeSubagentDefinition(SubagentReference reference, Map<String, Object> frontMatter, String content) {
 		this.reference = reference;
 		this.frontMatter = frontMatter;
 		this.content = content;
@@ -75,7 +73,7 @@ public class ClaudeSubagent implements Subagent {
 
 	@Override
 	public String getKind() {
-		return CLAUDE_SUBAGENT_KIND;
+		return KIND;
 	}
 
 	/**

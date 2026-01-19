@@ -16,8 +16,7 @@
 package org.springaicommunity.agent.tools.task.subagent.claude;
 
 import org.junit.jupiter.api.Test;
-import org.springaicommunity.agent.tools.task.subagent.Kind;
-import org.springaicommunity.agent.tools.task.subagent.Subagent;
+import org.springaicommunity.agent.tools.task.subagent.SubagentDefinition;
 import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,8 +33,8 @@ class ClaudeSubagentResolverTest {
 
 	@Test
 	void shouldResolveOnlyClaudeSubagentKind() {
-		SubagentReference claudeRef = new SubagentReference("file:test.md", Kind.CLAUDE_SUBAGENT.name(), null);
-		SubagentReference a2aRef = new SubagentReference("http://example.com", Kind.A2A_SUBAGENT.name(), null);
+		SubagentReference claudeRef = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, null);
+		SubagentReference a2aRef = new SubagentReference("http://example.com", "A2A", null);
 
 		assertThat(resolver.canResolve(claudeRef)).isTrue();
 		assertThat(resolver.canResolve(a2aRef)).isFalse();
@@ -44,19 +43,19 @@ class ClaudeSubagentResolverTest {
 	@Test
 	void shouldResolveFromClasspathResource() {
 		SubagentReference ref = new SubagentReference("classpath:/agent/EXPLORE_SUBAGENT.md",
-				Kind.CLAUDE_SUBAGENT.name(), null);
+				ClaudeSubagentDefinition.KIND, null);
 
-		Subagent subagent = resolver.resolve(ref);
+		SubagentDefinition subagent = resolver.resolve(ref);
 
-		assertThat(subagent).isInstanceOf(ClaudeSubagent.class);
+		assertThat(subagent).isInstanceOf(ClaudeSubagentDefinition.class);
 		assertThat(subagent.getName()).isEqualTo("Explore");
 		assertThat(subagent.getDescription()).contains("exploring codebases");
-		assertThat(subagent.getKind()).isEqualTo(Kind.CLAUDE_SUBAGENT.name());
+		assertThat(subagent.getKind()).isEqualTo(ClaudeSubagentDefinition.KIND);
 	}
 
 	@Test
 	void shouldFailForNonExistentFile() {
-		SubagentReference ref = new SubagentReference("file:/non/existent/file.md", Kind.CLAUDE_SUBAGENT.name(), null);
+		SubagentReference ref = new SubagentReference("file:/non/existent/file.md", ClaudeSubagentDefinition.KIND, null);
 
 		assertThatThrownBy(() -> resolver.resolve(ref)).isInstanceOf(RuntimeException.class)
 			.hasMessageContaining("Failed to read task file");

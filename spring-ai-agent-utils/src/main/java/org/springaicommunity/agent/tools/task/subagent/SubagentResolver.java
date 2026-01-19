@@ -22,6 +22,6 @@ public interface SubagentResolver {
 
 	boolean canResolve(SubagentReference subagentRef);
 
-	Subagent resolve(SubagentReference subagentRef);
+	SubagentDefinition resolve(SubagentReference subagentRef);
 
 }

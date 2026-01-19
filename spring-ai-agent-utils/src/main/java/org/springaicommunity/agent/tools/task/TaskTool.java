@@ -25,11 +25,11 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springaicommunity.agent.tools.task.repository.TaskRepository;
-import org.springaicommunity.agent.tools.task.subagent.Kind;
-import org.springaicommunity.agent.tools.task.subagent.Subagent;
+import org.springaicommunity.agent.tools.task.subagent.SubagentDefinition;
 import org.springaicommunity.agent.tools.task.subagent.SubagentExecutor;
 import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
 import org.springaicommunity.agent.tools.task.subagent.SubagentResolver;
+import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentDefinition;
 import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentResolver;
 
 import org.springframework.ai.tool.ToolCallback;
@@ -40,7 +40,6 @@ import org.springframework.util.Assert;
 /**
  * @author Christian Tzolov
  */
-
 public class TaskTool {
 
 	private static final String TASK_DESCRIPTION_TEMPLATE = """
@@ -133,11 +132,11 @@ public class TaskTool {
 		// Storage for background tasks
 		private final TaskRepository taskRepository;
 
-		private final Map<String, Subagent> subagents;
+		private final Map<String, SubagentDefinition> subagents;
 
 		private final Map<String, SubagentExecutor> subagentExecutors;
 
-		public TaskFunction(List<Subagent> subagents, List<SubagentExecutor> subagentExecutors,
+		public TaskFunction(List<SubagentDefinition> subagents, List<SubagentExecutor> subagentExecutors,
 				TaskRepository taskRepository) {
 			this.taskRepository = taskRepository;
 			this.subagents = subagents.stream().collect(Collectors.toMap(sa -> sa.getName(), sa -> sa));
@@ -153,7 +152,7 @@ public class TaskTool {
 				throw new RuntimeException("No subagent found with name: " + subagentName);
 			}
 
-			Subagent subagent = this.subagents.get(subagentName);
+			SubagentDefinition subagent = this.subagents.get(subagentName);
 
 			SubagentExecutor subagentExecutor = this.subagentExecutors.get(subagent.getKind());
 
@@ -197,9 +196,9 @@ public class TaskTool {
 
 			// Register built-in Claude subagent references
 			this.subagentReferences.add(new SubagentReference("classpath:/agent/GENERAL_PURPOSE_SUBAGENT.md",
-					Kind.CLAUDE_SUBAGENT.name(), null));
+					ClaudeSubagentDefinition.KIND, null));
 			this.subagentReferences.add(new SubagentReference("classpath:/agent/EXPLORE_SUBAGENT.md",
-					Kind.CLAUDE_SUBAGENT.name(), null));
+					ClaudeSubagentDefinition.KIND, null));
 
 			// Register built-in Claude subagent resolvers
 			this.subagentResolvers.add(new ClaudeSubagentResolver());
@@ -247,7 +246,7 @@ public class TaskTool {
 			return this;
 		}
 
-		private Subagent resolve(SubagentReference subagentReference) {
+		private SubagentDefinition resolve(SubagentReference subagentReference) {
 			for (SubagentResolver subagentResolver : this.subagentResolvers) {
 				if (subagentResolver.canResolve(subagentReference)) {
 					return subagentResolver.resolve(subagentReference);
@@ -261,7 +260,7 @@ public class TaskTool {
 			Assert.notNull(this.taskRepository, "taskRepository must be provided");
 			Assert.notEmpty(this.subagentExecutors, "At least one subagentExecutor must be provided");
 
-			List<Subagent> subagents = this.subagentReferences.stream().map(sr -> this.resolve(sr)).toList();
+			List<SubagentDefinition> subagents = this.subagentReferences.stream().map(sr -> this.resolve(sr)).toList();
 
 			String subagentRegistrations = subagents.stream()
 				.map(sa -> sa.toSubagentRegistrations())

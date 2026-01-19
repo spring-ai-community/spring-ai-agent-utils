@@ -19,9 +19,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springaicommunity.agent.tools.task.repository.DefaultTaskRepository;
 import org.springaicommunity.agent.tools.task.repository.TaskRepository;
-import org.springaicommunity.agent.tools.task.subagent.Kind;
-import org.springaicommunity.agent.tools.task.subagent.Subagent;
+import org.springaicommunity.agent.tools.task.subagent.SubagentDefinition;
 import org.springaicommunity.agent.tools.task.subagent.SubagentExecutor;
+import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentDefinition;
 
 import org.springframework.ai.tool.ToolCallback;
 
@@ -45,11 +45,11 @@ class TaskToolTest {
 		this.mockExecutor = new SubagentExecutor() {
 			@Override
 			public String getKind() {
-				return Kind.CLAUDE_SUBAGENT.name();
+				return ClaudeSubagentDefinition.KIND;
 			}
 
 			@Override
-			public String execute(TaskTool.TaskCall taskCall, Subagent subagent) {
+			public String execute(TaskTool.TaskCall taskCall, SubagentDefinition subagent) {
 				return "Executed: " + taskCall.prompt();
 			}
 		};
