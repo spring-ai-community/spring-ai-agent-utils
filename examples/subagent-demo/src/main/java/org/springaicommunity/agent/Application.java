@@ -52,17 +52,20 @@ public class Application {
 		return args -> {
 
 			var taskTools = TaskToolCallbackProvider.builder()
-				// Add Claude Subagent support
+				// Add Claude Subagent (local)
 				.subagentReferences(ClaudeSubagentReferences.fromResources(agentPaths))
-				// Add A2A Subagent support
-				// .subagentReferences(new SubagentReference("http://localhost:10001", A2ASubagentDefinition.KIND))
-				.subagentTypes(new SubagentType(new A2ASubagentResolver(), new A2ASubagentExecutor()))
 
+				// configuration used by the local Claude subagents
 				.chatClientBuilder("default",
 						chatClientBuilder.clone()
 							.defaultToolContext(Map.of("foo", "bar"))
 							.defaultAdvisors(new MyLoggingAdvisor(0, "[TASK]")))
 				.skillsResources(skillPaths)
+
+				// Add A2A Subagent (remote)
+				.subagentReferences(new SubagentReference("http://localhost:10001", A2ASubagentDefinition.KIND))
+				.subagentTypes(new SubagentType(new A2ASubagentResolver(), new A2ASubagentExecutor()))
+
 				.build();
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off

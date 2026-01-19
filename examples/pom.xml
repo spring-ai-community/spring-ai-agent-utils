@@ -35,6 +35,7 @@
         <module>ask-user-question-demo</module>
         <module>skills-demo</module>
         <module>subagent-demo</module>
+        <module>todo-demo</module>
     </modules>
 
     <repositories>
