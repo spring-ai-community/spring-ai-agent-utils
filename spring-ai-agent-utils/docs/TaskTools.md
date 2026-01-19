@@ -1,8 +1,8 @@
-# Task Tools - Hierarchical Sub-Agent System
+# Task Tools - Extensible Sub-Agent System
 
 ## Overview
 
-The Task Tools provide hierarchical autonomous sub-agent capabilities for Spring AI, inspired by [Claude Code's sub-agents](https://code.claude.com/docs/en/sub-agents). This system enables your main AI agent to delegate complex, multi-step tasks to specialized sub-agents that work autonomously with their own context, tools, and system prompts.
+The Task Tools provide an extensible hierarchical sub-agent system for Spring AI, inspired by [Claude Code's sub-agents](https://code.claude.com/docs/en/sub-agents). This architecture enables your main AI agent to delegate complex, multi-step tasks to specialized sub-agents while supporting multiple execution backends (Claude-based, A2A, custom implementations).
 
 ## Key Concepts
 
@@ -15,21 +15,56 @@ Sub-agents are specialized AI assistants that your main agent can delegate tasks
 - **Configurable tool access** - Limited to only the necessary capabilities for their role
 - **Independent execution** - Works autonomously and returns results to the parent agent
 
+### Extensible Architecture
+
+The system is built on pluggable abstractions that allow:
+
+- **Multiple subagent types** - Claude-based, A2A protocol, or custom implementations
+- **Pluggable resolvers** - Load subagent definitions from various sources (files, classpath, remote)
+- **Pluggable executors** - Execute subagents using different backends (Spring AI ChatClient, A2A, etc.)
+- **Multi-model support** - Different ChatClient configurations per model (sonnet, opus, haiku)
+
 ### Benefits
 
 | Benefit | Details |
 |---------|---------|
 | **Context Preservation** | Keeps main conversation focused on high-level objectives while sub-agents handle details |
 | **Specialized Expertise** | Fine-tuned for specific domains with higher success rates |
-| **Reusability** | Define once, use across projects, share with teams |
+| **Extensibility** | Add new subagent types by implementing simple interfaces |
+| **Multi-Model** | Route to different models based on subagent configuration |
 | **Flexible Permissions** | Granular control over tool access per sub-agent |
 | **Async Execution** | Run sub-agents in background for long-running tasks |
 
 ## Architecture
 
-The Task Tools consist of three main components:
+### Core Components
 
-1. **TaskTool** - Launches and manages sub-agents
+```
+TaskToolCallbackProvider
+    ├── SubagentReference[] ──────► (URIs pointing to subagent definitions)
+    ├── SubagentType[] ───────────► (bundles resolver + executor per kind)
+    │   └── SubagentType
+    │       ├── SubagentResolver ─► (parse references into SubagentDefinition)
+    │       └── SubagentExecutor ─► (execute subagents)
+    └── Built-in Claude support
+        ├── ClaudeSubagentResolver
+        └── ClaudeSubagentExecutor
+            └── Map<String, ChatClient.Builder> (model routing)
+```
+
+### Abstractions
+
+| Interface | Purpose |
+|-----------|---------|
+| `SubagentDefinition` | Core interface representing a subagent with name, description, kind, and reference |
+| `SubagentReference` | Record holding URI, kind, and metadata for locating a subagent definition |
+| `SubagentResolver` | Strategy for resolving `SubagentReference` → `SubagentDefinition` |
+| `SubagentExecutor` | Strategy for executing a `TaskCall` against a `SubagentDefinition` |
+| `SubagentType` | Record bundling a `SubagentResolver` and `SubagentExecutor` together for a specific kind |
+
+### Main Components
+
+1. **TaskTool** - Launches and manages sub-agents using pluggable resolvers and executors
 2. **TaskOutputTool** - Retrieves results from background sub-agents
 3. **TaskToolCallbackProvider** - Convenience builder for configuring the complete system
 
@@ -51,10 +86,6 @@ description: General-purpose agent for researching complex questions, searching 
 - Analyzing multiple files to understand system architecture
 - Performing multi-step research tasks
 - Full read/write access to tools
-
-**Use Cases:**
-- "Search for all REST controllers and analyze their patterns"
-- "Find and update all hardcoded configuration values"
 
 ### Explore Sub-Agent
 
@@ -78,11 +109,6 @@ description: Fast agent specialized for exploring codebases. Use for finding fil
 - `medium` - Moderate exploration, multiple search strategies
 - `very thorough` - Comprehensive analysis across multiple locations
 
-**Use Cases:**
-- "How are REST endpoints structured in this codebase?"
-- "Find all files that use Spring Security"
-- "Explore the authentication implementation"
-
 ## Quick Start
 
 ### Basic Setup
@@ -97,15 +123,14 @@ public class AgentConfig {
     @Bean
     CommandLineRunner demo(ChatClient.Builder chatClientBuilder) {
         return args -> {
-            // Configure Task tools with sub-agents
+            // Configure Task tools with multi-model support
             var taskTools = TaskToolCallbackProvider.builder()
-                .chatClientBuilder(chatClientBuilder)
+                .chatClientBuilder("default", chatClientBuilder)
                 .build();
 
             // Build main chat client with Task tools
             ChatClient chatClient = chatClientBuilder
                 .defaultToolCallbacks(taskTools)
-                // ... add other tools ...
                 .build();
 
             // Use naturally - agent will delegate to sub-agents
@@ -126,92 +151,129 @@ The `TaskToolCallbackProvider` is a convenience builder that sets up both TaskTo
 
 ```java
 TaskToolCallbackProvider taskTools = TaskToolCallbackProvider.builder()
-    .chatClientBuilder(chatClientBuilder)              // Required: ChatClient builder
-    .agentDirectories("/path/to/custom/agents")        // Optional: Custom sub-agent definitions
-    .skillsDirectories(".claude/skills")               // Optional: Skills for sub-agents
-    .braveApiKey(System.getenv("BRAVE_API_KEY"))      // Optional: For web search
-    .taskRepository(new DefaultTaskRepository())       // Optional: Custom task storage
+    // Required: At least one ChatClient builder with key "default"
+    .chatClientBuilder("default", chatClientBuilder)
+
+    // Optional: Additional model-specific ChatClient builders
+    .chatClientBuilder("sonnet", sonnetChatClientBuilder)
+    .chatClientBuilder("opus", opusChatClientBuilder)
+    .chatClientBuilder("haiku", haikuChatClientBuilder)
+
+    // Optional: Custom subagent references (for Claude-based subagents)
+    .subagentReferences(ClaudeSubagentReferences.fromRootDirectory("/path/to/agents"))
+
+    // Optional: Custom subagent types (bundles resolver + executor for new kinds)
+    .subagentTypes(new SubagentType(myResolver, myExecutor))
+
+    // Optional: Skills for sub-agents
+    .skillsDirectories(".claude/skills")
+
+    // Optional: For web search
+    .braveApiKey(System.getenv("BRAVE_API_KEY"))
+
+    // Optional: Custom task storage
+    .taskRepository(new DefaultTaskRepository())
+
     .build();
 ```
 
-### Loading from Spring Resources
+### Multi-Model Configuration
 
-For better Spring Boot integration, you can load agents from Spring `Resource` objects:
+Route subagents to different models based on their configuration:
+
+```java
+// Create model-specific ChatClient builders
+ChatClient.Builder sonnetBuilder = ChatClient.builder(sonnetModel);
+ChatClient.Builder opusBuilder = ChatClient.builder(opusModel);
+ChatClient.Builder haikuBuilder = ChatClient.builder(haikuModel);
+
+TaskToolCallbackProvider taskTools = TaskToolCallbackProvider.builder()
+    .chatClientBuilder("default", sonnetBuilder)  // Fallback
+    .chatClientBuilder("sonnet", sonnetBuilder)
+    .chatClientBuilder("opus", opusBuilder)
+    .chatClientBuilder("haiku", haikuBuilder)
+    .build();
+```
+
+When a subagent specifies `model: opus` in its frontmatter, it will use the corresponding ChatClient builder.
+
+### Loading Subagent References
+
+#### From Directories
+
+```java
+import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentReferences;
+
+List<SubagentReference> refs = ClaudeSubagentReferences.fromRootDirectory("/path/to/agents");
+
+TaskToolCallbackProvider taskTools = TaskToolCallbackProvider.builder()
+    .chatClientBuilder("default", chatClientBuilder)
+    .subagentReferences(refs)
+    .build();
+```
+
+#### From Spring Resources
 
 ```java
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
-@Configuration
-public class TaskConfig {
+@Autowired
+private ResourceLoader resourceLoader;
 
-    @Autowired
-    private ResourceLoader resourceLoader;
-
-    @Bean
-    public TaskToolCallbackProvider taskTools(ChatClient.Builder chatClientBuilder) {
-        Resource agentsResource = resourceLoader.getResource("classpath:.claude/agents");
-
-        return TaskToolCallbackProvider.builder()
-            .chatClientBuilder(chatClientBuilder)
-            .agentResource(agentsResource)
-            .build();
-    }
-}
-```
-
-Loading multiple resources:
-
-```java
 @Bean
 public TaskToolCallbackProvider taskTools(ChatClient.Builder chatClientBuilder) {
-    List<Resource> agentResources = List.of(
-        resourceLoader.getResource("classpath:.claude/agents"),
-        resourceLoader.getResource("file:${user.home}/.claude/agents")
-    );
+    Resource agentsResource = resourceLoader.getResource("classpath:.claude/agents");
+
+    List<SubagentReference> refs = ClaudeSubagentReferences.fromResource(agentsResource);
 
     return TaskToolCallbackProvider.builder()
-        .chatClientBuilder(chatClientBuilder)
-        .agentResources(agentResources)
+        .chatClientBuilder("default", chatClientBuilder)
+        .subagentReferences(refs)
         .build();
 }
 ```
 
-### Manual Configuration
+#### Multiple Sources
 
-For more control, configure TaskTool and TaskOutputTool separately:
+```java
+List<SubagentReference> refs = ClaudeSubagentReferences.fromRootDirectories(List.of(
+    "src/main/resources/agents",
+    System.getProperty("user.home") + "/.claude/agents"
+));
+```
+
+### Manual Configuration with TaskTool
+
+For more control, configure TaskTool directly:
 
 ```java
 import org.springaicommunity.agent.tools.task.TaskTool;
 import org.springaicommunity.agent.tools.task.TaskOutputTool;
-import org.springaicommunity.agent.tools.task.repository.DefaultTaskRepository;
+import org.springaicommunity.agent.tools.task.subagent.claude.*;
 
 // Shared repository for task management
 TaskRepository taskRepository = new DefaultTaskRepository();
 
-// Core tools for sub-agents
-List<ToolCallback> subAgentTools = List.of(
-    FileSystemTools.builder().build(),
-    GrepTool.builder().build(),
-    GlobTool.builder().build(),
-    new ShellTools()
+// Create subagent references
+List<SubagentReference> refs = ClaudeSubagentReferences.fromRootDirectory("/path/to/agents");
+
+// Create executor with multi-model support
+Map<String, ChatClient.Builder> chatClientBuilders = Map.of(
+    "default", defaultBuilder,
+    "sonnet", sonnetBuilder,
+    "opus", opusBuilder
 );
 
-// Configure TaskTool
-ToolCallback taskTool = TaskTool.builder()
-    .chatClientBuilder(chatClientBuilder)
-    .taskRepository(taskRepository)
-    .tools(subAgentTools)
-    .addTaskDirectory("/path/to/custom/agents")  // Optional: path-based
-    .build();
+List<ToolCallback> subAgentTools = List.of(/* ... */);
+ClaudeSubagentExecutor executor = new ClaudeSubagentExecutor(chatClientBuilders, subAgentTools);
 
-// Alternative with Spring Resources
-Resource agentsResource = resourceLoader.getResource("classpath:.claude/agents");
+// Build TaskTool
 ToolCallback taskTool = TaskTool.builder()
-    .chatClientBuilder(chatClientBuilder)
+    .subagentReferences(refs)
+    .subagentResolvers(new ClaudeSubagentResolver())
+    .subagentExecutors(executor)
     .taskRepository(taskRepository)
-    .tools(subAgentTools)
-    .addTasksResource(agentsResource)  // Optional: resource-based
     .build();
 
 // Configure TaskOutputTool
@@ -246,8 +308,10 @@ project-root/
 ---
 name: your-sub-agent-name
 description: When and how to use this subagent. Include trigger keywords and example scenarios.
-tools: Read, Edit, Grep, Glob  # Optional: inherits all if omitted
-model: sonnet                   # Optional: sonnet, opus, haiku
+tools: Read, Edit, Grep, Glob       # Optional: inherits all if omitted
+disallowedTools: Bash, Shell        # Optional: explicitly deny specific tools
+model: sonnet                        # Optional: sonnet, opus, haiku
+permissionMode: default              # Optional: permission handling mode
 ---
 
 # Your Sub-Agent's System Prompt
@@ -261,10 +325,6 @@ You are a [role description]. You specialize in [domain].
 **Guidelines:**
 - [Guideline 1]
 - [Guideline 2]
-
-**Process:**
-1. [Step 1]
-2. [Step 2]
 ```
 
 ### Configuration Fields
@@ -273,8 +333,10 @@ You are a [role description]. You specialize in [domain].
 |-------|----------|-------------|
 | `name` | Yes | Unique identifier (lowercase with hyphens) |
 | `description` | Yes | Natural language purpose description with usage examples |
-| `tools` | No | Comma-separated list of tool names (inherits all if omitted) |
+| `tools` | No | Comma-separated list of allowed tool names (inherits all if omitted) |
+| `disallowedTools` | No | Comma-separated list of tools to explicitly deny |
 | `model` | No | Model preference: `sonnet`, `opus`, `haiku` |
+| `permissionMode` | No | Permission handling mode (default: `default`) |
 
 ### Example: Code Reviewer Sub-Agent
 
@@ -283,6 +345,7 @@ You are a [role description]. You specialize in [domain].
 name: code-reviewer
 description: Expert code reviewer. Use proactively after writing or modifying code. Focuses on code quality, security, and best practices.
 tools: Read, Grep, Glob, Bash
+disallowedTools: Edit, Write
 model: sonnet
 ---
 
@@ -299,58 +362,122 @@ You are a senior code reviewer with expertise in software quality and security.
 - No code duplication
 - Comprehensive error handling
 - Security (no exposed secrets, SQL injection, XSS)
-- Input validation
-- Test coverage
-- Performance considerations
-
-**Organize Feedback By Priority:**
-- **Critical Issues**: Security vulnerabilities, bugs (must fix)
-- **Warnings**: Code smells, maintenance issues (should fix)
-- **Suggestions**: Style improvements, optimizations (consider)
 
 **Output Format:**
 Provide clear, actionable feedback with file references and line numbers.
 ```
 
-### Example: Spring AI Expert Sub-Agent
+## Extending the System
 
-From the [subagent-demo](../../examples/subagent-demo):
+### Creating a Custom Subagent Type
 
-```markdown
----
-name: spring-ai-expert
-description: Use when user asks about Spring AI framework, features, configuration, API methods, integration, or troubleshooting.
-model: sonnet
----
+To add support for a new subagent type (e.g., A2A protocol):
 
-You are a Spring AI Expert with deep expertise in the Spring AI framework.
+#### 1. Define the Subagent Implementation
 
-**Your Primary Resources:**
-- Official Spring AI Reference: https://docs.spring.io/spring-ai/reference/index.html
-- Spring AI GitHub: https://github.com/spring-projects/spring-ai
+```java
+public class A2ASubagentDefinition implements SubagentDefinition {
 
-**Core Responsibilities:**
-1. Answer questions accurately by consulting official documentation
-2. Explore documentation thoroughly for specific topics
-3. Examine source code when needed for implementation details
-4. Provide contextual guidance with code examples
-5. Cover key Spring AI areas (chat clients, embeddings, RAG, function calling, etc.)
-6. Troubleshooting support with debugging approaches
+    public static final String KIND = "A2A";
 
-**Quality Assurance:**
-- Always verify information against official sources
-- Provide links to specific documentation sections
-- Distinguish documented features from inferred behavior
+    private final String name;
+    private final String description;
+    private final String endpoint;
+    private final SubagentReference reference;
+
+    @Override
+    public String getName() { return name; }
+
+    @Override
+    public String getDescription() { return description; }
+
+    @Override
+    public String getKind() { return KIND; }
+
+    @Override
+    public SubagentReference getReference() { return reference; }
+
+    public String getEndpoint() { return endpoint; }
+}
+```
+
+#### 2. Create a Resolver
+
+```java
+public class A2ASubagentResolver implements SubagentResolver {
+
+    @Override
+    public boolean canResolve(SubagentReference ref) {
+        return ref.kind().equals(A2ASubagentDefinition.KIND);
+    }
+
+    @Override
+    public SubagentDefinition resolve(SubagentReference ref) {
+        // Load A2A agent card from endpoint
+        String agentCard = fetchAgentCard(ref.uri());
+        return parseA2ASubagentDefinition(ref, agentCard);
+    }
+}
+```
+
+#### 3. Create an Executor
+
+```java
+public class A2ASubagentExecutor implements SubagentExecutor {
+
+    private final A2AClient a2aClient;
+
+    @Override
+    public String getKind() {
+        return A2ASubagentDefinition.KIND;
+    }
+
+    @Override
+    public String execute(TaskCall taskCall, SubagentDefinition subagent) {
+        A2ASubagentDefinition a2a = (A2ASubagentDefinition) subagent;
+        return a2aClient.sendTask(a2a.getEndpoint(), taskCall.prompt());
+    }
+}
+```
+
+#### 4. Register with TaskToolCallbackProvider
+
+```java
+// Create SubagentType that bundles resolver + executor
+SubagentType a2aType = new SubagentType(
+    new A2ASubagentResolver(),
+    new A2ASubagentExecutor(a2aClient)
+);
+
+TaskToolCallbackProvider taskTools = TaskToolCallbackProvider.builder()
+    .chatClientBuilder("default", chatClientBuilder)
+    .subagentReferences(
+        new SubagentReference("http://agent.example.com", A2ASubagentDefinition.KIND)
+    )
+    .subagentTypes(a2aType)
+    .build();
+```
+
+Alternatively, register directly with TaskTool for more control:
+
+```java
+TaskTool.builder()
+    .subagentReferences(
+        new SubagentReference("http://agent.example.com", A2ASubagentDefinition.KIND)
+    )
+    .subagentResolvers(new A2ASubagentResolver())
+    .subagentExecutors(new A2ASubagentExecutor(a2aClient))
+    .taskRepository(taskRepository)
+    .build();
 ```
 
 ## Usage Patterns
 
 ### Automatic Delegation
 
-The main agent automatically delegates to sub-agents based on:
+The main agent automatically delegates to sub-agents based on their descriptions:
 
 ```java
-// Example: Agent automatically uses Explore sub-agent
 String response = chatClient
     .prompt("How does authentication work in this codebase?")
     .call()
@@ -358,17 +485,11 @@ String response = chatClient
 // Main agent recognizes this as exploration task and delegates to Explore sub-agent
 ```
 
-To encourage automatic delegation, use these keywords in the `description` field:
-- "Use proactively"
-- "MUST BE USED when"
-- Include specific trigger phrases and example scenarios
-
 ### Explicit Invocation
 
 Users can explicitly request specific sub-agents:
 
 ```java
-// Example: Explicit sub-agent request
 String response = chatClient
     .prompt("Use the code-reviewer subagent to review my recent changes")
     .call()
@@ -385,8 +506,6 @@ String response = chatClient
     .prompt("Run the test-runner in the background and let me know when tests complete")
     .call()
     .content();
-
-// TaskTool will set run_in_background=true
 // Returns task_id for later retrieval
 
 // Later, retrieve results via TaskOutputTool
@@ -429,7 +548,6 @@ public interface TaskRepository {
 ```java
 import org.springaicommunity.agent.tools.task.repository.DefaultTaskRepository;
 
-// Uses CompletableFuture for async execution
 TaskRepository repository = new DefaultTaskRepository();
 ```
 
@@ -441,13 +559,9 @@ For distributed systems or persistence:
 @Component
 public class RedisTaskRepository implements TaskRepository {
 
-    @Autowired
-    private RedisTemplate<String, BackgroundTask> redisTemplate;
-
     @Override
     public BackgroundTask putTask(String taskId, Supplier<String> taskExecution) {
         // Store in Redis, execute via message queue, etc.
-        return createDistributedTask(taskId, taskExecution);
     }
 
     @Override
@@ -458,8 +572,6 @@ public class RedisTaskRepository implements TaskRepository {
 ```
 
 ## Complete Example
-
-See the [subagent-demo](../../examples/subagent-demo) for a complete working example:
 
 ```java
 @SpringBootApplication
@@ -472,19 +584,26 @@ public class Application {
     String braveApiKey;
 
     @Bean
-    CommandLineRunner demo(ChatClient.Builder chatClientBuilder) {
+    CommandLineRunner demo(
+            ChatClient.Builder defaultBuilder,
+            @Qualifier("sonnet") ChatClient.Builder sonnetBuilder,
+            @Qualifier("opus") ChatClient.Builder opusBuilder) {
+
         return args -> {
-            // Configure Task tools with custom agents
+            // Configure Task tools with custom agents and multi-model support
             var taskTools = TaskToolCallbackProvider.builder()
-                .agentDirectories("src/main/resources/agents")
+                .chatClientBuilder("default", defaultBuilder)
+                .chatClientBuilder("sonnet", sonnetBuilder)
+                .chatClientBuilder("opus", opusBuilder)
+                .subagentReferences(
+                    ClaudeSubagentReferences.fromRootDirectory("src/main/resources/agents")
+                )
                 .skillsDirectories(skillPaths)
                 .braveApiKey(braveApiKey)
-                .chatClientBuilder(chatClientBuilder.clone()
-                    .defaultAdvisors(new LoggingAdvisor()))
                 .build();
 
             // Build main chat client
-            ChatClient chatClient = chatClientBuilder
+            ChatClient chatClient = defaultBuilder
                 .defaultToolCallbacks(taskTools)
                 .defaultTools(
                     FileSystemTools.builder().build(),
@@ -521,186 +640,50 @@ public class Application {
 
 ### 1. Design Focused Sub-Agents
 
-Each sub-agent should have a single, clear responsibility:
+Each sub-agent should have a single, clear responsibility.
+
+### 2. Use `disallowedTools` for Safety
+
+Explicitly deny dangerous tools for read-only agents:
 
 ```markdown
 ---
-name: test-runner
-description: Runs tests and fixes failures. Use proactively after code changes.
-tools: Bash, Read, Edit, Grep
+name: explorer
+tools: Read, Grep, Glob
+disallowedTools: Edit, Write, Bash, Shell
 ---
 ```
 
-### 2. Provide Detailed System Prompts
+### 3. Leverage Multi-Model Routing
 
-Include specific instructions, examples, and constraints:
-
-```markdown
-**Process:**
-1. Run tests: `mvn test`
-2. Analyze failures in test output
-3. Read failing test code
-4. Identify root cause
-5. Implement minimal fix
-6. Re-run tests to verify
-
-**Constraints:**
-- Preserve test intent and coverage
-- Don't skip or disable tests
-- Don't modify test assertions unless clearly wrong
-```
-
-### 3. Limit Tool Access
-
-Grant only necessary tools for security and focus:
+Use faster/cheaper models for simple tasks:
 
 ```markdown
 ---
-tools: Read, Grep, Glob, Bash  # Read-only tools for exploration
+name: quick-search
+model: haiku
 ---
 ```
 
-### 4. Use Descriptive Names
-
-Choose clear, self-documenting names:
-- ✅ `spring-ai-expert`, `code-reviewer`, `test-runner`
-- ❌ `helper`, `agent1`, `utility`
-
-### 5. Include Usage Examples
-
-Help the main agent understand when to delegate:
+Use more capable models for complex analysis:
 
 ```markdown
 ---
-description: Use when user asks about Spring AI. Examples:
-  - "How do I configure embeddings in Spring AI?"
-  - "What vector stores does Spring AI support?"
-  - "Debug my Spring AI RAG pipeline"
+name: deep-analyzer
+model: opus
 ---
 ```
 
-### 6. Version Control Custom Agents
+### 4. Register Custom Subagent Types
 
-Commit project-specific agents for team collaboration:
+Extend the system for new protocols like A2A rather than modifying core code.
+
+### 5. Version Control Custom Agents
 
 ```bash
 git add .claude/agents/
 git commit -m "Add code-reviewer and test-runner sub-agents"
 ```
-
-### 7. Monitor Sub-Agent Performance
-
-Add logging to understand sub-agent usage:
-
-```java
-public class SubAgentLoggingAdvisor implements CallAroundAdvisor {
-
-    @Override
-    public AdvisedResponse aroundCall(AdvisedRequest advisedRequest,
-                                     CallAroundAdvisorChain chain) {
-        // Log sub-agent invocations
-        advisedRequest.toolCalls().stream()
-            .filter(tc -> "Task".equals(tc.name()))
-            .forEach(tc -> log.info("Sub-agent called: {}", tc.arguments()));
-
-        return chain.nextAroundCall(advisedRequest);
-    }
-}
-```
-
-## Advanced Features
-
-### Resumable Sub-Agents
-
-Continue long-running research across multiple interactions:
-
-```java
-// First invocation
-String response1 = chatClient
-    .prompt("Use code-analyzer to review authentication module")
-    .call()
-    .content();
-// Returns: "Analysis complete. Agent ID: agent_abc123"
-
-// Resume with additional context
-String response2 = chatClient
-    .prompt("Resume agent agent_abc123 and now analyze authorization logic")
-    .call()
-    .content();
-```
-
-**Implementation:** Sub-agent maintains conversation history in its context window.
-
-### Model Override
-
-Specify different models for different sub-agents:
-
-```markdown
----
-name: quick-explorer
-model: haiku  # Fast, low-latency for simple searches
----
-```
-
-```markdown
----
-name: deep-analyzer
-model: opus  # Most capable for complex analysis
----
-```
-
-### Tool Filtering
-
-Sub-agents inherit only specified tools from parent:
-
-```java
-// Parent has many tools
-List<ToolCallback> allTools = List.of(
-    FileSystemTools.builder().build(),
-    new ShellTools(),
-    GrepTool.builder().build(),
-    // ... many more
-);
-
-// Sub-agent definition limits to specific tools
----
-name: read-only-explorer
-tools: Read, Grep, Glob  # Only these 3 tools available
----
-```
-
-## Troubleshooting
-
-### Sub-Agent Not Being Used
-
-**Problem:** Main agent not delegating to custom sub-agent.
-
-**Solutions:**
-1. Make description more specific with trigger keywords
-2. Add "Use proactively" or "MUST BE USED when" to description
-3. Include concrete examples in description
-4. Verify sub-agent file is in correct directory
-5. Check sub-agent name matches in both filename and front matter
-
-### Sub-Agent Exceeding Scope
-
-**Problem:** Sub-agent performing unwanted actions.
-
-**Solutions:**
-1. Limit tools in front matter: `tools: Read, Grep, Glob`
-2. Add explicit constraints in system prompt
-3. For read-only: Use Explore sub-agent as template
-4. Add "NEVER" statements: "NEVER modify files", "NEVER run npm install"
-
-### Background Tasks Not Completing
-
-**Problem:** Background sub-agent tasks hanging or timing out.
-
-**Solutions:**
-1. Check TaskRepository implementation
-2. Verify timeout settings in TaskOutputTool call
-3. Add logging to task execution
-4. Consider switching to synchronous execution for debugging
 
 ## API Reference
 
@@ -712,36 +695,13 @@ public class TaskTool {
     public static Builder builder() { ... }
 
     public static class Builder {
-        // Required
-        Builder chatClientBuilder(ChatClient.Builder chatClientBuilder);
+        Builder subagentReferences(List<SubagentReference> refs);
+        Builder subagentReferences(SubagentReference... refs);
+        Builder subagentExecutors(List<SubagentExecutor> executors);
+        Builder subagentExecutors(SubagentExecutor... executors);
+        Builder subagentResolvers(List<SubagentResolver> resolvers);
+        Builder subagentResolvers(SubagentResolver... resolvers);
         Builder taskRepository(TaskRepository taskRepository);
-
-        // Optional
-        Builder tools(List<ToolCallback> tools);
-        Builder tools(ToolCallback tool);
-        Builder addTaskDirectory(String taskRootDirectory);
-        Builder addTaskDirectories(List<String> taskRootDirectories);
-        Builder addTasksResource(Resource tasksRootPath);
-        Builder addTasksResources(List<Resource> tasksRootPaths);
-        Builder taskDescriptionTemplate(String template);
-
-        ToolCallback build();
-    }
-}
-```
-
-### TaskOutputTool
-
-```java
-public class TaskOutputTool {
-
-    public static Builder builder() { ... }
-
-    public static class Builder {
-        // Required
-        Builder taskRepository(TaskRepository taskRepository);
-
-        // Optional
         Builder taskDescriptionTemplate(String template);
 
         ToolCallback build();
@@ -757,21 +717,81 @@ public class TaskToolCallbackProvider implements ToolCallbackProvider {
     public static Builder builder() { ... }
 
     public static class Builder {
-        // Required
-        Builder chatClientBuilder(ChatClient.Builder chatClientBuilder);
-
-        // Optional
-        Builder taskRepository(TaskRepository taskRepository);
-        Builder agentDirectories(List<String> agentDirectories);
-        Builder agentDirectories(String agentDirectory);
-        Builder agentResource(Resource agentRootPath);
-        Builder agentResources(List<Resource> agentRootPaths);
-        Builder skillsDirectories(List<String> skillsDirectories);
-        Builder skillsDirectories(String skillsDirectory);
-        Builder braveApiKey(String braveApiKey);
+        Builder chatClientBuilder(String modelId, ChatClient.Builder builder);
+        Builder chatClientBuilders(Map<String, ChatClient.Builder> builders);
+        Builder subagentReferences(List<SubagentReference> refs);
+        Builder subagentReferences(SubagentReference... refs);
+        Builder subagentTypes(List<SubagentType> types);
+        Builder subagentTypes(SubagentType... types);
+        Builder skillsDirectories(List<String> dirs);
+        Builder skillsDirectories(String dir);
+        Builder skillsResource(Resource resource);
+        Builder skillsResources(List<Resource> resources);
+        Builder braveApiKey(String apiKey);
+        Builder taskRepository(TaskRepository repository);
 
         TaskToolCallbackProvider build();
     }
+}
+```
+
+### Subagent Interfaces
+
+```java
+public interface SubagentDefinition {
+    String getName();
+    String getDescription();
+    String getKind();
+    SubagentReference getReference();
+    default String toSubagentRegistrations() { ... }
+}
+
+public interface SubagentResolver {
+    boolean canResolve(SubagentReference ref);
+    SubagentDefinition resolve(SubagentReference ref);
+}
+
+public interface SubagentExecutor {
+    String getKind();
+    String execute(TaskCall taskCall, SubagentDefinition subagent);
+}
+
+public record SubagentReference(String uri, String kind, Map<String, String> metadata) {
+    public SubagentReference(String uri, String kind) { this(uri, kind, Map.of()); }
+}
+
+public record SubagentType(SubagentResolver resolver, SubagentExecutor executor) {
+    public String kind() { return executor.getKind(); }
+}
+```
+
+### ClaudeSubagentDefinition
+
+The built-in Claude subagent definition uses the kind constant `"CLAUDE"`:
+
+```java
+public class ClaudeSubagentDefinition implements SubagentDefinition {
+    public static final String KIND = "CLAUDE";
+
+    // Additional Claude-specific methods:
+    public String getModel();           // Model override (sonnet, opus, haiku)
+    public List<String> tools();        // Allowed tool names
+    public List<String> disallowedTools(); // Tools to deny
+    public List<String> skills();       // Skills to load
+    public String permissionMode();     // Permission handling mode
+    public String getContent();         // System prompt content
+}
+```
+
+### ClaudeSubagentReferences
+
+```java
+public class ClaudeSubagentReferences {
+    static List<SubagentReference> fromRootDirectory(String rootDirectory);
+    static List<SubagentReference> fromRootDirectories(List<String> rootDirectories);
+    static List<SubagentReference> fromResource(Resource resource);
+    static List<SubagentReference> fromResources(List<Resource> resources);
+    static List<SubagentReference> fromResources(Resource... resources);
 }
 ```
 
@@ -786,5 +806,6 @@ public class TaskToolCallbackProvider implements ToolCallbackProvider {
 ## References
 
 - [Claude Code Sub-Agents Documentation](https://code.claude.com/docs/en/sub-agents)
+- [Claude Agent SDK Sub-Agents](https://platform.claude.com/docs/en/agent-sdk/subagents)
 - [Spring AI Documentation](https://docs.spring.io/spring-ai/reference/)
 - [Example: subagent-demo](../../examples/subagent-demo)

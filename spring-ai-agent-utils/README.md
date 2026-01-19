@@ -73,11 +73,11 @@ public class Application {
 					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, "2025-01-01"))
                 
 
-                // Sub-Agents
+                // Sub-Agents (with multi-model support)
                 .defaultToolCallbacks(TaskToolCallbackProvider.builder()
-                    .agentDirectories(".claude/agents")
+                    .chatClientBuilder("default", chatClientBuilder.clone())
+                    .subagentReferences(ClaudeSubagentReferences.fromRootDirectory(".claude/agents"))
                     .skillsDirectories(".claude/skills")
-                    .chatClientBuilder(chatClientBuilder.clone().defaultToolContext(Map.of("foo", "bar")))
                     .build())
 
                 // Skills
@@ -389,19 +389,23 @@ Todos todos = new Todos(List.of(
 todoTool.todoWrite(todos);
 ```
 
-### TaskTools - Hierarchical Sub-Agent System
+### TaskTools - Extensible Sub-Agent System
 
-Enable your AI agent to delegate complex, multi-step tasks to specialized sub-agents with dedicated context windows. Based on [Claude Code's sub-agents](https://code.claude.com/docs/en/sub-agents), this system provides autonomous task execution with specialized expertise.
+Enable your AI agent to delegate complex, multi-step tasks to specialized sub-agents with dedicated context windows. Based on [Claude Code's sub-agents](https://code.claude.com/docs/en/sub-agents), this system provides autonomous task execution with specialized expertise and an extensible architecture supporting multiple sub-agent types.
 
 [**View Full Documentation →**](docs/TaskTools.md)
 
 **Quick Example:**
 ```java
-// Configure Task tools with built-in and custom sub-agents
+import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentReferences;
+
+// Configure Task tools with multi-model support
 var taskTools = TaskToolCallbackProvider.builder()
-    .chatClientBuilder(chatClientBuilder)
-    .agentDirectories(".claude/agents")  // Custom sub-agents
-    .skillsDirectories(".claude/skills") // Skills for sub-agents
+    .chatClientBuilder("default", chatClientBuilder)
+    .chatClientBuilder("opus", opusChatClientBuilder)     // Optional: for complex tasks
+    .chatClientBuilder("haiku", haikuChatClientBuilder)   // Optional: for quick tasks
+    .subagentReferences(ClaudeSubagentReferences.fromRootDirectory(".claude/agents"))
+    .skillsDirectories(".claude/skills")
     .build();
 
 // Build main chat client with Task tools
@@ -428,6 +432,7 @@ String response = chatClient
 name: code-reviewer
 description: Expert code reviewer. Use proactively after writing or modifying code.
 tools: Read, Grep, Glob, Bash
+disallowedTools: Edit, Write
 model: sonnet
 ---
 
@@ -443,9 +448,10 @@ Organize feedback by priority: Critical Issues, Warnings, Suggestions.
 ```
 
 **Key Features:**
+- **Multi-Model Routing** - Route sub-agents to different models (sonnet, opus, haiku) based on task complexity
+- **Extensible Architecture** - Pluggable resolvers and executors support Claude-based, A2A, or custom sub-agent types
 - **Dedicated Context** - Each sub-agent has its own context window, preventing pollution of main conversation
-- **Specialized Prompts** - Custom system prompts tailored for specific domains
-- **Tool Filtering** - Limit sub-agents to only necessary tools
+- **Tool Filtering** - Allow or disallow specific tools per sub-agent with `tools` and `disallowedTools`
 - **Background Execution** - Run long-running tasks asynchronously with TaskOutputTool
 - **Resumable Agents** - Continue long-running research across multiple interactions
 

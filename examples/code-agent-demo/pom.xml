@@ -12,9 +12,9 @@
 	</parent>
 
 	<groupId>org.springaicommunity</groupId>
-	<artifactId>chat-demo</artifactId>
+	<artifactId>code-agent-demo</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
-	<name>chat-demo</name>
+	<name>code-agent-demo</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>

@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.springaicommunity.agent.a2a.A2ASubagentDefinition;
+import org.springaicommunity.agent.a2a.A2ASubagentExecutor;
+import org.springaicommunity.agent.a2a.A2ASubagentResolver;
 import org.springaicommunity.agent.tools.BraveWebSearchTool;
 import org.springaicommunity.agent.tools.FileSystemTools;
 import org.springaicommunity.agent.tools.GlobTool;
@@ -13,6 +16,9 @@ import org.springaicommunity.agent.tools.SkillsTool;
 import org.springaicommunity.agent.tools.SmartWebFetchTool;
 import org.springaicommunity.agent.tools.TodoWriteTool;
 import org.springaicommunity.agent.tools.task.TaskToolCallbackProvider;
+import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
+import org.springaicommunity.agent.tools.task.subagent.SubagentType;
+import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentReferences;
 import org.springaicommunity.agent.utils.AgentEnvironment;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -46,11 +52,17 @@ public class Application {
 		return args -> {
 
 			var taskTools = TaskToolCallbackProvider.builder()
-				.agentResources(agentPaths)
+				.subagentReferences(ClaudeSubagentReferences.fromResources(agentPaths))
+
+				// Add A2A Subagent support
+				.subagentReferences(new SubagentReference("http://localhost:10001", A2ASubagentDefinition.KIND))
+				.subagentTypes(new SubagentType(new A2ASubagentResolver(), new A2ASubagentExecutor()))
+
+				.chatClientBuilder("default",
+						chatClientBuilder.clone()
+							.defaultToolContext(Map.of("foo", "bar"))
+							.defaultAdvisors(new MyLoggingAdvisor(0, "[TASK]")))
 				.skillsResources(skillPaths)
-				.chatClientBuilder(chatClientBuilder.clone()
-					.defaultToolContext(Map.of("foo", "bar"))
-					.defaultAdvisors(new MyLoggingAdvisor(0, "[TASK]")))
 				.build();
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off
@@ -66,7 +78,6 @@ public class Application {
 
 				// skills tool
 				.defaultToolCallbacks(SkillsTool.builder().addSkillsResources(skillPaths).build())
-
 				
 				.defaultTools(
 					// task orchestration tools
