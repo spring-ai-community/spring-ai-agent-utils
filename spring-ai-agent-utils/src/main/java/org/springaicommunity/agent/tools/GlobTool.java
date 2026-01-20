@@ -48,15 +48,20 @@ public class GlobTool {
 
 	private final int maxResults;
 
+	private final Path workingDirectory;
+
 	/**
 	 * Constructor with configurable parameters.
 	 * @param maxDepth Maximum directory traversal depth to prevent infinite recursion
 	 * (default: 100)
 	 * @param maxResults Maximum number of results to return (default: 1000)
+	 * @param workingDirectory The working directory to use when path is not specified.
+	 * If null, defaults to current JVM working directory.
 	 */
-	protected GlobTool(int maxDepth, int maxResults) {
+	protected GlobTool(int maxDepth, int maxResults, Path workingDirectory) {
 		this.maxDepth = maxDepth;
 		this.maxResults = maxResults;
+		this.workingDirectory = workingDirectory;
 	}
 
 	// @formatter:off
@@ -75,8 +80,17 @@ public class GlobTool {
 		Assert.hasText(pattern, "	The glob pattern must not be empty");
 
 		try {
-			// Determine search path
-			Path searchPath = StringUtils.hasText(path) ? Paths.get(path) : Paths.get(".");
+			// Determine search path - use configured workingDirectory if path not specified
+			Path searchPath;
+			if (StringUtils.hasText(path)) {
+				searchPath = Paths.get(path);
+			}
+			else if (this.workingDirectory != null) {
+				searchPath = this.workingDirectory;
+			}
+			else {
+				searchPath = Paths.get(".");
+			}
 
 			if (!Files.exists(searchPath)) {
 				return "Error: Path does not exist: " + searchPath.toAbsolutePath();
@@ -185,6 +199,8 @@ public class GlobTool {
 
 		private int maxResults = 1000;
 
+		private Path workingDirectory = null;
+
 		private Builder() {
 		}
 
@@ -198,8 +214,29 @@ public class GlobTool {
 			return this;
 		}
 
+		/**
+		 * Set the working directory to use when the agent doesn't specify a path.
+		 * This allows tools to operate within a sandbox/workspace context.
+		 * @param workingDirectory the working directory path
+		 * @return this builder
+		 */
+		public Builder workingDirectory(Path workingDirectory) {
+			this.workingDirectory = workingDirectory;
+			return this;
+		}
+
+		/**
+		 * Set the working directory using a string path.
+		 * @param workingDirectory the working directory path as string
+		 * @return this builder
+		 */
+		public Builder workingDirectory(String workingDirectory) {
+			this.workingDirectory = workingDirectory != null ? Paths.get(workingDirectory) : null;
+			return this;
+		}
+
 		public GlobTool build() {
-			return new GlobTool(maxDepth, maxResults);
+			return new GlobTool(maxDepth, maxResults, workingDirectory);
 		}
 
 	}
