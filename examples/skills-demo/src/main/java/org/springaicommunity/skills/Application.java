@@ -33,6 +33,7 @@ public class Application {
 		return args -> {
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off
+				.defaultSystem("Always use the available skills to assist the user in their requests.")
 
 				// Skills tool
 				.defaultToolCallbacks(SkillsTool.builder().addSkillsResources(agentSkillsDirs).build())
@@ -63,11 +64,6 @@ public class Application {
 				// @formatter:on
 
 			var answer = chatClient
-				// .prompt("""
-				// 	Explain Spring AI and recursive advisors in simple terms. Do full
-				// 	research before answering. Collect information from internet if needed.
-				// 	Save the final answer in a PDF file in /tmp/spring-ai-overview.pdf.
-				// 	""")
 				.prompt("""
 					Explain reinforcement learning in simple terms and use.
 					Use required skills.
