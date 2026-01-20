@@ -6,7 +6,7 @@
 
     <groupId>org.springaicommunity</groupId>
     <artifactId>spring-ai-agent-utils-parent</artifactId>
-    <version>0.4.1</version>
+    <version>0.4.2-SNAPSHOT</version>
 
     <name>Spring AI Agent Utilities Parent</name>
 
