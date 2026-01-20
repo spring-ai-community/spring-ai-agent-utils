@@ -51,15 +51,13 @@ public class SkillsTool {
 			- Invoke skills using this tool with the skill name only (no arguments)
 			- When you invoke a skill, you will see <command-message>The "{name}" skill is loading</command-message>
 			- The skill's prompt will expand and provide detailed instructions on how to complete the task
-			- Examples:
-			  - `command: "pdf"` - invoke the pdf skill
-			  - `command: "xlsx"` - invoke the xlsx skill
-			  - `command: "ms-office-suite:pdf"` - invoke using fully qualified name
+
+			NOTE: Response always starts start with the base directory of the skill execution environment. You can use this to retrieve additional files of call shell commands.
+			Skill description follows after the base directory line.
 
 			Important:
 			- Only use skills listed in <available_skills> below
 			- Do not invoke a skill that is already running
-			- Do not use this tool for built-in CLI commands (like /help, /clear, etc.)
 			</skills_instructions>
 
 			<available_skills>
