@@ -37,14 +37,6 @@ import org.springframework.ai.tool.annotation.ToolParam;
  */
 public class FileSystemTools {
 
-	private static final String READ_SYSTEM_REMINDER_SUFFIX = """
-
-			<system-reminder>
-			Whenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.
-			</system-reminder>
-
-			""";
-
 	// @formatter:off
 	@Tool(name = "Read", description = """
 		Reads a file from the local filesystem. You can access any file directly by using this tool.
@@ -137,7 +129,7 @@ public class FileSystemTools {
 				result.append(line).append("\n");
 			}
 
-			return result.toString() + READ_SYSTEM_REMINDER_SUFFIX;
+			return result.toString();
 
 		}
 		catch (IOException e) {
