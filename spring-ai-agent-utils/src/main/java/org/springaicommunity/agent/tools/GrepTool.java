@@ -55,6 +55,8 @@ public class GrepTool {
 
 	private final int maxLineLength;
 
+	private final Path workingDirectory;
+
 	// File type mappings (common extensions)
 	private static final Map<String, String[]> FILE_TYPE_EXTENSIONS = new HashMap<>();
 	static {
@@ -83,7 +85,7 @@ public class GrepTool {
 	 */
 	@Deprecated
 	public GrepTool() {
-		this(100000, 100, 10000);
+		this(100000, 100, 10000, null);
 	}
 
 	/**
@@ -93,11 +95,14 @@ public class GrepTool {
 	 * (default: 100)
 	 * @param maxLineLength Maximum line length to process, longer lines are skipped
 	 * (default: 10000)
+	 * @param workingDirectory The working directory to use when path is not specified.
+	 * If null, defaults to current JVM working directory.
 	 */
-	private GrepTool(int maxOutputLength, int maxDepth, int maxLineLength) {
+	private GrepTool(int maxOutputLength, int maxDepth, int maxLineLength, Path workingDirectory) {
 		this.maxOutputLength = maxOutputLength;
 		this.maxDepth = maxDepth;
 		this.maxLineLength = maxLineLength;
+		this.workingDirectory = workingDirectory;
 	}
 
 	/**
@@ -141,8 +146,17 @@ public class GrepTool {
 		@ToolParam(description = "Enable multiline mode where . matches newlines and patterns can span lines. Default: false.", required = false) Boolean multiline) { // @formatter:on
 
 		try {
-			// Determine search path
-			Path searchPath = StringUtils.hasText(path) ? Paths.get(path) : Paths.get(".");
+			// Determine search path - use configured workingDirectory if path not specified
+			Path searchPath;
+			if (StringUtils.hasText(path)) {
+				searchPath = Paths.get(path);
+			}
+			else if (this.workingDirectory != null) {
+				searchPath = this.workingDirectory;
+			}
+			else {
+				searchPath = Paths.get(".");
+			}
 
 			if (!Files.exists(searchPath)) {
 				return "Error: Path does not exist: " + searchPath.toAbsolutePath();
@@ -509,9 +523,14 @@ public class GrepTool {
 	}
 
 	public static class Builder {
+
 		private int maxOutputLength = 100000;
+
 		private int maxDepth = 100;
+
 		private int maxLineLength = 10000;
+
+		private Path workingDirectory = null;
 
 		public Builder maxOutputLength(int maxOutputLength) {
 			this.maxOutputLength = maxOutputLength;
@@ -528,9 +547,31 @@ public class GrepTool {
 			return this;
 		}
 
-		public GrepTool build() {
-			return new GrepTool(this.maxOutputLength, this.maxDepth, this.maxLineLength);
+		/**
+		 * Set the working directory to use when the agent doesn't specify a path. This
+		 * allows tools to operate within a sandbox/workspace context.
+		 * @param workingDirectory the working directory path
+		 * @return this builder
+		 */
+		public Builder workingDirectory(Path workingDirectory) {
+			this.workingDirectory = workingDirectory;
+			return this;
 		}
+
+		/**
+		 * Set the working directory using a string path.
+		 * @param workingDirectory the working directory path as string
+		 * @return this builder
+		 */
+		public Builder workingDirectory(String workingDirectory) {
+			this.workingDirectory = workingDirectory != null ? Paths.get(workingDirectory) : null;
+			return this;
+		}
+
+		public GrepTool build() {
+			return new GrepTool(this.maxOutputLength, this.maxDepth, this.maxLineLength, this.workingDirectory);
+		}
+
 	}
 
 }
