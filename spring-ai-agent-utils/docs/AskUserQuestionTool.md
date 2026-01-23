@@ -36,7 +36,7 @@ ChatClient chatClient = chatClientBuilder
     .build();
 ```
 
-You must provide a custom `QuestionHandler` implementation via the `questionHandler()` builder method.
+You must provide a `QuestionHandler` implementation via the `questionHandler()` builder method. For CLI applications, you can use the provided `CommandLineQuestionHandler` (see [Console-Based Implementation](#console-based-implementation)).
 
 The `AskUserQuestionTool` class is thread-safe. However, the provided `QuestionHandler` must also be thread-safe if it maintains shared state.
 
@@ -135,60 +135,24 @@ This is useful when you want to allow partial answers or handle validation in yo
 
 ### Console-Based Implementation
 
+The library provides a ready-to-use `CommandLineQuestionHandler` for console/CLI applications:
+
 ```java
-public class ConsoleQuestionHandler {
+import org.springaicommunity.agent.utils.CommandLineQuestionHandler;
 
-    public static AskUserQuestionTool createTool() {
-        return AskUserQuestionTool.builder()
-            .questionHandler(ConsoleQuestionHandler::handleQuestions)
-            .build();
-    }
+AskUserQuestionTool askTool = AskUserQuestionTool.builder()
+    .questionHandler(new CommandLineQuestionHandler())
+    .build();
 
-    private static Map<String, String> handleQuestions(List<Question> questions) {
-        Map<String, String> answers = new HashMap<>();
-        Scanner scanner = new Scanner(System.in);
-
-        for (Question q : questions) {
-            System.out.println("\n" + q.header() + ": " + q.question());
-
-            List<Option> options = q.options();
-            for (int i = 0; i < options.size(); i++) {
-                Option opt = options.get(i);
-                System.out.printf("  %d. %s - %s%n", i + 1, opt.label(), opt.description());
-            }
-
-            if (q.multiSelect()) {
-                System.out.println("  (Enter numbers separated by commas, or type custom text)");
-            } else {
-                System.out.println("  (Enter a number, or type custom text)");
-            }
-
-            String response = scanner.nextLine().trim();
-            answers.put(q.question(), parseResponse(response, options));
-        }
-
-        return answers;
-    }
-
-    private static String parseResponse(String response, List<Option> options) {
-        try {
-            // Try parsing as option number(s)
-            String[] parts = response.split(",");
-            List<String> labels = new ArrayList<>();
-            for (String part : parts) {
-                int index = Integer.parseInt(part.trim()) - 1;
-                if (index >= 0 && index < options.size()) {
-                    labels.add(options.get(index).label());
-                }
-            }
-            return labels.isEmpty() ? response : String.join(", ", labels);
-        } catch (NumberFormatException e) {
-            // Not a number, use as free text
-            return response;
-        }
-    }
-}
+ChatClient chatClient = chatClientBuilder
+    .defaultTools(askTool)
+    .build();
 ```
+
+The `CommandLineQuestionHandler` displays questions with numbered options and supports:
+- Single-select: Enter a number (e.g., `1`) or custom text
+- Multi-select: Enter comma-separated numbers (e.g., `1,3`) or custom text
+- Free-text input as an alternative to predefined options
 
 ### Web/GUI Implementation
 
@@ -234,9 +198,8 @@ public class WebQuestionHandler {
 
 ## Demo Application
 
-See the [ask-user-question-demo](../../../examples/ask-user-question-demo) for a complete working example of a console-based AI chat application using the AskUserQuestionTool. The demo shows how to:
-- Implement a custom question handler for console interaction
-- Parse user responses (numeric selections or free text)
+See the [ask-user-question-demo](../../../examples/ask-user-question-demo) for a complete working example of a console-based AI chat application using the AskUserQuestionTool with `CommandLineQuestionHandler`. The demo shows how to:
+- Use the provided `CommandLineQuestionHandler` for console interaction
 - Handle both single-select and multi-select questions
 - Configure the tool with answer validation options
 
