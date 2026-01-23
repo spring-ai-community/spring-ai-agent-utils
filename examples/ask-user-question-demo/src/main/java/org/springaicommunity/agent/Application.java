@@ -1,14 +1,9 @@
 package org.springaicommunity.agent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import org.springaicommunity.agent.tools.AskUserQuestionTool;
-import org.springaicommunity.agent.tools.AskUserQuestionTool.Question;
-import org.springaicommunity.agent.tools.AskUserQuestionTool.Question.Option;
+import org.springaicommunity.agent.utils.CommandLineQuestionHandler;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -35,7 +30,7 @@ public class Application {
 			
 				// Ask user question tool
 				.defaultTools(AskUserQuestionTool.builder()
-					.questionHandler(Application::handleQuestions)
+					.questionHandler(new CommandLineQuestionHandler())
 					.answersValidation(false)
 					.build())
 
@@ -59,51 +54,4 @@ public class Application {
 			}
 		};
 	}
-
-	private static Map<String, String> handleQuestions(List<Question> questions) {
-		Map<String, String> answers = new HashMap<>();
-		Scanner scanner = new Scanner(System.in);
-
-		for (Question q : questions) {
-			System.out.println("\n" + q.header() + ": " + q.question());
-
-			List<Option> options = q.options();
-			for (int i = 0; i < options.size(); i++) {
-				Option opt = options.get(i);
-				System.out.printf("  %d. %s - %s%n", i + 1, opt.label(), opt.description());
-			}
-
-			if (q.multiSelect()) {
-				System.out.println("  (Enter numbers separated by commas, or type custom text)");
-			}
-			else {
-				System.out.println("  (Enter a number, or type custom text)");
-			}
-
-			String response = scanner.nextLine().trim();
-			answers.put(q.question(), parseResponse(response, options));
-		}
-
-		return answers;
-	}
-
-	private static String parseResponse(String response, List<Option> options) {
-		try {
-			// Try parsing as option number(s)
-			String[] parts = response.split(",");
-			List<String> labels = new ArrayList<>();
-			for (String part : parts) {
-				int index = Integer.parseInt(part.trim()) - 1;
-				if (index >= 0 && index < options.size()) {
-					labels.add(options.get(index).label());
-				}
-			}
-			return labels.isEmpty() ? response : String.join(", ", labels);
-		}
-		catch (NumberFormatException e) {
-			// Not a number, use as free text
-			return response;
-		}
-	}
-
 }

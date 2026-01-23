@@ -97,9 +97,9 @@ public class Application {
                 // Task orchestration
                 .defaultTools(TodoWriteTool.builder().build())
 
-                // User feedback tool
+                // User feedback tool (use CommandLineQuestionHandler for CLI apps)
                 .defaultTools(AskUserQuestionTool.builder()
-                    .questionHandler(questions -> handleUserQuestions(questions))
+                    .questionHandler(new CommandLineQuestionHandler())
                     .build())
 
 				// Advisors
@@ -317,7 +317,13 @@ Ask users clarifying questions during AI agent execution. Enables agents to gath
 
 **Quick Example:**
 ```java
+// For CLI applications, use the provided CommandLineQuestionHandler
 AskUserQuestionTool askTool = AskUserQuestionTool.builder()
+    .questionHandler(new CommandLineQuestionHandler())
+    .build();
+
+// Or implement a custom handler for web/GUI applications
+AskUserQuestionTool customTool = AskUserQuestionTool.builder()
     .questionHandler(questions -> {
         // Display questions to user via your UI
         Map<String, String> answers = collectUserAnswers(questions);
@@ -331,7 +337,7 @@ AskUserQuestionTool askTool = AskUserQuestionTool.builder()
 
 **Demo Application:**
 
-See the [ask-user-question-demo](../examples/ask-user-question-demo) for a complete console-based implementation.
+See the [ask-user-question-demo](../examples/ask-user-question-demo) for a complete console-based implementation using `CommandLineQuestionHandler`.
 
 ---
 

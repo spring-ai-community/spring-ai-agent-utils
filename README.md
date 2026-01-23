@@ -127,9 +127,9 @@ public class Application {
                 // Task orchestration
                 .defaultTools(TodoWriteTool.builder().build())
 
-                // User feedback tool
+                // User feedback tool (use CommandLineQuestionHandler for CLI apps)
                 .defaultTools(AskUserQuestionTool.builder()
-                    .questionHandler(questions -> handleUserQuestions(questions))
+                    .questionHandler(new CommandLineQuestionHandler())
                     .build())
 
 				// Advisors
