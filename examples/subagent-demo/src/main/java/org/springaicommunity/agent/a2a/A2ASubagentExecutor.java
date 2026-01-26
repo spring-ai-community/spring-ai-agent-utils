@@ -39,9 +39,12 @@ import org.springaicommunity.agent.tools.task.subagent.SubagentDefinition;
 import org.springaicommunity.agent.tools.task.subagent.SubagentExecutor;
 
 /**
+ * Executes tasks via A2A protocol by sending messages to remote agents.
+ * Demonstrates how to implement {@link SubagentExecutor} for remote agent communication.
+ *
  * @author Christian Tzolov
+ * @see <a href="https://google.github.io/A2A/">A2A Protocol Specification</a>
  */
-
 public class A2ASubagentExecutor implements SubagentExecutor {
 
 	private static final Logger logger = LoggerFactory.getLogger(A2ASubagentExecutor.class);

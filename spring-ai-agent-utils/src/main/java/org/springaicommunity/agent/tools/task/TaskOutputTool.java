@@ -26,9 +26,11 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.util.Assert;
 
 /**
+ * Tool for retrieving output from running or completed background tasks.
+ * Supports blocking and non-blocking modes with configurable timeouts.
+ *
  * @author Christian Tzolov
  */
-
 public class TaskOutputTool {
 
 	private static final String TASK_DESCRIPTION_TEMPLATE = """

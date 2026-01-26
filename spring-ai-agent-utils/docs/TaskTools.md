@@ -795,8 +795,9 @@ public class ClaudeSubagentReferences {
 }
 ```
 
-## Related Tools
+## Related Documentation
 
+- [**Subagent Framework**](Subagent.md) - Protocol-agnostic subagent abstraction for integrating A2A, MCP, and custom agent protocols
 - [**FileSystemTools**](FileSystemTools.md) - File operations for sub-agents
 - [**GrepTool**](GrepTool.md) - Code search capabilities
 - [**GlobTool**](GlobTool.md) - File pattern matching

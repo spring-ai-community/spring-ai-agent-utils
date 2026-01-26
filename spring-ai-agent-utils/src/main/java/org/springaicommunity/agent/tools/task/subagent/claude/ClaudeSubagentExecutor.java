@@ -33,6 +33,9 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * Executes Claude subagent tasks using Spring AI ChatClient.
+ * Configures chat client with appropriate tools based on subagent definition.
+ *
  * @author Christian Tzolov
  */
 public class ClaudeSubagentExecutor implements SubagentExecutor {

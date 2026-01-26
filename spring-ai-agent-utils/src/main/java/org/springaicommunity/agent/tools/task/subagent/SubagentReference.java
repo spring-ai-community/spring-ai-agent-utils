@@ -18,6 +18,11 @@ package org.springaicommunity.agent.tools.task.subagent;
 import java.util.Map;
 
 /**
+ * Reference to a subagent definition resource (e.g., markdown file URI).
+ *
+ * @param uri the resource URI (classpath or file path)
+ * @param kind the subagent kind (e.g., "CLAUDE")
+ * @param metadata optional key-value metadata
  * @author Christian Tzolov
  */
 public record SubagentReference(String uri, String kind, Map<String, String> metadata) {
