@@ -45,9 +45,11 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * Provides Task and TaskOutput tool callbacks with configured subagents and core tools.
+ * Uses deferred initialization to build tools on first access.
+ *
  * @author Christian Tzolov
  */
-
 public class TaskToolCallbackProvider implements ToolCallbackProvider {
 
 	private final String braveApiKey;

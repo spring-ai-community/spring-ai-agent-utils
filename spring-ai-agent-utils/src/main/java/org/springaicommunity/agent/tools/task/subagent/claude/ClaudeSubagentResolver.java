@@ -27,9 +27,10 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.util.Assert;
 
 /**
+ * Resolves Claude subagent references by parsing markdown files with YAML frontmatter.
+ *
  * @author Christian Tzolov
  */
-
 public class ClaudeSubagentResolver implements SubagentResolver {
 
 	@Override

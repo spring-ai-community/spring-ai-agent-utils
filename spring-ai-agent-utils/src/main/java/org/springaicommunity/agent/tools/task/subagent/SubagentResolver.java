@@ -16,12 +16,16 @@
 package org.springaicommunity.agent.tools.task.subagent;
 
 /**
+ * Resolves subagent references into their full definitions.
+ *
  * @author Christian Tzolov
  */
 public interface SubagentResolver {
 
+	/** Checks if this resolver can handle the given reference. */
 	boolean canResolve(SubagentReference subagentRef);
 
+	/** Resolves the reference to a full subagent definition. */
 	SubagentDefinition resolve(SubagentReference subagentRef);
 
 }

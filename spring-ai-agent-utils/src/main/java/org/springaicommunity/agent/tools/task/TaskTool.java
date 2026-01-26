@@ -38,6 +38,9 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.util.Assert;
 
 /**
+ * Tool for launching specialized subagents to handle complex, multi-step tasks.
+ * Supports both synchronous and background execution modes.
+ *
  * @author Christian Tzolov
  */
 public class TaskTool {

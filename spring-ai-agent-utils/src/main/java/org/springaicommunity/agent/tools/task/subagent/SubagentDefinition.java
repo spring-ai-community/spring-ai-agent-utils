@@ -16,19 +16,25 @@
 package org.springaicommunity.agent.tools.task.subagent;
 
 /**
+ * Defines a subagent's identity and configuration metadata.
+ *
  * @author Christian Tzolov
  */
-
 public interface SubagentDefinition {
 
+	/** Returns the unique name of this subagent. */
 	String getName();
 
+	/** Returns the description of this subagent's capabilities. */
 	String getDescription();
 
+	/** Returns the kind/type identifier (e.g., "CLAUDE"). */
 	String getKind();
 
+	/** Returns the reference used to resolve this definition. */
 	SubagentReference getReference();
 
+	/** Formats this subagent for registration display. */
 	default public String toSubagentRegistrations() {
 		return "-%s: /%s".formatted(getName(), getDescription());
 	}

@@ -26,7 +26,11 @@ import org.springaicommunity.agent.tools.task.subagent.SubagentResolver;
 import org.springframework.util.Assert;
 
 /**
+ * Resolves A2A subagent references by fetching the AgentCard from the well-known endpoint.
+ * Demonstrates how to implement {@link SubagentResolver} for remote agent discovery.
+ *
  * @author Christian Tzolov
+ * @see <a href="https://google.github.io/A2A/">A2A Protocol Specification</a>
  */
 public class A2ASubagentResolver implements SubagentResolver {
 

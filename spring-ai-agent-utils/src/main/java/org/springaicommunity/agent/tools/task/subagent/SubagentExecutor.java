@@ -18,12 +18,16 @@ package org.springaicommunity.agent.tools.task.subagent;
 import org.springaicommunity.agent.tools.task.TaskTool.TaskCall;
 
 /**
+ * Executes subagent tasks for a specific subagent kind.
+ *
  * @author Christian Tzolov
  */
 public interface SubagentExecutor {
 
+	/** Returns the kind of subagent this executor handles. */
 	String getKind();
 
+	/** Executes the task using the specified subagent definition. */
 	String execute(TaskCall taskCall, SubagentDefinition subagent);
-	
+
 }

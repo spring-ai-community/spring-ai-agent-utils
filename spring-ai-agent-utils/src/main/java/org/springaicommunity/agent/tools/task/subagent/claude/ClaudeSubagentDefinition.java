@@ -27,6 +27,9 @@ import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
 import org.springframework.util.StringUtils;
 
 /**
+ * Claude-specific subagent definition parsed from markdown with YAML frontmatter.
+ * Supports model, tools, disallowed tools, skills, and permission mode configuration.
+ *
  * @author Christian Tzolov
  */
 public class ClaudeSubagentDefinition implements SubagentDefinition {

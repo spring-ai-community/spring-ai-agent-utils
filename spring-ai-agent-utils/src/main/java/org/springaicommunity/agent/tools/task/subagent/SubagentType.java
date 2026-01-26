@@ -16,10 +16,15 @@
 package org.springaicommunity.agent.tools.task.subagent;
 
 /**
+ * Pairs a subagent resolver with its executor for a specific kind.
+ *
+ * @param resolver resolves references into definitions
+ * @param executor executes tasks for this subagent kind
  * @author Christian Tzolov
  */
 public record SubagentType(SubagentResolver resolver, SubagentExecutor executor) {
 
+	/** Returns the kind identifier from the executor. */
 	public String kind() {
 		return executor.getKind();
 	}
