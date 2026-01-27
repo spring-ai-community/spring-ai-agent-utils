@@ -202,6 +202,10 @@ public class TaskTool {
 					ClaudeSubagentDefinition.KIND, null));
 			this.subagentReferences.add(new SubagentReference("classpath:/agent/EXPLORE_SUBAGENT.md",
 					ClaudeSubagentDefinition.KIND, null));
+			this.subagentReferences.add(new SubagentReference("classpath:/agent/PLAN_SUBAGENT.md",
+					ClaudeSubagentDefinition.KIND, null));
+			this.subagentReferences.add(new SubagentReference("classpath:/agent/BASH_SUBAGENT.md",
+					ClaudeSubagentDefinition.KIND, null));
 
 			// Register built-in Claude subagent resolvers
 			this.subagentResolvers.add(new ClaudeSubagentResolver());

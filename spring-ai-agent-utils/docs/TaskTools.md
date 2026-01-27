@@ -109,6 +109,47 @@ description: Fast agent specialized for exploring codebases. Use for finding fil
 - `medium` - Moderate exploration, multiple search strategies
 - `very thorough` - Comprehensive analysis across multiple locations
 
+### Plan Sub-Agent
+
+A software architect agent specialized for designing implementation plans:
+
+```markdown
+---
+name: Plan
+description: Software architect agent for designing implementation plans. Use this when you need to plan the implementation strategy for a task.
+---
+```
+
+**Capabilities:**
+- Exploring codebases to understand existing patterns and architecture
+- Identifying critical files that need modification or creation
+- Designing step-by-step implementation approaches
+- Considering architectural trade-offs and presenting alternatives
+- Surfacing potential risks or challenges early
+- **Strictly read-only** - planning only, no file modifications
+
+### Bash Sub-Agent
+
+A command execution specialist for terminal operations:
+
+```markdown
+---
+name: Bash
+description: Command execution specialist for running bash commands. Use this for git operations, command execution, and other terminal tasks.
+---
+```
+
+**Capabilities:**
+- Git operations (commits, branches, merges, status checks)
+- Build and test commands (npm, cargo, make, pytest)
+- Package management operations
+- System operations and environment setup
+- DevOps tasks (Docker, deployment scripts)
+
+**Guidelines:**
+- Follows git safety protocols (no force push to main, no destructive commands without confirmation)
+- Limited to Bash tool only - file reading/editing handled by parent agent
+
 ## Quick Start
 
 ### Basic Setup

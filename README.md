@@ -80,7 +80,7 @@ While these tools can be used standalone, truly agentic behavior emerges when th
 
 _Check the latest version:_ [![](https://img.shields.io/maven-central/v/org.springaicommunity/spring-ai-agent-utils.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/org.springaicommunity/spring-ai-agent-utils)
 
-> **Note:** You need Sping-AI version `2.0.0-SNAPSHOT` or `2.0.0-M2` when released.
+> **Note:** You need Spring AI version `2.0.0-M2` or later.
 
 **2. Configure your agent:**
 
@@ -162,7 +162,7 @@ This project reimplements key Claude Code features based on:
 
 - Java 17+
 - Spring Boot 3.x / 4.x
-- Spring AI 2.0.0-SNAPSHOT (or 2.0.0-M2 when released)
+- Spring AI 2.0.0-M2 or later
 - Maven 3.6+
 
 ## Building

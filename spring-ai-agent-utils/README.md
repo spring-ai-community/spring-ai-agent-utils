@@ -49,7 +49,7 @@ While these tools can be used standalone, truly agentic behavior emerges when th
 
 _Check the latest version:_ [![](https://img.shields.io/maven-central/v/org.springaicommunity/spring-ai-agent-utils.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/org.springaicommunity/spring-ai-agent-utils)
 
-> **Note:** You need Sping-AI version `2.0.0-SNAPSHOT` or `2.0.0-M2` when released.
+> **Note:** You need Spring AI version `2.0.0-M2` or later.
 
 
 ## Quick Start
@@ -431,6 +431,8 @@ String response = chatClient
 **Built-in Sub-Agents:**
 - **general-purpose** - Complex research and multi-step tasks with full tool access
 - **Explore** - Fast, read-only codebase exploration with thoroughness levels (quick/medium/very thorough)
+- **Plan** - Software architect agent for designing implementation plans, identifying critical files, and considering architectural trade-offs
+- **Bash** - Command execution specialist for git operations, build commands, and other terminal tasks
 
 **Create Custom Sub-Agent:** `.claude/agents/code-reviewer.md`
 ```markdown
