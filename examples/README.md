@@ -20,9 +20,17 @@ Demonstrates the AskUserQuestionTool for interactive agent-user communication wi
 
 ### [Sub-Agent Demo](subagent-demo)
 
-Demonstrates the hierarchical sub-agent system with custom sub-agent creation and TaskTools integration.
+Demonstrates the hierarchical sub-agent system using Markdown-defined local subagents with the TaskTool dispatcher pattern.
 
-See the [TaskTools documentation](../spring-ai-agent-utils/docs/TaskTools.md) for creating custom sub-agents.
+See the [Sub-Agent Demo README](subagent-demo/README.md) for architecture details.
+
+---
+
+### [Sub-Agent A2A Demo](subagent-a2a-demo)
+
+Extends the sub-agent system with [A2A (Agent-to-Agent) protocol](https://google.github.io/A2A/) support for delegating tasks to remote agents over HTTP.
+
+See the [Sub-Agent A2A Demo README](subagent-a2a-demo/README.md) for setup instructions.
 
 ---
 
