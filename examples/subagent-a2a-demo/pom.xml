@@ -12,23 +12,37 @@
 	</parent>
 
 	<groupId>org.springaicommunity</groupId>
-	<artifactId>subagent-demo</artifactId>
+	<artifactId>subagent-a2a-demo</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
-	<name>subagent-demo</name>
+	<name>subagent-a2a-demo</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
 		<java.version>17</java.version>
 		<maven.deploy.skip>true</maven.deploy.skip>
 		<spring-ai.version>2.0.0-M2</spring-ai.version>
+		<a2a.sdk.version>0.3.3.Final</a2a.sdk.version>
 	</properties>
 
 	<dependencies>
 
 		<dependency>
+			<groupId>io.github.a2asdk</groupId>
+			<artifactId>a2a-java-sdk-client</artifactId>
+			<version>${a2a.sdk.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.github.a2asdk</groupId>
+			<artifactId>a2a-java-sdk-client-transport-jsonrpc</artifactId>
+			<version>${a2a.sdk.version}</version>
+		</dependency>
+
+
+		<dependency>
 			<groupId>org.springaicommunity</groupId>
 			<artifactId>spring-ai-agent-utils</artifactId>
-			<version>0.4.2-SNAPSHOT</version>
+			<version>0.5.0-SNAPSHOT</version>
 		</dependency>
 
 		<!-- <dependency>

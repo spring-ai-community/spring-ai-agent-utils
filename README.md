@@ -28,7 +28,8 @@ spring-ai-agent-utils/
     ├── code-agent-demo/            # Full-featured AI coding assistant
     ├── ask-user-question-demo/     # Interactive question-answer demo
     ├── skills-demo/                # Focused skills system demo
-    └── subagent-demo/              # Extensible sub-agent example
+    ├── subagent-demo/              # Markdown-defined local sub-agents
+    └── subagent-a2a-demo/          # A2A protocol remote sub-agents
 ```
 
 ## Agentic Utils
@@ -182,7 +183,8 @@ mvn spring-boot:run
 |---------|-------------|
 | [code-agent-demo](examples/code-agent-demo) | Full-featured AI coding assistant with interactive CLI, all tools, and multi-model support |
 | [todo-demo](examples/todo-demo) | Structured task management with `TodoWriteTool` and real-time progress tracking |
-| [subagent-demo](examples/subagent-demo) | Hierarchical sub-agent system with custom sub-agents and TaskTools integration |
+| [subagent-demo](examples/subagent-demo) | Hierarchical sub-agent system with Markdown-defined local sub-agents |
+| [subagent-a2a-demo](examples/subagent-a2a-demo) | A2A protocol integration for delegating tasks to remote agents |
 | [skills-demo](examples/skills-demo) | SkillsTool system with custom skill development and the ai-tuto example |
 | [ask-user-question-demo](examples/ask-user-question-demo) | Interactive agent-user communication with `AskUserQuestionTool` |
 
