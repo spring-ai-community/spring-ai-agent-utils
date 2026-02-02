@@ -122,7 +122,7 @@ public class Application {
                     FileSystemTools.builder().build(),
                     GrepTool.builder().build(),
                     GlobTool.builder().build(),
-                    SmartWebFetchTool.builder(chatClient).build(),
+                    SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build(),
                     BraveWebSearchTool.builder(braveApiKey).build())
 
                 // Task orchestration
