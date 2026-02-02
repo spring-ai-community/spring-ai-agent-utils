@@ -2,7 +2,6 @@ package org.springaicommunity.skills;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.springaicommunity.agent.tools.BraveWebSearchTool;
 import org.springaicommunity.agent.tools.FileSystemTools;
@@ -59,7 +58,6 @@ public class Application {
 						.showAvailableTools(false)
 						.showSystemMessage(false)
 						.build())
-				.defaultToolContext(Map.of("foo", "bar"))
 				.build();
 				// @formatter:on
 

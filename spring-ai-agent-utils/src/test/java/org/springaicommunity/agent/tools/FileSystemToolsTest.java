@@ -59,7 +59,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, content, StandardCharsets.UTF_8);
 
 			// When
-			String result = tools.read(file.toString(), null, null, null);
+			String result = tools.read(file.toString(), null, null);
 
 			// Then
 			assertThat(result).contains("File: " + file.toString());
@@ -80,7 +80,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, content.toString(), StandardCharsets.UTF_8);
 
 			// When - Read lines 50-54 (5 lines starting from line 50)
-			String result = tools.read(file.toString(), 50, 5, null);
+			String result = tools.read(file.toString(), 50, 5);
 
 			// Then
 			assertThat(result).contains("    50\tLine 50");
@@ -98,7 +98,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, "", StandardCharsets.UTF_8);
 
 			// When
-			String result = tools.read(file.toString(), null, null, null);
+			String result = tools.read(file.toString(), null, null);
 
 			// Then
 			assertThat(result).contains("File is empty");
@@ -108,7 +108,7 @@ class FileSystemToolsTest {
 		@DisplayName("Should return error for non-existent file")
 		void shouldReturnErrorForNonExistentFile() {
 			// When
-			String result = tools.read(tempDir.resolve("nonexistent.txt").toString(), null, null, null);
+			String result = tools.read(tempDir.resolve("nonexistent.txt").toString(), null, null);
 
 			// Then
 			assertThat(result).contains("Error: File does not exist");
@@ -118,7 +118,7 @@ class FileSystemToolsTest {
 		@DisplayName("Should return error when path is a directory")
 		void shouldReturnErrorWhenPathIsDirectory() {
 			// When
-			String result = tools.read(tempDir.toString(), null, null, null);
+			String result = tools.read(tempDir.toString(), null, null);
 
 			// Then
 			assertThat(result).contains("Error: Path is a directory, not a file");
@@ -133,7 +133,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, longLine, StandardCharsets.UTF_8);
 
 			// When
-			String result = tools.read(file.toString(), null, null, null);
+			String result = tools.read(file.toString(), null, null);
 
 			// Then
 			assertThat(result).contains("(line truncated)");
@@ -147,7 +147,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, "Line 1\nLine 2\n", StandardCharsets.UTF_8);
 
 			// When
-			String result = tools.read(file.toString(), null, null, null);
+			String result = tools.read(file.toString(), null, null);
 
 			// Then
 			assertThat(result).contains("     1\tLine 1");
@@ -168,7 +168,7 @@ class FileSystemToolsTest {
 			String content = "Hello World";
 
 			// When
-			String result = tools.write(file.toString(), content, null);
+			String result = tools.write(file.toString(), content);
 
 			// Then
 			assertThat(result).contains("Successfully created file");
@@ -186,7 +186,7 @@ class FileSystemToolsTest {
 			String newContent = "New content";
 
 			// When
-			String result = tools.write(file.toString(), newContent, null);
+			String result = tools.write(file.toString(), newContent);
 
 			// Then
 			assertThat(result).contains("Successfully overwrote file");
@@ -201,7 +201,7 @@ class FileSystemToolsTest {
 			String content = "Test content";
 
 			// When
-			String result = tools.write(file.toString(), content, null);
+			String result = tools.write(file.toString(), content);
 
 			// Then
 			assertThat(result).contains("Successfully created file");
@@ -217,7 +217,7 @@ class FileSystemToolsTest {
 			String content = "Line 1\nLine 2\nLine 3";
 
 			// When
-			tools.write(file.toString(), content, null);
+			tools.write(file.toString(), content);
 
 			// Then
 			assertThat(file).hasContent(content);
@@ -230,7 +230,7 @@ class FileSystemToolsTest {
 			Path file = tempDir.resolve("empty.txt");
 
 			// When
-			String result = tools.write(file.toString(), "", null);
+			String result = tools.write(file.toString(), "");
 
 			// Then
 			assertThat(result).contains("Successfully created file");
@@ -246,7 +246,7 @@ class FileSystemToolsTest {
 			String content = "Line 1\nLine 2\n";
 
 			// When
-			tools.write(file.toString(), content, null);
+			tools.write(file.toString(), content);
 
 			// Then
 			assertThat(file).hasContent(content);
@@ -267,7 +267,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, original, StandardCharsets.UTF_8);
 
 			// When
-			String result = tools.edit(file.toString(), "Line 2", "Modified Line 2", null, null);
+			String result = tools.edit(file.toString(), "Line 2", "Modified Line 2", null);
 
 			// Then
 			assertThat(result).contains("The file " + file.toString() + " has been updated");
@@ -288,7 +288,7 @@ class FileSystemToolsTest {
 			String newString = "import java.util.List;\nimport java.util.Map;\nimport java.util.Set;";
 
 			// When
-			String result = tools.edit(file.toString(), oldString, newString, null, null);
+			String result = tools.edit(file.toString(), oldString, newString, null);
 
 			// Then
 			assertThat(result).contains("has been updated");
@@ -303,7 +303,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, "Line 1\nLine 2", StandardCharsets.UTF_8);
 
 			// When
-			String result = tools.edit(file.toString(), "NonExistent", "New", null, null);
+			String result = tools.edit(file.toString(), "NonExistent", "New", null);
 
 			// Then
 			assertThat(result).contains("Error: old_string not found in file");
@@ -317,7 +317,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, "foo\nbar\nfoo\nbaz", StandardCharsets.UTF_8);
 
 			// When
-			String result = tools.edit(file.toString(), "foo", "replaced", null, null);
+			String result = tools.edit(file.toString(), "foo", "replaced", null);
 
 			// Then
 			assertThat(result).contains("Error: old_string appears 2 times in the file");
@@ -332,7 +332,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, "foo\nbar\nfoo\nbaz", StandardCharsets.UTF_8);
 
 			// When
-			String result = tools.edit(file.toString(), "foo", "replaced", true, null);
+			String result = tools.edit(file.toString(), "foo", "replaced", true);
 
 			// Then
 			assertThat(result).contains("has been updated");
@@ -348,7 +348,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, "content", StandardCharsets.UTF_8);
 
 			// When
-			String result = tools.edit(file.toString(), "same", "same", null, null);
+			String result = tools.edit(file.toString(), "same", "same", null);
 
 			// Then
 			assertThat(result).contains("Error: old_string and new_string must be different");
@@ -358,7 +358,7 @@ class FileSystemToolsTest {
 		@DisplayName("Should return error for non-existent file")
 		void shouldReturnErrorForNonExistentFile() {
 			// When
-			String result = tools.edit(tempDir.resolve("nonexistent.txt").toString(), "old", "new", null, null);
+			String result = tools.edit(tempDir.resolve("nonexistent.txt").toString(), "old", "new", null);
 
 			// Then
 			assertThat(result).contains("Error: File does not exist");
@@ -368,7 +368,7 @@ class FileSystemToolsTest {
 		@DisplayName("Should return error when path is a directory")
 		void shouldReturnErrorWhenPathIsDirectory() {
 			// When
-			String result = tools.edit(tempDir.toString(), "old", "new", null, null);
+			String result = tools.edit(tempDir.toString(), "old", "new", null);
 
 			// Then
 			assertThat(result).contains("Error: Path is a directory, not a file");
@@ -382,7 +382,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, "Line 1\nLine 2\n", StandardCharsets.UTF_8);
 
 			// When
-			tools.edit(file.toString(), "Line 1", "Modified Line 1", null, null);
+			tools.edit(file.toString(), "Line 1", "Modified Line 1", null);
 
 			// Then
 			String content = Files.readString(file, StandardCharsets.UTF_8);
@@ -398,7 +398,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, "Line 1\nLine 2", StandardCharsets.UTF_8);
 
 			// When
-			tools.edit(file.toString(), "Line 1", "Modified Line 1", null, null);
+			tools.edit(file.toString(), "Line 1", "Modified Line 1", null);
 
 			// Then
 			String content = Files.readString(file, StandardCharsets.UTF_8);
@@ -414,7 +414,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, "Line 1\nLine 2\nLine 3\nLine 4\nLine 5", StandardCharsets.UTF_8);
 
 			// When
-			String result = tools.edit(file.toString(), "Line 3", "Modified Line 3", null, null);
+			String result = tools.edit(file.toString(), "Line 3", "Modified Line 3", null);
 
 			// Then
 			assertThat(result).contains("→"); // Arrow character
@@ -436,7 +436,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, content.toString(), StandardCharsets.UTF_8);
 
 			// When
-			String result = tools.edit(file.toString(), "Line 10", "Modified Line 10", null, null);
+			String result = tools.edit(file.toString(), "Line 10", "Modified Line 10", null);
 
 			// Then
 			// Should show ~5 lines before and after the edit
@@ -455,7 +455,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, "First Line\nSecond Line\nThird Line", StandardCharsets.UTF_8);
 
 			// When
-			String result = tools.edit(file.toString(), "First Line", "Modified First Line", null, null);
+			String result = tools.edit(file.toString(), "First Line", "Modified First Line", null);
 
 			// Then
 			assertThat(result).contains("Modified First Line");
@@ -470,7 +470,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, "First Line\nSecond Line\nLast Line", StandardCharsets.UTF_8);
 
 			// When
-			String result = tools.edit(file.toString(), "Last Line", "Modified Last Line", null, null);
+			String result = tools.edit(file.toString(), "Last Line", "Modified Last Line", null);
 
 			// Then
 			assertThat(result).contains("Modified Last Line");
@@ -484,7 +484,7 @@ class FileSystemToolsTest {
 			Files.writeString(file, "Text with special chars: .*+?[]{}()", StandardCharsets.UTF_8);
 
 			// When
-			String result = tools.edit(file.toString(), ".*+?[]{}()", "REPLACED", null, null);
+			String result = tools.edit(file.toString(), ".*+?[]{}()", "REPLACED", null);
 
 			// Then
 			assertThat(result).contains("has been updated");
@@ -507,8 +507,8 @@ class FileSystemToolsTest {
 			String content = "Integration test content\nLine 2";
 
 			// When
-			String writeResult = tools.write(file.toString(), content, null);
-			String readResult = tools.read(file.toString(), null, null, null);
+			String writeResult = tools.write(file.toString(), content);
+			String readResult = tools.read(file.toString(), null, null);
 
 			// Then
 			assertThat(writeResult).contains("Successfully created file");
@@ -524,9 +524,9 @@ class FileSystemToolsTest {
 			String original = "Original line 1\nOriginal line 2";
 
 			// When
-			tools.write(file.toString(), original, null);
-			tools.edit(file.toString(), "Original line 1", "Modified line 1", null, null);
-			String result = tools.read(file.toString(), null, null, null);
+			tools.write(file.toString(), original);
+			tools.edit(file.toString(), "Original line 1", "Modified line 1", null);
+			String result = tools.read(file.toString(), null, null);
 
 			// Then
 			assertThat(result).contains("Modified line 1");
@@ -541,9 +541,9 @@ class FileSystemToolsTest {
 			Files.writeString(file, "Line A\nLine B\nLine C", StandardCharsets.UTF_8);
 
 			// When
-			tools.edit(file.toString(), "Line A", "Modified A", null, null);
-			tools.edit(file.toString(), "Line B", "Modified B", null, null);
-			tools.edit(file.toString(), "Line C", "Modified C", null, null);
+			tools.edit(file.toString(), "Line A", "Modified A", null);
+			tools.edit(file.toString(), "Line B", "Modified B", null);
+			tools.edit(file.toString(), "Line C", "Modified C", null);
 
 			// Then
 			String content = Files.readString(file, StandardCharsets.UTF_8);

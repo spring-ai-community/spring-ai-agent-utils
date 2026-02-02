@@ -53,7 +53,6 @@ public class Application {
 				// configuration used by the local Claude subagents
 				.chatClientBuilder("default",
 						chatClientBuilder.clone()
-							.defaultToolContext(Map.of("foo", "bar"))
 							.defaultAdvisors(new MyLoggingAdvisor(0, "[TASK]")))
 				.skillsResources(skillPaths)
 
@@ -98,7 +97,6 @@ public class Application {
 
 					new MyLoggingAdvisor()) // logging advisor
 
-				.defaultToolContext(Map.of("foo", "bar"))
 				.build();
 				// @formatter:on
 
