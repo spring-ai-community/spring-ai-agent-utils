@@ -35,8 +35,7 @@ String result = shellTools.bash(
     "ls -la",           // command
     null,               // timeout (uses default 2 minutes)
     "List all files",   // description
-    null,               // runInBackground (false)
-    toolContext
+    null               // runInBackground (false)
 );
 
 // With custom timeout
@@ -44,8 +43,7 @@ String result = shellTools.bash(
     "npm install",
     300000L,            // 5 minute timeout
     "Install dependencies",
-    null,
-    toolContext
+    null
 );
 
 // Background execution
@@ -53,8 +51,7 @@ String result = shellTools.bash(
     "npm run dev",
     null,
     "Start dev server",
-    true,               // Run in background
-    toolContext
+    true               // Run in background
 );
 // Returns: "bash_id: shell_1234567890"
 ```
@@ -94,23 +91,20 @@ String startResult = shellTools.bash(
     "mvn clean install",
     null,
     "Build project",
-    true,
-    toolContext
+    true
 );
 // Extract bash_id from result (e.g., "shell_1234567890")
 
 // Monitor output
 String output = shellTools.bashOutput(
     "shell_1234567890",  // bash_id
-    null,                 // no filter
-    toolContext
+    null                 // no filter
 );
 
 // Filter output with regex (only show ERROR lines)
 String filteredOutput = shellTools.bashOutput(
     "shell_1234567890",
-    ".*ERROR.*",         // regex filter
-    toolContext
+    ".*ERROR.*"         // regex filter
 );
 ```
 
@@ -151,8 +145,7 @@ Gracefully terminates a running background shell process.
 ```java
 // Kill a background process
 String result = shellTools.killShell(
-    "shell_1234567890",
-    toolContext
+    "shell_1234567890"
 );
 // Returns: "Successfully killed shell: shell_1234567890"
 ```
@@ -173,22 +166,21 @@ String start = shellTools.bash(
     "python train_model.py",
     null,
     "Train ML model",
-    true,
-    toolContext
+    true
 );
 // Returns: "bash_id: shell_1234567890 ..."
 
 // 2. Periodically check progress
-String output1 = shellTools.bashOutput("shell_1234567890", ".*epoch.*", toolContext);
+String output1 = shellTools.bashOutput("shell_1234567890", ".*epoch.*");
 // Shows only lines containing "epoch"
 
 Thread.sleep(5000);
 
-String output2 = shellTools.bashOutput("shell_1234567890", null, toolContext);
+String output2 = shellTools.bashOutput("shell_1234567890", null);
 // Shows all new output since last check
 
 // 3. Kill if needed
-String killResult = shellTools.killShell("shell_1234567890", toolContext);
+String killResult = shellTools.killShell("shell_1234567890");
 // Returns: "Successfully killed shell: shell_1234567890"
 ```
 
@@ -210,26 +202,26 @@ String killResult = shellTools.killShell("shell_1234567890", toolContext);
 
 1. **Use descriptive names**: Provide clear descriptions for better logging
    ```java
-   shellTools.bash("git status", null, "Check git status", null, toolContext);
+   shellTools.bash("git status", null, "Check git status", null);
    ```
 
 2. **Background for long tasks**: Use background execution for commands that take > 30 seconds
    ```java
-   shellTools.bash("npm run test", null, "Run test suite", true, toolContext);
+   shellTools.bash("npm run test", null, "Run test suite", true);
    ```
 
 3. **Monitor background processes**: Regularly check output of background processes
    ```java
-   String output = shellTools.bashOutput(bashId, null, toolContext);
+   String output = shellTools.bashOutput(bashId, null);
    ```
 
 4. **Filter wisely**: Use regex filters to focus on relevant output
    ```java
    // Only show test failures
-   shellTools.bashOutput(bashId, ".*(FAIL|ERROR).*", toolContext);
+   shellTools.bashOutput(bashId, ".*(FAIL|ERROR).*");
    ```
 
 5. **Clean up**: Kill background processes when no longer needed
    ```java
-   shellTools.killShell(bashId, toolContext);
+   shellTools.killShell(bashId);
    ```

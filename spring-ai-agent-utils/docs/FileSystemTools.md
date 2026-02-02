@@ -32,24 +32,21 @@ FileSystemTools fileTools = FileSystemTools.builder().build();
 String content = fileTools.read(
     "/path/to/file.txt",
     null,                    // offset (start from beginning)
-    null,                    // limit (read up to 2000 lines)
-    toolContext
+    null                    // limit (read up to 2000 lines)
 );
 
 // Read specific line range
 String content = fileTools.read(
     "/path/to/large-file.log",
     100,                     // Start from line 100
-    50,                      // Read 50 lines
-    toolContext
+    50                      // Read 50 lines
 );
 
 // Read from line 500 onwards
 String content = fileTools.read(
     "/path/to/file.java",
     500,                     // Start from line 500
-    2000,                    // Read up to 2000 lines
-    toolContext
+    2000                    // Read up to 2000 lines
 );
 ```
 
@@ -93,32 +90,28 @@ Writes content to a file, creating new files or overwriting existing ones.
 // Create a new file
 String result = fileTools.write(
     "/path/to/new-file.txt",
-    "This is the file content\nWith multiple lines",
-    toolContext
+    "This is the file content\nWith multiple lines"
 );
 // Returns: "Successfully created file: /path/to/new-file.txt (45 bytes)"
 
 // Create an empty file
 String result = fileTools.write(
     "/path/to/empty-file.txt",
-    null,                    // content (creates empty file)
-    toolContext
+    null                    // content (creates empty file)
 );
 // Returns: "Successfully created file: /path/to/empty-file.txt (0 bytes)"
 
 // Overwrite an existing file
 String result = fileTools.write(
     "/path/to/existing-file.txt",
-    "New content replacing old content",
-    toolContext
+    "New content replacing old content"
 );
 // Returns: "Successfully overwrote file: /path/to/existing-file.txt (33 bytes)"
 
 // Create file with parent directories
 String result = fileTools.write(
     "/path/to/new/directory/file.txt",
-    "Content",
-    toolContext
+    "Content"
 );
 // Automatically creates /path/to/new/directory/ if it doesn't exist
 ```
@@ -158,8 +151,7 @@ String result = fileTools.edit(
     "/path/to/file.java",
     "public void oldMethod() {",       // old_string
     "public void newMethod() {",       // new_string
-    null,                               // replace_all (false)
-    toolContext
+    null                               // replace_all (false)
 );
 
 // Replace all occurrences (useful for variable renaming)
@@ -167,8 +159,7 @@ String result = fileTools.edit(
     "/path/to/file.java",
     "oldVariableName",                 // old_string
     "newVariableName",                 // new_string
-    true,                              // replace_all
-    toolContext
+    true                              // replace_all
 );
 
 // Multi-line replacement
@@ -176,8 +167,7 @@ String result = fileTools.edit(
     "/path/to/config.yml",
     "database:\n  host: localhost\n  port: 5432",
     "database:\n  host: prod-server\n  port: 3306",
-    null,
-    toolContext
+    null
 );
 ```
 
@@ -225,19 +215,19 @@ Incorrect old_string (includes line number):
 
 1. **Read before editing**: Always use Read tool first to see exact content
    ```java
-   String content = fileTools.read("/path/to/file.java", null, null, toolContext);
+   String content = fileTools.read("/path/to/file.java", null, null);
    // Now edit based on what you see
    ```
 
 2. **Include context for uniqueness**: If replacement string appears multiple times, include surrounding lines
    ```java
    // Instead of just "foo"
-   fileTools.edit(filePath, "bar\nfoo\nbaz", "bar\nnewValue\nbaz", null, toolContext);
+   fileTools.edit(filePath, "bar\nfoo\nbaz", "bar\nnewValue\nbaz", null);
    ```
 
 3. **Use replace_all for renaming**: When renaming variables or constants throughout a file
    ```java
-   fileTools.edit(filePath, "OLD_CONSTANT", "NEW_CONSTANT", true, toolContext);
+   fileTools.edit(filePath, "OLD_CONSTANT", "NEW_CONSTANT", true);
    ```
 
 4. **Preserve indentation**: Copy exact whitespace from Read output (spaces/tabs)
@@ -253,8 +243,7 @@ FileSystemTools fileTools = FileSystemTools.builder().build();
 String content = fileTools.read(
     "/src/main/java/Example.java",
     null,
-    null,
-    toolContext
+    null
 );
 
 // 2. Identify exact string to replace (preserving indentation)
@@ -273,8 +262,7 @@ String result = fileTools.edit(
     "/src/main/java/Example.java",
     oldCode,
     newCode,
-    null,
-    toolContext
+    null
 );
 
 // Output shows snippet with context around the edit

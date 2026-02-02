@@ -28,7 +28,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 
@@ -59,8 +58,7 @@ public class FileSystemTools {
 	public String read(
 		@ToolParam(description = "The absolute path to the file to read") String filePath,
 		@ToolParam(description = "The line number to start reading from. Only provide if the file is too large to read at once", required = false) Integer offset,
-		@ToolParam(description = "The number of lines to read. Only provide if the file is too large to read at once.", required = false) Integer limit,
-		ToolContext toolContext) { // @formatter:on
+		@ToolParam(description = "The number of lines to read. Only provide if the file is too large to read at once.", required = false) Integer limit) { // @formatter:on
 
 		try {
 			File file = new File(filePath);
@@ -150,12 +148,11 @@ public class FileSystemTools {
 		""")
 	public String write(
 		@ToolParam(description = "The absolute path to the file to write (must be absolute, not relative)") String filePath,
-		@ToolParam(description = "The content to write to the file") String content,
-		ToolContext toolContext) { // @formatter:on
+		@ToolParam(description = "The content to write to the file") String content) { // @formatter:on
 
 		try {
 			content = content != null ? content : "";
-			
+
 			Path path = Paths.get(filePath);
 			File file = path.toFile();
 
@@ -207,8 +204,7 @@ public class FileSystemTools {
 		@ToolParam(description = "The absolute path to the file to modify") String filePath,
 		@ToolParam(description = "The text to replace") String old_string,
 		@ToolParam(description = "The text to replace it with (must be different from old_string)") String new_string,
-		@ToolParam(description = "Replace all occurences of old_string (default false)", required = false) Boolean replace_all,
-		ToolContext toolContext) { // @formatter:on
+		@ToolParam(description = "Replace all occurences of old_string (default false)", required = false) Boolean replace_all) { // @formatter:on
 
 		try {
 			File file = new File(filePath);
@@ -383,9 +379,11 @@ public class FileSystemTools {
 	}
 
 	public static class Builder {
+
 		public FileSystemTools build() {
 			return new FileSystemTools();
 		}
+
 	}
 
 }

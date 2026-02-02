@@ -771,7 +771,7 @@ String configs = globTool.glob("**/*.yml", "./config");
 
 // Read each config
 for (String configPath : configs.split("\n")) {
-    String content = fileTools.read(configPath, null, null, toolContext);
+    String content = fileTools.read(configPath, null, null);
     // Process config content
 }
 ```

@@ -201,10 +201,10 @@ Read, write, and edit files with precise control. Provides three core operations
 FileSystemTools fileTools = FileSystemTools.builder().build();
 
 // Read a file
-String content = fileTools.read("/path/to/file.txt", null, null, toolContext);
+String content = fileTools.read("/path/to/file.txt", null, null);
 
 // Edit with precise replacement
-fileTools.edit(filePath, "oldValue", "newValue", null, toolContext);
+fileTools.edit(filePath, "oldValue", "newValue", null);
 ```
 
 ### ShellTools
