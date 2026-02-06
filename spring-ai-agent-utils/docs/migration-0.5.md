@@ -33,6 +33,16 @@ The subagent SPI types moved from `org.springaicommunity.agent.tools.task.subage
 | `o.s.agent.tools.task.subagent.SubagentType` | `o.s.agent.common.task.subagent.SubagentType` |
 | `o.s.agent.tools.task.TaskTool.TaskCall` | `o.s.agent.common.task.subagent.TaskCall` |
 
+Claude-specific classes moved up one level (the intermediate `subagent` package was removed):
+
+| Old Import | New Import |
+|---|---|
+| `o.s.agent.tools.task.subagent.claude.ClaudeSubagentDefinition` | `o.s.agent.tools.task.claude.ClaudeSubagentDefinition` |
+| `o.s.agent.tools.task.subagent.claude.ClaudeSubagentExecutor` | `o.s.agent.tools.task.claude.ClaudeSubagentExecutor` |
+| `o.s.agent.tools.task.subagent.claude.ClaudeSubagentReferences` | `o.s.agent.tools.task.claude.ClaudeSubagentReferences` |
+| `o.s.agent.tools.task.subagent.claude.ClaudeSubagentResolver` | `o.s.agent.tools.task.claude.ClaudeSubagentResolver` |
+| `o.s.agent.tools.task.subagent.claude.ClaudeSubagentType` | `o.s.agent.tools.task.claude.ClaudeSubagentType` |
+
 A2A classes moved from the example package to the new module:
 
 | Old Import | New Import |

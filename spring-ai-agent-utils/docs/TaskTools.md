@@ -176,7 +176,7 @@ description: Command execution specialist for running bash commands. Use this fo
 
 ```java
 import org.springaicommunity.agent.tools.task.TaskTool;
-import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentType;
+import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentType;
 
 @Configuration
 public class AgentConfig {
@@ -272,26 +272,31 @@ ToolCallback taskTool = TaskTool.builder()
     .build();
 ```
 
-### Multi-Model Configuration
+### Multi-Provider and Multi-Model Configuration
 
-Route subagents to different models based on their frontmatter `model` field:
+Route subagents to different LLM providers and models based on their frontmatter `model` field. The `chatClientBuilder` keys represent named providers — these can be any Spring AI supported LLM provider (Anthropic, OpenAI, Ollama, etc.), not just Claude variants:
 
 ```java
 SubagentType claudeType = ClaudeSubagentType.builder()
-    .chatClientBuilder("default", sonnetBuilder)   // Fallback
-    .chatClientBuilder("opus", opusBuilder)         // For model: opus
-    .chatClientBuilder("haiku", haikuBuilder)       // For model: haiku
+    .chatClientBuilder("default", anthropicBuilder)  // Fallback provider
+    .chatClientBuilder("openai", openAiBuilder)      // OpenAI provider
+    .chatClientBuilder("ollama", ollamaBuilder)      // Ollama provider
     .build();
 ```
 
-When a subagent specifies `model: opus` in its frontmatter, it will use the corresponding ChatClient builder. The model field also supports short names (`opus`, `sonnet`, `haiku`) and `provider:model` notation (e.g., `openai:gpt-5`).
+The `model` frontmatter field supports two formats:
+
+- **`model`** — Uses the default provider with the specified model. Short aliases (`opus`, `haiku`, `sonnet`) are mapped to their full Claude model identifiers. The model can also be the full model name of any provider (e.g., `gpt-4o`).
+- **`provider:model`** — Uses the named provider with the specified model (e.g., `openai:gpt-4o`, `ollama:llama3`).
+
+If the specified provider is not found in the builder map, or if no model is specified, the default builder is used as a fallback.
 
 ### Loading Subagent References
 
 #### From Directories
 
 ```java
-import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentReferences;
+import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentReferences;
 
 List<SubagentReference> refs = ClaudeSubagentReferences.fromRootDirectory("/path/to/agents");
 ```
@@ -363,7 +368,7 @@ You are a [role description]. You specialize in [domain].
 | `description` | Yes | Natural language purpose description with usage examples |
 | `tools` | No | Comma-separated list of allowed tool names (inherits all if omitted) |
 | `disallowedTools` | No | Comma-separated list of tools to explicitly deny |
-| `model` | No | Model preference: `sonnet`, `opus`, `haiku`, or `provider:model` |
+| `model` | No | Model specification: a short alias (`sonnet`, `opus`, `haiku`), a full model name (`gpt-4o`), or `provider:model` (`openai:gpt-4o`) |
 | `skills` | No | Comma-separated list of skill names to preload into the subagent's system prompt |
 | `permissionMode` | No | Permission handling mode (default: `default`) |
 
@@ -593,7 +598,7 @@ disallowedTools: Edit, Write, Bash, Shell
 ---
 ```
 
-### 3. Leverage Multi-Model Routing
+### 3. Leverage Multi-Provider and Multi-Model Routing
 
 Use faster/cheaper models for simple tasks:
 
@@ -610,6 +615,15 @@ Use more capable models for complex analysis:
 ---
 name: deep-analyzer
 model: opus
+---
+```
+
+Route to a different provider entirely:
+
+```markdown
+---
+name: local-searcher
+model: ollama:llama3
 ---
 ```
 

@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springaicommunity.agent.tools.task.subagent.claude;
+package org.springaicommunity.agent.tools.task.claude;
 
 import org.junit.jupiter.api.Test;
 import org.springaicommunity.agent.common.task.subagent.SubagentType;
+import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentDefinition;
+import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentExecutor;
+import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentResolver;
+import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentType;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;

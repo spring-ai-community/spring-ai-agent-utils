@@ -410,7 +410,7 @@ Enable your AI agent to delegate complex, multi-step tasks to specialized sub-ag
 **Quick Example:**
 ```java
 import org.springaicommunity.agent.tools.task.TaskTool;
-import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentType;
+import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentType;
 
 // Configure Task tool with Claude sub-agents and multi-model support
 var taskTool = TaskTool.builder()

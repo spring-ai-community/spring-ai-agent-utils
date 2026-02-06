@@ -37,13 +37,13 @@
  * <h2>Components</h2>
  *
  * <ul>
- *   <li>{@link org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentDefinition}
+ *   <li>{@link org.springaicommunity.agent.tools.task.claude.ClaudeSubagentDefinition}
  *       - Parsed representation of a Claude subagent from markdown frontmatter</li>
- *   <li>{@link org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentResolver}
+ *   <li>{@link org.springaicommunity.agent.tools.task.claude.ClaudeSubagentResolver}
  *       - Resolves markdown URIs (classpath/file) into definitions</li>
- *   <li>{@link org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentExecutor}
+ *   <li>{@link org.springaicommunity.agent.tools.task.claude.ClaudeSubagentExecutor}
  *       - Executes tasks via Spring AI ChatClient with tool filtering</li>
- *   <li>{@link org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentReferences}
+ *   <li>{@link org.springaicommunity.agent.tools.task.claude.ClaudeSubagentReferences}
  *       - Factory methods for discovering agent files from directories/resources</li>
  * </ul>
  *
@@ -78,4 +78,4 @@
  *
  * @see <a href="https://code.claude.com/docs/en/sub-agents">Claude Code Sub-agents Documentation</a>
  */
-package org.springaicommunity.agent.tools.task.subagent.claude;
+package org.springaicommunity.agent.tools.task.claude;

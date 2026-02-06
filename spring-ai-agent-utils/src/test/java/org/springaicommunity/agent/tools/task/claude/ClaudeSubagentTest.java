@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springaicommunity.agent.tools.task.subagent.claude;
+package org.springaicommunity.agent.tools.task.claude;
 
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.springaicommunity.agent.common.task.subagent.SubagentReference;
+import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentDefinition;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

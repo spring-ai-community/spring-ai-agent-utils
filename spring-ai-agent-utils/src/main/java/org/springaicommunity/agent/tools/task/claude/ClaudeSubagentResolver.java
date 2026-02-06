@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.springaicommunity.agent.tools.task.subagent.claude;
+package org.springaicommunity.agent.tools.task.claude;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

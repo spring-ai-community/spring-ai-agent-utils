@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.springaicommunity.agent.tools.task.subagent.claude;
+package org.springaicommunity.agent.tools.task.claude;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,6 +137,29 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 	private static final Map<String, String> MODEL_NAME_MAPPER = Map.of("opus", "claude-opus-4-64k", "haiku",
 			"claude-haiku-4-5-20251001", "sonnet", "claude-sonnet-4-5-20250929");
 
+	/**
+	 * Resolves the appropriate {@link ChatClient.Builder} for the given subagent
+	 * definition based on its model specification.
+	 *
+	 * <p>
+	 * The model reference supports two formats:
+	 * <ul>
+	 * <li>{@code model} - uses the default provider with the specified model (e.g.,
+	 * {@code "sonnet"} or {@code "gpt-4o"})</li>
+	 * <li>{@code provider:model} - uses the named provider with the specified model
+	 * (e.g., {@code "openai:gpt-4o"} or {@code "anthropic:claude-sonnet-4-5-20250929"})</li>
+	 * </ul>
+	 *
+	 * <p>
+	 * The provider can be any Spring AI supported LLM provider registered in the
+	 * builder map, and the model can be either a short alias ({@code opus},
+	 * {@code haiku}, {@code sonnet}) or the full model identifier of the target
+	 * provider. If the specified provider is not found or no model is specified, the
+	 * default builder is returned.
+	 * @param claudeSubagent the subagent definition containing the model specification
+	 * @return a {@link ChatClient.Builder} configured for the requested provider and
+	 * model, or the default builder as a fallback
+	 */
 	protected ChatClient.Builder doFindChatClientBuilder(ClaudeSubagentDefinition claudeSubagent) {
 
 		if (StringUtils.hasText(claudeSubagent.getModel())) {
