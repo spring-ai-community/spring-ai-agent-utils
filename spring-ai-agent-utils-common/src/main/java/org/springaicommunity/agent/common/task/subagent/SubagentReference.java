@@ -1,5 +1,5 @@
 /*
-* Copyright 2025 - 2025 the original author or authors.
+* Copyright 2026 - 2026 the original author or authors.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -13,20 +13,21 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.springaicommunity.agent.tools.task.subagent;
+package org.springaicommunity.agent.common.task.subagent;
+
+import java.util.Map;
 
 /**
- * Pairs a subagent resolver with its executor for a specific kind.
+ * Reference to a subagent definition resource (e.g., markdown file URI).
  *
- * @param resolver resolves references into definitions
- * @param executor executes tasks for this subagent kind
+ * @param uri the resource URI (classpath or file path)
+ * @param kind the subagent kind (e.g., "CLAUDE")
+ * @param metadata optional key-value metadata
  * @author Christian Tzolov
  */
-public record SubagentType(SubagentResolver resolver, SubagentExecutor executor) {
+public record SubagentReference(String uri, String kind, Map<String, String> metadata) {
 
-	/** Returns the kind identifier from the executor. */
-	public String kind() {
-		return executor.getKind();
+	public SubagentReference(String uri, String kind) {
+		this(uri, kind, Map.of());
 	}
-
 }

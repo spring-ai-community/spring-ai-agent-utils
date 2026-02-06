@@ -18,7 +18,7 @@ package org.springaicommunity.agent.tools.task.subagent.claude;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
+import org.springaicommunity.agent.common.task.subagent.SubagentReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

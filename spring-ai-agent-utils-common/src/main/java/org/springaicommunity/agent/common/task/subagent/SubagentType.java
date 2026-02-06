@@ -1,5 +1,5 @@
 /*
-* Copyright 2025 - 2025 the original author or authors.
+* Copyright 2026 - 2026 the original author or authors.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -13,19 +13,20 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.springaicommunity.agent.tools.task.subagent;
+package org.springaicommunity.agent.common.task.subagent;
 
 /**
- * Resolves subagent references into their full definitions.
+ * Pairs a subagent resolver with its executor for a specific kind.
  *
+ * @param resolver resolves references into definitions
+ * @param executor executes tasks for this subagent kind
  * @author Christian Tzolov
  */
-public interface SubagentResolver {
+public record SubagentType(SubagentResolver resolver, SubagentExecutor executor) {
 
-	/** Checks if this resolver can handle the given reference. */
-	boolean canResolve(SubagentReference subagentRef);
-
-	/** Resolves the reference to a full subagent definition. */
-	SubagentDefinition resolve(SubagentReference subagentRef);
+	/** Returns the kind identifier from the executor. */
+	public String kind() {
+		return executor.getKind();
+	}
 
 }

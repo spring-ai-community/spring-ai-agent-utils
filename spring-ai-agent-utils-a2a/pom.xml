@@ -10,10 +10,10 @@
 		<version>0.5.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>spring-ai-agent-utils</artifactId>
+	<artifactId>spring-ai-agent-utils-a2a</artifactId>
 	<version>0.5.0-SNAPSHOT</version>
-	<name>spring-ai-agent-utils</name>
-	<description>Spring AI Agent Utilities</description>
+	<name>spring-ai-agent-utils-a2a</name>
+	<description>Spring AI Agent Utilities A2A</description>
 
 	<url>https://github.com/spring-ai-community/spring-ai-agent-utils</url>
 
@@ -53,79 +53,28 @@
 	<properties>
 		<maven.compiler.target>17</maven.compiler.target>
 		<maven.compiler.source>17</maven.compiler.source>
+		<a2a.sdk.version>0.3.3.Final</a2a.sdk.version>
 	</properties>
 
 	<dependencies>
-		
+
 		<dependency>
 			<groupId>org.springaicommunity</groupId>
 			<artifactId>spring-ai-agent-utils-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-			<version>${spring-framework.version}</version>
-			<scope>provided</scope>
+			<groupId>io.github.a2asdk</groupId>
+			<artifactId>a2a-java-sdk-client</artifactId>
+			<version>${a2a.sdk.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-client-chat</artifactId>
-			<scope>provided</scope>
+			<groupId>io.github.a2asdk</groupId>
+			<artifactId>a2a-java-sdk-client-transport-jsonrpc</artifactId>
+			<version>${a2a.sdk.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.vladsch.flexmark</groupId>
-			<artifactId>flexmark-html2md-converter</artifactId>
-			<version>${flexmark.version}</version>
-		</dependency>
-
-
-		<!-- Test dependencies -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter</artifactId>
-			<version>5.10.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>5.11.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-junit-jupiter</artifactId>
-			<version>5.11.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<version>3.25.3</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-observation</artifactId>
-			<version>1.12.4</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.ai</groupId>
-				<artifactId>spring-ai-bom</artifactId>
-				<version>${spring-ai.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 </project>

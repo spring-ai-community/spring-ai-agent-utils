@@ -19,10 +19,9 @@ This project demonstrates how to reverse-engineer and reimplement Claude Code's 
 
 ```
 spring-ai-agent-utils/
-├── spring-ai-agent-utils/          # Agent Utils Core library
-│   ├── src/                        # Agent Tool Utils implementation
-│   ├── docs/                       # Agent Tool documentation
-│   └── README.md                   # Detailed library documentation
+├── spring-ai-agent-utils-common/   # Shared subagent SPI (interfaces & records)
+├── spring-ai-agent-utils/          # Core library (tools, skills, Claude subagents)
+├── spring-ai-agent-utils-a2a/      # A2A protocol subagent implementation
 │
 └── examples/
     ├── code-agent-demo/            # Full-featured AI coding assistant
@@ -61,10 +60,14 @@ These are the agent tools needed to implement any agentic behavior
 
 While these tools can be used standalone, truly agentic behavior emerges when they are combined. SkillsTool naturally pairs with FileSystemTools and ShellTools to execute domain-specific workflows. BraveWebSearchTool and SmartWebFetchTool provide your AI application with access to real-world information. TaskTools orchestrates complex operations by delegating to specialized sub-agents, each equipped with a tailored subset of these tools.
 
-### Detailed documentation
+### Detailed Documentation
 
-- **[Agent Utils Library Documentation](spring-ai-agent-utils/README.md)** - Complete API reference, tool capabilities, and skills development guide
-- **[Example Applications](#examples)** - Working demos showcasing different use cases
+| Module | Description |
+|--------|-------------|
+| [**spring-ai-agent-utils**](spring-ai-agent-utils/README.md) | Core library - tools, skills, Claude subagents, and full API reference |
+| [**spring-ai-agent-utils-common**](spring-ai-agent-utils-common/README.md) | Shared subagent SPI (SubagentDefinition, SubagentResolver, SubagentExecutor, SubagentType) |
+| [**spring-ai-agent-utils-a2a**](spring-ai-agent-utils-a2a/README.md) | A2A protocol subagent for remote agent orchestration |
+| [**Examples**](#examples) | Working demos showcasing different use cases |
 
 
 ## Quick Start
@@ -90,30 +93,35 @@ _Check the latest version:_ [![](https://img.shields.io/maven-central/v/org.spri
 public class Application {
 
     @Bean
-    CommandLineRunner demo(ChatClient.Builder chatClientBuilder, 
+    CommandLineRunner demo(ChatClient.Builder chatClientBuilder,
         @Value("${BRAVE_API_KEY}") String braveApiKey,
+        @Value("${agent.skills.paths}") List<Resource> skillPaths,
         @Value("classpath:/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md") Resource agentSystemPrompt) {
-        
+
         return args -> {
+            // Configure Task tool with Claude sub-agents
+            var taskTool = TaskTool.builder()
+                .subagentTypes(ClaudeSubagentType.builder()
+                    .chatClientBuilder("default", chatClientBuilder.clone())
+                    .skillsResources(skillPaths)
+                    .braveApiKey(braveApiKey)
+                    .build())
+                .build();
+
             ChatClient chatClient = chatClientBuilder
                 // Main agent prompt
-				.defaultSystem(p -> p.text(agentSystemPrompt) // system prompt
-					.param(AgentEnvironment.ENVIRONMENT_INFO_KEY, AgentEnvironment.info())
-					.param(AgentEnvironment.GIT_STATUS_KEY, AgentEnvironment.gitStatus())
-					.param(AgentEnvironment.AGENT_MODEL_KEY, "claude-sonnet-4-5-20250929")
-					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, "2025-01-01"))
-                
+                .defaultSystem(p -> p.text(agentSystemPrompt) // system prompt
+                    .param(AgentEnvironment.ENVIRONMENT_INFO_KEY, AgentEnvironment.info())
+                    .param(AgentEnvironment.GIT_STATUS_KEY, AgentEnvironment.gitStatus())
+                    .param(AgentEnvironment.AGENT_MODEL_KEY, "claude-sonnet-4-5-20250929")
+                    .param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, "2025-01-01"))
 
-                // Sub-Agents (with multi-model support)
-                .defaultToolCallbacks(TaskToolCallbackProvider.builder()
-                    .chatClientBuilder("default", chatClientBuilder.clone())
-                    .subagentReferences(ClaudeSubagentReferences.fromRootDirectory(".claude/agents"))
-                    .skillsDirectories(".claude/skills")
-                    .build())
+                // Sub-Agents
+                .defaultToolCallbacks(taskTool)
 
                 // Skills
                 .defaultToolCallbacks(SkillsTool.builder()
-                    .addSkillsDirectory(".claude/skills")
+                    .addSkillsResources(skillPaths)
                     .build())
 
                 // Core Tools
@@ -133,10 +141,10 @@ public class Application {
                     .questionHandler(new CommandLineQuestionHandler())
                     .build())
 
-				// Advisors
-				.defaultAdvisors(
-					ToolCallAdvisor.builder().conversationHistoryEnabled(false).build(), // Tool Calling
-					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build()).build()) // Memory
+                // Advisors
+                .defaultAdvisors(
+                    ToolCallAdvisor.builder().conversationHistoryEnabled(false).build(), // Tool Calling
+                    MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build()).build()) // Memory
 
                 .build();
 

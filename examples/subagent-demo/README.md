@@ -24,14 +24,16 @@ export GOOGLE_CLOUD_PROJECT=your-project-id
 ### Task Tools Setup
 
 ```java
-var taskTools = TaskToolCallbackProvider.builder()
-    .subagentReferences(ClaudeSubagentReferences.fromResources(agentPaths))
-    .chatClientBuilder("default", chatClientBuilder.clone())
-    .skillsResources(skillPaths)
+var taskTool = TaskTool.builder()
+    .subagentTypes(ClaudeSubagentType.builder()
+        .skillsResources(skillPaths)
+        .chatClientBuilder("default", chatClientBuilder.clone())
+        .braveApiKey(braveApiKey)
+        .build())
     .build();
 
 ChatClient chatClient = chatClientBuilder
-    .defaultToolCallbacks(taskTools)
+    .defaultToolCallbacks(taskTool)
     // ... other tools and advisors
     .build();
 ```
@@ -71,17 +73,19 @@ You are a Spring AI Expert...
 
 ## Features Demonstrated
 
-- **TaskToolCallbackProvider** - Configures TaskTool and TaskOutputTool
-- **ClaudeSubagentReferences** - Loads sub-agent definitions from classpath resources
+- **TaskTool** - Launches and manages sub-agents with pluggable resolvers and executors
+- **ClaudeSubagentType** - Configures the Claude subagent type with default tools, skills, and model routing
 - **Custom Sub-Agents** - Domain-specific expert (Spring AI)
-- **Skills Integration** - Sub-agents can access reusable skills
-- **Multi-Model Support** - Route sub-agents to different models
+- **Skills Integration** - Sub-agents receive preloaded skill content in their system prompt
+- **Multi-Model Support** - Route sub-agents to different models via the `model` frontmatter field
 
 ## Dependencies
 
-- `spring-ai-agent-utils` - Core library with Task Tools
+- `spring-ai-agent-utils` - Core library with Task Tools and Claude subagent support
 - `spring-ai-starter-model-google-genai` - Google Gemini (configurable for Anthropic/OpenAI)
 
 ## Related Documentation
 
 - [Task Tools Documentation](../../spring-ai-agent-utils/docs/TaskTools.md)
+- [Subagent Framework](../../spring-ai-agent-utils/docs/Subagent.md)
+- [Sub-Agent A2A Demo](../subagent-a2a-demo) - Combining local and remote A2A sub-agents

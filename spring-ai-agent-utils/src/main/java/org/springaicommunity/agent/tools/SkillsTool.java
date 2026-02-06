@@ -15,20 +15,15 @@
 */
 package org.springaicommunity.agent.tools;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.springaicommunity.agent.utils.MarkdownParser;
+import org.springaicommunity.agent.utils.Skills;
 
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -110,21 +105,13 @@ public class SkillsTool {
 			return this;
 		}
 
-		public Builder addSkillsResources(List<Resource> skillsRootPaths) {
-			for (Resource skillsRootPath : skillsRootPaths) {
-				this.addSkillsResource(skillsRootPath);
-			}
+		public Builder addSkillsResources(List<Resource> skillsResources) {
+			this.skills.addAll(Skills.loadResources(skillsResources));
 			return this;
 		}
 
-		public Builder addSkillsResource(Resource skillsRootPath) {
-			try {
-				String path = skillsRootPath.getFile().toPath().toAbsolutePath().toString();
-				this.addSkillsDirectory(path);
-			}
-			catch (IOException ex) {
-				throw new RuntimeException("Failed to load skills from directory: " + skillsRootPath, ex);
-			}
+		public Builder addSkillsResource(Resource skillsResource) {
+			this.skills.addAll(Skills.loadResource(skillsResource));
 			return this;
 		}
 
@@ -135,12 +122,7 @@ public class SkillsTool {
 
 		public Builder addSkillsDirectories(List<String> skillsRootDirectories) {
 			for (String skillsRootDirectory : skillsRootDirectories) {
-				try {
-					this.skills.addAll(skills(skillsRootDirectory));
-				}
-				catch (IOException ex) {
-					throw new RuntimeException("Failed to load skills from directory: " + skillsRootDirectory, ex);
-				}
+				this.skills.addAll(Skills.loadDirectory(skillsRootDirectory));
 			}
 			return this;
 		}
@@ -161,7 +143,11 @@ public class SkillsTool {
 	/**
 	 * Represents a SKILL.md file with its location and parsed content.
 	 */
-	private static record Skill(Path path, Map<String, Object> frontMatter, String content) {
+	public static record Skill(Path path, Map<String, Object> frontMatter, String content) {
+
+		public String name() {
+			return this.frontMatter().get("name").toString();
+		}	
 
 		public String toXml() {
 			String frontMatterXml = this.frontMatter()
@@ -179,50 +165,11 @@ public class SkillsTool {
 
 		Map<String, Skill> skillsMap = new HashMap<>();
 
-		for (Skill skillFile : skills) {
-			skillsMap.put(skillFile.frontMatter().get("name").toString(), skillFile);
+		for (Skill skill : skills) {
+			skillsMap.put(skill.name(), skill);
 		}
 
 		return skillsMap;
-	}
-
-	/**
-	 * Recursively finds all SKILL.md files in the given root directory and returns their
-	 * parsed contents.
-	 * @param rootDirectory the root directory to search for SKILL.md files
-	 * @return a list of SkillFile objects containing the path, front-matter, and content
-	 * of each SKILL.md file
-	 * @throws IOException if an I/O error occurs while reading the directory or files
-	 */
-	private static List<Skill> skills(String rootDirectory) throws IOException {
-		Path rootPath = Paths.get(rootDirectory);
-
-		if (!Files.exists(rootPath)) {
-			throw new IOException("Root directory does not exist: " + rootDirectory);
-		}
-
-		if (!Files.isDirectory(rootPath)) {
-			throw new IOException("Path is not a directory: " + rootDirectory);
-		}
-
-		List<Skill> skillFiles = new ArrayList<>();
-
-		try (Stream<Path> paths = Files.walk(rootPath)) {
-			paths.filter(Files::isRegularFile)
-				.filter(path -> path.getFileName().toString().equals("SKILL.md"))
-				.forEach(path -> {
-					try {
-						String markdown = Files.readString(path, StandardCharsets.UTF_8);
-						MarkdownParser parser = new MarkdownParser(markdown);
-						skillFiles.add(new Skill(path, parser.getFrontMatter(), parser.getContent()));
-					}
-					catch (IOException e) {
-						throw new RuntimeException("Failed to read SKILL.md file: " + path, e);
-					}
-				});
-		}
-
-		return skillFiles;
 	}
 
 }
