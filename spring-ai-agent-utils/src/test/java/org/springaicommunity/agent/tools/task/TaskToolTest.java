@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 - 2025 the original author or authors.
+ * Copyright 2026 - 2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,14 @@ package org.springaicommunity.agent.tools.task;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springaicommunity.agent.common.task.subagent.SubagentDefinition;
+import org.springaicommunity.agent.common.task.subagent.SubagentExecutor;
+import org.springaicommunity.agent.common.task.subagent.SubagentType;
+import org.springaicommunity.agent.common.task.subagent.TaskCall;
 import org.springaicommunity.agent.tools.task.repository.DefaultTaskRepository;
 import org.springaicommunity.agent.tools.task.repository.TaskRepository;
-import org.springaicommunity.agent.tools.task.subagent.SubagentDefinition;
-import org.springaicommunity.agent.tools.task.subagent.SubagentExecutor;
 import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentDefinition;
+import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentResolver;
 
 import org.springframework.ai.tool.ToolCallback;
 
@@ -37,44 +40,43 @@ class TaskToolTest {
 
 	private TaskRepository taskRepository;
 
-	private SubagentExecutor mockExecutor;
+	private SubagentType mockSubagentType;
 
 	@BeforeEach
 	void setUp() {
 		this.taskRepository = new DefaultTaskRepository();
-		this.mockExecutor = new SubagentExecutor() {
+		SubagentExecutor mockExecutor = new SubagentExecutor() {
 			@Override
 			public String getKind() {
 				return ClaudeSubagentDefinition.KIND;
 			}
 
 			@Override
-			public String execute(TaskTool.TaskCall taskCall, SubagentDefinition subagent) {
+			public String execute(TaskCall taskCall, SubagentDefinition subagent) {
 				return "Executed: " + taskCall.prompt();
 			}
 		};
+
+		mockSubagentType = new SubagentType(new ClaudeSubagentResolver(), mockExecutor);
 	}
 
 	@Test
 	void shouldFailWhenTaskRepositoryIsNull() {
-		assertThatThrownBy(() -> TaskTool.builder().subagentExecutors(mockExecutor).build())
+		assertThatThrownBy(() -> TaskTool.builder().taskRepository(null).subagentTypes(mockSubagentType).build())
 			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessageContaining("taskRepository must be provided");
+			.hasMessageContaining("taskRepository must not be null");
 	}
 
 	@Test
 	void shouldFailWhenNoExecutorsProvided() {
 		assertThatThrownBy(() -> TaskTool.builder().taskRepository(taskRepository).build())
 			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessageContaining("At least one subagentExecutor must be provided");
+			.hasMessageContaining("At least one subagentTypes must be provided");
 	}
 
 	@Test
 	void shouldBuildWithRequiredParameters() {
-		ToolCallback tool = TaskTool.builder()
-			.taskRepository(taskRepository)
-			.subagentExecutors(mockExecutor)
-			.build();
+		ToolCallback tool = TaskTool.builder().taskRepository(taskRepository).subagentTypes(mockSubagentType).build();
 
 		assertThat(tool).isNotNull();
 		assertThat(tool.getToolDefinition().name()).isEqualTo("Task");
@@ -82,10 +84,7 @@ class TaskToolTest {
 
 	@Test
 	void shouldIncludeBuiltInSubagentsInDescription() {
-		ToolCallback tool = TaskTool.builder()
-			.taskRepository(taskRepository)
-			.subagentExecutors(mockExecutor)
-			.build();
+		ToolCallback tool = TaskTool.builder().taskRepository(taskRepository).subagentTypes(mockSubagentType).build();
 
 		String description = tool.getToolDefinition().description();
 		assertThat(description).contains("general-purpose");
@@ -93,20 +92,8 @@ class TaskToolTest {
 	}
 
 	@Test
-	void shouldAcceptCustomSubagentResolvers() {
-		ToolCallback tool = TaskTool.builder()
-			.taskRepository(taskRepository)
-			.subagentExecutors(mockExecutor)
-			.subagentResolvers(new org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentResolver())
-			.build();
-
-		assertThat(tool).isNotNull();
-	}
-
-	@Test
 	void shouldCreateTaskCallWithAllFields() {
-		TaskTool.TaskCall call = new TaskTool.TaskCall("desc", "prompt", "general-purpose", "opus", "resume-123",
-				true);
+		TaskCall call = new TaskCall("desc", "prompt", "general-purpose", "opus", "resume-123", true);
 
 		assertThat(call.description()).isEqualTo("desc");
 		assertThat(call.prompt()).isEqualTo("prompt");
@@ -118,7 +105,7 @@ class TaskToolTest {
 
 	@Test
 	void shouldCreateTaskCallWithOptionalFieldsAsNull() {
-		TaskTool.TaskCall call = new TaskTool.TaskCall("desc", "prompt", "Explore", null, null, null);
+		TaskCall call = new TaskCall("desc", "prompt", "Explore", null, null, null);
 
 		assertThat(call.model()).isNull();
 		assertThat(call.resume()).isNull();

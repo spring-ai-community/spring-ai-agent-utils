@@ -37,22 +37,39 @@ The system is built on pluggable abstractions that allow:
 
 ## Architecture
 
+### Module Structure
+
+The subagent system is split across three modules:
+
+```
+spring-ai-agent-utils-common      # Core SPI: SubagentDefinition, SubagentResolver,
+                                   #   SubagentExecutor, SubagentType, SubagentReference, TaskCall
+
+spring-ai-agent-utils              # TaskTool, TaskOutputTool, ClaudeSubagentType,
+                                   #   ClaudeSubagentExecutor, ClaudeSubagentResolver
+
+spring-ai-agent-utils-a2a          # A2ASubagentDefinition, A2ASubagentResolver,
+                                   #   A2ASubagentExecutor (optional dependency)
+```
+
 ### Core Components
 
 ```
-TaskToolCallbackProvider
+TaskTool.builder()
     ├── SubagentReference[] ──────► (URIs pointing to subagent definitions)
     ├── SubagentType[] ───────────► (bundles resolver + executor per kind)
     │   └── SubagentType
     │       ├── SubagentResolver ─► (parse references into SubagentDefinition)
     │       └── SubagentExecutor ─► (execute subagents)
-    └── Built-in Claude support
-        ├── ClaudeSubagentResolver
+    └── ClaudeSubagentType.builder()
+        ├── ClaudeSubagentResolver  (auto-registered)
         └── ClaudeSubagentExecutor
             └── Map<String, ChatClient.Builder> (model routing)
 ```
 
 ### Abstractions
+
+These interfaces live in the `spring-ai-agent-utils-common` module and are shared across all subagent implementations.
 
 | Interface | Purpose |
 |-----------|---------|
@@ -61,14 +78,17 @@ TaskToolCallbackProvider
 | `SubagentResolver` | Strategy for resolving `SubagentReference` → `SubagentDefinition` |
 | `SubagentExecutor` | Strategy for executing a `TaskCall` against a `SubagentDefinition` |
 | `SubagentType` | Record bundling a `SubagentResolver` and `SubagentExecutor` together for a specific kind |
+| `TaskCall` | Input record describing the task to execute (prompt, subagent type, model, etc.) |
 
 ### Main Components
 
 1. **TaskTool** - Launches and manages sub-agents using pluggable resolvers and executors
 2. **TaskOutputTool** - Retrieves results from background sub-agents
-3. **TaskToolCallbackProvider** - Convenience builder for configuring the complete system
+3. **ClaudeSubagentType** - Convenience builder for configuring the Claude subagent type with tools, skills, and model routing
 
 ## Built-in Sub-Agents
+
+When a `ClaudeSubagentType` is registered, TaskTool automatically adds four built-in Claude subagents.
 
 ### General-Purpose Sub-Agent
 
@@ -152,11 +172,11 @@ description: Command execution specialist for running bash commands. Use this fo
 
 ## Quick Start
 
-### Basic Setup
+### Basic Setup (Claude subagents only)
 
 ```java
-import org.springaicommunity.agent.tools.task.TaskToolCallbackProvider;
-import org.springframework.ai.chat.client.ChatClient;
+import org.springaicommunity.agent.tools.task.TaskTool;
+import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentType;
 
 @Configuration
 public class AgentConfig {
@@ -164,14 +184,16 @@ public class AgentConfig {
     @Bean
     CommandLineRunner demo(ChatClient.Builder chatClientBuilder) {
         return args -> {
-            // Configure Task tools with multi-model support
-            var taskTools = TaskToolCallbackProvider.builder()
-                .chatClientBuilder("default", chatClientBuilder)
+            // Configure Task tool with Claude subagents
+            var taskTool = TaskTool.builder()
+                .subagentTypes(ClaudeSubagentType.builder()
+                    .chatClientBuilder("default", chatClientBuilder)
+                    .build())
                 .build();
 
-            // Build main chat client with Task tools
+            // Build main chat client with Task tool
             ChatClient chatClient = chatClientBuilder
-                .defaultToolCallbacks(taskTools)
+                .defaultToolCallbacks(taskTool)
                 .build();
 
             // Use naturally - agent will delegate to sub-agents
@@ -186,31 +208,39 @@ public class AgentConfig {
 
 ## Configuration
 
-### Using TaskToolCallbackProvider (Recommended)
+### Using ClaudeSubagentType
 
-The `TaskToolCallbackProvider` is a convenience builder that sets up both TaskTool and TaskOutputTool with sensible defaults:
+`ClaudeSubagentType` is a convenience builder that creates a `SubagentType` bundling the Claude resolver and executor with default tools (Grep, Glob, Shell, FileSystem, WebFetch, TodoWrite) and optional extras (BraveWebSearch, Skills):
 
 ```java
-TaskToolCallbackProvider taskTools = TaskToolCallbackProvider.builder()
+SubagentType claudeType = ClaudeSubagentType.builder()
     // Required: At least one ChatClient builder with key "default"
     .chatClientBuilder("default", chatClientBuilder)
 
     // Optional: Additional model-specific ChatClient builders
-    .chatClientBuilder("sonnet", sonnetChatClientBuilder)
     .chatClientBuilder("opus", opusChatClientBuilder)
     .chatClientBuilder("haiku", haikuChatClientBuilder)
 
-    // Optional: Custom subagent references (for Claude-based subagents)
-    .subagentReferences(ClaudeSubagentReferences.fromRootDirectory("/path/to/agents"))
-
-    // Optional: Custom subagent types (bundles resolver + executor for new kinds)
-    .subagentTypes(new SubagentType(myResolver, myExecutor))
-
-    // Optional: Skills for sub-agents
-    .skillsDirectories(".claude/skills")
+    // Optional: Skills for sub-agents (preloaded into system prompt)
+    .skillsResources(skillResources)
 
     // Optional: For web search
     .braveApiKey(System.getenv("BRAVE_API_KEY"))
+
+    .build();
+```
+
+### Using TaskTool.builder()
+
+Register one or more `SubagentType` instances, plus any additional subagent references:
+
+```java
+ToolCallback taskTool = TaskTool.builder()
+    // Register Claude subagent type (includes built-in subagents)
+    .subagentTypes(claudeType)
+
+    // Optional: Custom subagent references (for Claude-based subagents)
+    .subagentReferences(ClaudeSubagentReferences.fromRootDirectory("/path/to/agents"))
 
     // Optional: Custom task storage
     .taskRepository(new DefaultTaskRepository())
@@ -218,25 +248,43 @@ TaskToolCallbackProvider taskTools = TaskToolCallbackProvider.builder()
     .build();
 ```
 
-### Multi-Model Configuration
-
-Route subagents to different models based on their configuration:
+### Combining Claude and A2A Subagents
 
 ```java
-// Create model-specific ChatClient builders
-ChatClient.Builder sonnetBuilder = ChatClient.builder(sonnetModel);
-ChatClient.Builder opusBuilder = ChatClient.builder(opusModel);
-ChatClient.Builder haikuBuilder = ChatClient.builder(haikuModel);
+import org.springaicommunity.agent.common.task.subagent.SubagentReference;
+import org.springaicommunity.agent.common.task.subagent.SubagentType;
+import org.springaicommunity.agent.subagent.a2a.A2ASubagentDefinition;
+import org.springaicommunity.agent.subagent.a2a.A2ASubagentExecutor;
+import org.springaicommunity.agent.subagent.a2a.A2ASubagentResolver;
 
-TaskToolCallbackProvider taskTools = TaskToolCallbackProvider.builder()
-    .chatClientBuilder("default", sonnetBuilder)  // Fallback
-    .chatClientBuilder("sonnet", sonnetBuilder)
-    .chatClientBuilder("opus", opusBuilder)
-    .chatClientBuilder("haiku", haikuBuilder)
+ToolCallback taskTool = TaskTool.builder()
+    // Local Claude subagents
+    .subagentTypes(ClaudeSubagentType.builder()
+        .chatClientBuilder("default", chatClientBuilder)
+        .skillsResources(skillPaths)
+        .braveApiKey(braveApiKey)
+        .build())
+
+    // Remote A2A subagent
+    .subagentReferences(new SubagentReference("http://localhost:10001/myagent", A2ASubagentDefinition.KIND))
+    .subagentTypes(new SubagentType(new A2ASubagentResolver(), new A2ASubagentExecutor()))
+
     .build();
 ```
 
-When a subagent specifies `model: opus` in its frontmatter, it will use the corresponding ChatClient builder.
+### Multi-Model Configuration
+
+Route subagents to different models based on their frontmatter `model` field:
+
+```java
+SubagentType claudeType = ClaudeSubagentType.builder()
+    .chatClientBuilder("default", sonnetBuilder)   // Fallback
+    .chatClientBuilder("opus", opusBuilder)         // For model: opus
+    .chatClientBuilder("haiku", haikuBuilder)       // For model: haiku
+    .build();
+```
+
+When a subagent specifies `model: opus` in its frontmatter, it will use the corresponding ChatClient builder. The model field also supports short names (`opus`, `sonnet`, `haiku`) and `provider:model` notation (e.g., `openai:gpt-5`).
 
 ### Loading Subagent References
 
@@ -246,33 +294,15 @@ When a subagent specifies `model: opus` in its frontmatter, it will use the corr
 import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentReferences;
 
 List<SubagentReference> refs = ClaudeSubagentReferences.fromRootDirectory("/path/to/agents");
-
-TaskToolCallbackProvider taskTools = TaskToolCallbackProvider.builder()
-    .chatClientBuilder("default", chatClientBuilder)
-    .subagentReferences(refs)
-    .build();
 ```
 
 #### From Spring Resources
 
 ```java
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
+@Value("${agent.tasks.paths}")
+List<Resource> agentPaths;
 
-@Autowired
-private ResourceLoader resourceLoader;
-
-@Bean
-public TaskToolCallbackProvider taskTools(ChatClient.Builder chatClientBuilder) {
-    Resource agentsResource = resourceLoader.getResource("classpath:.claude/agents");
-
-    List<SubagentReference> refs = ClaudeSubagentReferences.fromResource(agentsResource);
-
-    return TaskToolCallbackProvider.builder()
-        .chatClientBuilder("default", chatClientBuilder)
-        .subagentReferences(refs)
-        .build();
-}
+List<SubagentReference> refs = ClaudeSubagentReferences.fromResources(agentPaths);
 ```
 
 #### Multiple Sources
@@ -282,50 +312,6 @@ List<SubagentReference> refs = ClaudeSubagentReferences.fromRootDirectories(List
     "src/main/resources/agents",
     System.getProperty("user.home") + "/.claude/agents"
 ));
-```
-
-### Manual Configuration with TaskTool
-
-For more control, configure TaskTool directly:
-
-```java
-import org.springaicommunity.agent.tools.task.TaskTool;
-import org.springaicommunity.agent.tools.task.TaskOutputTool;
-import org.springaicommunity.agent.tools.task.subagent.claude.*;
-
-// Shared repository for task management
-TaskRepository taskRepository = new DefaultTaskRepository();
-
-// Create subagent references
-List<SubagentReference> refs = ClaudeSubagentReferences.fromRootDirectory("/path/to/agents");
-
-// Create executor with multi-model support
-Map<String, ChatClient.Builder> chatClientBuilders = Map.of(
-    "default", defaultBuilder,
-    "sonnet", sonnetBuilder,
-    "opus", opusBuilder
-);
-
-List<ToolCallback> subAgentTools = List.of(/* ... */);
-ClaudeSubagentExecutor executor = new ClaudeSubagentExecutor(chatClientBuilders, subAgentTools);
-
-// Build TaskTool
-ToolCallback taskTool = TaskTool.builder()
-    .subagentReferences(refs)
-    .subagentResolvers(new ClaudeSubagentResolver())
-    .subagentExecutors(executor)
-    .taskRepository(taskRepository)
-    .build();
-
-// Configure TaskOutputTool
-ToolCallback taskOutputTool = TaskOutputTool.builder()
-    .taskRepository(taskRepository)
-    .build();
-
-// Register with main chat client
-ChatClient chatClient = chatClientBuilder
-    .defaultToolCallbacks(taskTool, taskOutputTool)
-    .build();
 ```
 
 ## Creating Custom Sub-Agents
@@ -352,6 +338,7 @@ description: When and how to use this subagent. Include trigger keywords and exa
 tools: Read, Edit, Grep, Glob       # Optional: inherits all if omitted
 disallowedTools: Bash, Shell        # Optional: explicitly deny specific tools
 model: sonnet                        # Optional: sonnet, opus, haiku
+skills: ai-tutor                     # Optional: skills to preload
 permissionMode: default              # Optional: permission handling mode
 ---
 
@@ -376,7 +363,8 @@ You are a [role description]. You specialize in [domain].
 | `description` | Yes | Natural language purpose description with usage examples |
 | `tools` | No | Comma-separated list of allowed tool names (inherits all if omitted) |
 | `disallowedTools` | No | Comma-separated list of tools to explicitly deny |
-| `model` | No | Model preference: `sonnet`, `opus`, `haiku` |
+| `model` | No | Model preference: `sonnet`, `opus`, `haiku`, or `provider:model` |
+| `skills` | No | Comma-separated list of skill names to preload into the subagent's system prompt |
 | `permissionMode` | No | Permission handling mode (default: `default`) |
 
 ### Example: Code Reviewer Sub-Agent
@@ -412,103 +400,17 @@ Provide clear, actionable feedback with file references and line numbers.
 
 ### Creating a Custom Subagent Type
 
-To add support for a new subagent type (e.g., A2A protocol):
-
-#### 1. Define the Subagent Implementation
+To add support for a new subagent protocol, implement three interfaces from `spring-ai-agent-utils-common` and register them as a `SubagentType`. See the [Subagent Framework](Subagent.md) documentation for the full SPI reference, or the [spring-ai-agent-utils-a2a](../../spring-ai-agent-utils-a2a/README.md) module for a complete A2A protocol implementation.
 
 ```java
-public class A2ASubagentDefinition implements SubagentDefinition {
+// 1. Implement SubagentDefinition, SubagentResolver, SubagentExecutor
+// 2. Bundle them into a SubagentType
+SubagentType myType = new SubagentType(new MyResolver(), new MyExecutor());
 
-    public static final String KIND = "A2A";
-
-    private final String name;
-    private final String description;
-    private final String endpoint;
-    private final SubagentReference reference;
-
-    @Override
-    public String getName() { return name; }
-
-    @Override
-    public String getDescription() { return description; }
-
-    @Override
-    public String getKind() { return KIND; }
-
-    @Override
-    public SubagentReference getReference() { return reference; }
-
-    public String getEndpoint() { return endpoint; }
-}
-```
-
-#### 2. Create a Resolver
-
-```java
-public class A2ASubagentResolver implements SubagentResolver {
-
-    @Override
-    public boolean canResolve(SubagentReference ref) {
-        return ref.kind().equals(A2ASubagentDefinition.KIND);
-    }
-
-    @Override
-    public SubagentDefinition resolve(SubagentReference ref) {
-        // Load A2A agent card from endpoint
-        String agentCard = fetchAgentCard(ref.uri());
-        return parseA2ASubagentDefinition(ref, agentCard);
-    }
-}
-```
-
-#### 3. Create an Executor
-
-```java
-public class A2ASubagentExecutor implements SubagentExecutor {
-
-    private final A2AClient a2aClient;
-
-    @Override
-    public String getKind() {
-        return A2ASubagentDefinition.KIND;
-    }
-
-    @Override
-    public String execute(TaskCall taskCall, SubagentDefinition subagent) {
-        A2ASubagentDefinition a2a = (A2ASubagentDefinition) subagent;
-        return a2aClient.sendTask(a2a.getEndpoint(), taskCall.prompt());
-    }
-}
-```
-
-#### 4. Register with TaskToolCallbackProvider
-
-```java
-// Create SubagentType that bundles resolver + executor
-SubagentType a2aType = new SubagentType(
-    new A2ASubagentResolver(),
-    new A2ASubagentExecutor(a2aClient)
-);
-
-TaskToolCallbackProvider taskTools = TaskToolCallbackProvider.builder()
-    .chatClientBuilder("default", chatClientBuilder)
-    .subagentReferences(
-        new SubagentReference("http://agent.example.com", A2ASubagentDefinition.KIND)
-    )
-    .subagentTypes(a2aType)
-    .build();
-```
-
-Alternatively, register directly with TaskTool for more control:
-
-```java
+// 3. Register with TaskTool
 TaskTool.builder()
-    .subagentReferences(
-        new SubagentReference("http://agent.example.com", A2ASubagentDefinition.KIND)
-    )
-    .subagentResolvers(new A2ASubagentResolver())
-    .subagentExecutors(new A2ASubagentExecutor(a2aClient))
-    .taskRepository(taskRepository)
+    .subagentReferences(new SubagentReference("my://agent-1", "MY_KIND"))
+    .subagentTypes(myType)
     .build();
 ```
 
@@ -558,7 +460,7 @@ String results = chatClient
 
 ### Tool Parameters
 
-When the main agent calls TaskTool, it uses these parameters:
+When the main agent calls TaskTool, it uses these parameters (defined in `TaskCall`):
 
 ```java
 public record TaskCall(
@@ -592,6 +494,8 @@ import org.springaicommunity.agent.tools.task.repository.DefaultTaskRepository;
 TaskRepository repository = new DefaultTaskRepository();
 ```
 
+`TaskTool.builder()` uses `DefaultTaskRepository` by default. Override with `.taskRepository(...)` for custom implementations.
+
 ### Custom Implementation
 
 For distributed systems or persistence:
@@ -618,43 +522,37 @@ public class RedisTaskRepository implements TaskRepository {
 @SpringBootApplication
 public class Application {
 
-    @Value("${app.agent.skills.paths}")
-    List<String> skillPaths;
-
-    @Value("${BRAVE_API_KEY:#{null}}")
-    String braveApiKey;
-
     @Bean
     CommandLineRunner demo(
-            ChatClient.Builder defaultBuilder,
-            @Qualifier("sonnet") ChatClient.Builder sonnetBuilder,
-            @Qualifier("opus") ChatClient.Builder opusBuilder) {
+            ChatClient.Builder chatClientBuilder,
+            @Value("${agent.skills.paths}") List<Resource> skillPaths,
+            @Value("${BRAVE_API_KEY:#{null}}") String braveApiKey) {
 
         return args -> {
-            // Configure Task tools with custom agents and multi-model support
-            var taskTools = TaskToolCallbackProvider.builder()
-                .chatClientBuilder("default", defaultBuilder)
-                .chatClientBuilder("sonnet", sonnetBuilder)
-                .chatClientBuilder("opus", opusBuilder)
-                .subagentReferences(
-                    ClaudeSubagentReferences.fromRootDirectory("src/main/resources/agents")
-                )
-                .skillsDirectories(skillPaths)
-                .braveApiKey(braveApiKey)
+            // Configure Task tool with Claude subagents
+            var taskTool = TaskTool.builder()
+                .subagentTypes(ClaudeSubagentType.builder()
+                    .chatClientBuilder("default",
+                        chatClientBuilder.clone().defaultAdvisors(new MyLoggingAdvisor(0, "[TASK]")))
+                    .skillsResources(skillPaths)
+                    .braveApiKey(braveApiKey)
+                    .build())
                 .build();
 
             // Build main chat client
-            ChatClient chatClient = defaultBuilder
-                .defaultToolCallbacks(taskTools)
+            ChatClient chatClient = chatClientBuilder
+                .defaultToolCallbacks(taskTool)
                 .defaultTools(
                     FileSystemTools.builder().build(),
                     GrepTool.builder().build(),
                     GlobTool.builder().build(),
-                    new ShellTools(),
+                    ShellTools.builder().build(),
                     TodoWriteTool.builder().build()
                 )
                 .defaultAdvisors(
-                    ToolCallAdvisor.builder().build(),
+                    ToolCallAdvisor.builder()
+                        .conversationHistoryEnabled(false)
+                        .build(),
                     MessageChatMemoryAdvisor.builder(
                         MessageWindowChatMemory.builder().maxMessages(500).build()
                     ).build()
@@ -738,10 +636,8 @@ public class TaskTool {
     public static class Builder {
         Builder subagentReferences(List<SubagentReference> refs);
         Builder subagentReferences(SubagentReference... refs);
-        Builder subagentExecutors(List<SubagentExecutor> executors);
-        Builder subagentExecutors(SubagentExecutor... executors);
-        Builder subagentResolvers(List<SubagentResolver> resolvers);
-        Builder subagentResolvers(SubagentResolver... resolvers);
+        Builder subagentTypes(List<SubagentType> types);
+        Builder subagentTypes(SubagentType... types);
         Builder taskRepository(TaskRepository taskRepository);
         Builder taskDescriptionTemplate(String template);
 
@@ -750,33 +646,28 @@ public class TaskTool {
 }
 ```
 
-### TaskToolCallbackProvider
+### ClaudeSubagentType
 
 ```java
-public class TaskToolCallbackProvider implements ToolCallbackProvider {
+public class ClaudeSubagentType {
 
     public static Builder builder() { ... }
 
     public static class Builder {
         Builder chatClientBuilder(String modelId, ChatClient.Builder builder);
         Builder chatClientBuilders(Map<String, ChatClient.Builder> builders);
-        Builder subagentReferences(List<SubagentReference> refs);
-        Builder subagentReferences(SubagentReference... refs);
-        Builder subagentTypes(List<SubagentType> types);
-        Builder subagentTypes(SubagentType... types);
+        Builder skillsResources(List<Resource> resources);
+        Builder skillsResource(Resource resource);
         Builder skillsDirectories(List<String> dirs);
         Builder skillsDirectories(String dir);
-        Builder skillsResource(Resource resource);
-        Builder skillsResources(List<Resource> resources);
         Builder braveApiKey(String apiKey);
-        Builder taskRepository(TaskRepository repository);
 
-        TaskToolCallbackProvider build();
+        SubagentType build();  // Returns SubagentType (resolver + executor pair)
     }
 }
 ```
 
-### Subagent Interfaces
+### Subagent Interfaces (from spring-ai-agent-utils-common)
 
 ```java
 public interface SubagentDefinition {
@@ -804,6 +695,11 @@ public record SubagentReference(String uri, String kind, Map<String, String> met
 public record SubagentType(SubagentResolver resolver, SubagentExecutor executor) {
     public String kind() { return executor.getKind(); }
 }
+
+public record TaskCall(
+    String description, String prompt, String subagent_type,
+    String model, String resume, Boolean run_in_background
+) {}
 ```
 
 ### ClaudeSubagentDefinition
@@ -818,7 +714,7 @@ public class ClaudeSubagentDefinition implements SubagentDefinition {
     public String getModel();           // Model override (sonnet, opus, haiku)
     public List<String> tools();        // Allowed tool names
     public List<String> disallowedTools(); // Tools to deny
-    public List<String> skills();       // Skills to load
+    public List<String> skills();       // Skills to preload
     public String permissionMode();     // Permission handling mode
     public String getContent();         // System prompt content
 }
@@ -838,7 +734,9 @@ public class ClaudeSubagentReferences {
 
 ## Related Documentation
 
-- [**Subagent Framework**](Subagent.md) - Protocol-agnostic subagent abstraction for integrating A2A, MCP, and custom agent protocols
+- [**Subagent Framework**](Subagent.md) - Protocol-agnostic subagent SPI for integrating A2A, MCP, and custom agent protocols
+- [**spring-ai-agent-utils-common**](../../spring-ai-agent-utils-common/README.md) - Shared subagent SPI module
+- [**spring-ai-agent-utils-a2a**](../../spring-ai-agent-utils-a2a/README.md) - A2A protocol subagent implementation
 - [**FileSystemTools**](FileSystemTools.md) - File operations for sub-agents
 - [**GrepTool**](GrepTool.md) - Code search capabilities
 - [**GlobTool**](GlobTool.md) - File pattern matching
@@ -851,3 +749,4 @@ public class ClaudeSubagentReferences {
 - [Claude Agent SDK Sub-Agents](https://platform.claude.com/docs/en/agent-sdk/subagents)
 - [Spring AI Documentation](https://docs.spring.io/spring-ai/reference/)
 - [Example: subagent-demo](../../examples/subagent-demo)
+- [Example: subagent-a2a-demo](../../examples/subagent-a2a-demo)

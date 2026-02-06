@@ -16,8 +16,8 @@
 package org.springaicommunity.agent.tools.task.subagent.claude;
 
 import org.junit.jupiter.api.Test;
-import org.springaicommunity.agent.tools.task.subagent.SubagentDefinition;
-import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
+import org.springaicommunity.agent.common.task.subagent.SubagentDefinition;
+import org.springaicommunity.agent.common.task.subagent.SubagentReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

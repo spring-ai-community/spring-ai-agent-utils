@@ -1,7 +1,6 @@
 package org.springaicommunity.agent;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import org.springaicommunity.agent.tools.BraveWebSearchTool;
@@ -12,8 +11,8 @@ import org.springaicommunity.agent.tools.ShellTools;
 import org.springaicommunity.agent.tools.SkillsTool;
 import org.springaicommunity.agent.tools.SmartWebFetchTool;
 import org.springaicommunity.agent.tools.TodoWriteTool;
-import org.springaicommunity.agent.tools.task.TaskToolCallbackProvider;
-import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentReferences;
+import org.springaicommunity.agent.tools.task.TaskTool;
+import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentType;
 import org.springaicommunity.agent.utils.AgentEnvironment;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -46,16 +45,15 @@ public class Application {
 
 		return args -> {
 
-			var taskTools = TaskToolCallbackProvider.builder()
-				// Add Claude Subagent (local)
-				.subagentReferences(ClaudeSubagentReferences.fromResources(agentPaths))
+			var taskTools = TaskTool.builder()
+				.subagentTypes(ClaudeSubagentType.builder()
+					.skillsResources(skillPaths)
+					// configuration used by the local Claude subagents
+					.chatClientBuilder("default",
+							chatClientBuilder.clone().defaultAdvisors(new MyLoggingAdvisor(0, "[TASK]")))
 
-				// configuration used by the local Claude subagents
-				.chatClientBuilder("default",
-						chatClientBuilder.clone()
-							.defaultAdvisors(new MyLoggingAdvisor(0, "[TASK]")))
-				.skillsResources(skillPaths)
-
+					.braveApiKey(braveApiKey)
+					.build())
 				.build();
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off

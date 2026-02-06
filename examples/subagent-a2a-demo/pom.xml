@@ -45,6 +45,12 @@
 			<version>0.5.0-SNAPSHOT</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springaicommunity</groupId>
+			<artifactId>spring-ai-agent-utils-a2a</artifactId>
+			<version>0.5.0-SNAPSHOT</version>
+		</dependency>
+
 		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-anthropic</artifactId>

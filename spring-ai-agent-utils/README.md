@@ -59,30 +59,35 @@ _Check the latest version:_ [![](https://img.shields.io/maven-central/v/org.spri
 public class Application {
 
     @Bean
-    CommandLineRunner demo(ChatClient.Builder chatClientBuilder, 
+    CommandLineRunner demo(ChatClient.Builder chatClientBuilder,
         @Value("${BRAVE_API_KEY}") String braveApiKey,
+        @Value("${agent.skills.paths}") List<Resource> skillPaths,
         @Value("classpath:/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md") Resource agentSystemPrompt) {
-        
+
         return args -> {
+            // Configure Task tool with Claude sub-agents
+            var taskTool = TaskTool.builder()
+                .subagentTypes(ClaudeSubagentType.builder()
+                    .chatClientBuilder("default", chatClientBuilder.clone())
+                    .skillsResources(skillPaths)
+                    .braveApiKey(braveApiKey)
+                    .build())
+                .build();
+
             ChatClient chatClient = chatClientBuilder
                 // Main agent prompt
-				.defaultSystem(p -> p.text(agentSystemPrompt) // system prompt
-					.param(AgentEnvironment.ENVIRONMENT_INFO_KEY, AgentEnvironment.info())
-					.param(AgentEnvironment.GIT_STATUS_KEY, AgentEnvironment.gitStatus())
-					.param(AgentEnvironment.AGENT_MODEL_KEY, "claude-sonnet-4-5-20250929")
-					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, "2025-01-01"))
-                
+                .defaultSystem(p -> p.text(agentSystemPrompt) // system prompt
+                    .param(AgentEnvironment.ENVIRONMENT_INFO_KEY, AgentEnvironment.info())
+                    .param(AgentEnvironment.GIT_STATUS_KEY, AgentEnvironment.gitStatus())
+                    .param(AgentEnvironment.AGENT_MODEL_KEY, "claude-sonnet-4-5-20250929")
+                    .param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, "2025-01-01"))
 
-                // Sub-Agents (with multi-model support)
-                .defaultToolCallbacks(TaskToolCallbackProvider.builder()
-                    .chatClientBuilder("default", chatClientBuilder.clone())
-                    .subagentReferences(ClaudeSubagentReferences.fromRootDirectory(".claude/agents"))
-                    .skillsDirectories(".claude/skills")
-                    .build())
+                // Sub-Agents
+                .defaultToolCallbacks(taskTool)
 
                 // Skills
                 .defaultToolCallbacks(SkillsTool.builder()
-                    .addSkillsDirectory(".claude/skills")
+                    .addSkillsResources(skillPaths)
                     .build())
 
                 // Core Tools
@@ -102,10 +107,10 @@ public class Application {
                     .questionHandler(new CommandLineQuestionHandler())
                     .build())
 
-				// Advisors
-				.defaultAdvisors(
-					ToolCallAdvisor.builder().conversationHistoryEnabled(false).build(), // Tool Calling
-					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build()).build()) // Memory
+                // Advisors
+                .defaultAdvisors(
+                    ToolCallAdvisor.builder().conversationHistoryEnabled(false).build(), // Tool Calling
+                    MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build()).build()) // Memory
 
                 .build();
 
@@ -120,11 +125,12 @@ public class Application {
 
 ### Examples
 
-Four examples demonstrate different use cases:
+Five examples demonstrate different use cases:
 
 - **[code-agent-demo](../examples/code-agent-demo)** - Full-featured AI coding assistant with interactive CLI, all tools, conversation memory, and multi-model support
 - **[skills-demo](../examples/skills-demo)** - Focused demonstration of the SkillsTool system with custom skill development and helper scripts
 - **[subagent-demo](../examples/subagent-demo)** - Demonstrates hierarchical sub-agent system with custom Spring AI expert sub-agent and TaskTools integration
+- **[subagent-a2a-demo](../examples/subagent-a2a-demo)** - Demonstrates combining local Claude sub-agents with remote A2A protocol agents
 - **[ask-user-question-demo](../examples/ask-user-question-demo)** - Console-based chat application demonstrating the AskUserQuestionTool with single/multi-select questions and custom answer handling
 
 See the [Examples README](../examples/README.md) for detailed setup, configuration, and usage guide.
@@ -403,20 +409,22 @@ Enable your AI agent to delegate complex, multi-step tasks to specialized sub-ag
 
 **Quick Example:**
 ```java
-import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentReferences;
+import org.springaicommunity.agent.tools.task.TaskTool;
+import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentType;
 
-// Configure Task tools with multi-model support
-var taskTools = TaskToolCallbackProvider.builder()
-    .chatClientBuilder("default", chatClientBuilder)
-    .chatClientBuilder("opus", opusChatClientBuilder)     // Optional: for complex tasks
-    .chatClientBuilder("haiku", haikuChatClientBuilder)   // Optional: for quick tasks
-    .subagentReferences(ClaudeSubagentReferences.fromRootDirectory(".claude/agents"))
-    .skillsDirectories(".claude/skills")
+// Configure Task tool with Claude sub-agents and multi-model support
+var taskTool = TaskTool.builder()
+    .subagentTypes(ClaudeSubagentType.builder()
+        .chatClientBuilder("default", chatClientBuilder)
+        .chatClientBuilder("opus", opusChatClientBuilder)     // Optional: for complex tasks
+        .chatClientBuilder("haiku", haikuChatClientBuilder)   // Optional: for quick tasks
+        .skillsResources(skillPaths)
+        .build())
     .build();
 
-// Build main chat client with Task tools
+// Build main chat client with Task tool
 ChatClient chatClient = chatClientBuilder
-    .defaultToolCallbacks(taskTools)
+    .defaultToolCallbacks(taskTool)
     .defaultTools(FileSystemTools.builder().build(), GrepTool.builder().build())
     .build();
 
@@ -457,9 +465,10 @@ Organize feedback by priority: Critical Issues, Warnings, Suggestions.
 
 **Key Features:**
 - **Multi-Model Routing** - Route sub-agents to different models (sonnet, opus, haiku) based on task complexity
-- **Extensible Architecture** - Pluggable resolvers and executors support Claude-based, A2A, or custom sub-agent types
+- **Extensible Architecture** - Pluggable [subagent SPI](../spring-ai-agent-utils-common/README.md) supports Claude-based, [A2A](../spring-ai-agent-utils-a2a/README.md), or custom sub-agent types
 - **Dedicated Context** - Each sub-agent has its own context window, preventing pollution of main conversation
 - **Tool Filtering** - Allow or disallow specific tools per sub-agent with `tools` and `disallowedTools`
+- **Skill Preloading** - Inject skill content into sub-agent system prompts via the `skills` frontmatter field
 - **Background Execution** - Run long-running tasks asynchronously with TaskOutputTool
 - **Resumable Agents** - Continue long-running research across multiple interactions
 
@@ -497,6 +506,11 @@ brave.api.key=${BRAVE_API_KEY}
 ## License
 
 Apache License 2.0
+
+## Related Modules
+
+- [**spring-ai-agent-utils-common**](../spring-ai-agent-utils-common/README.md) - Shared subagent SPI (SubagentDefinition, SubagentResolver, SubagentExecutor, SubagentType)
+- [**spring-ai-agent-utils-a2a**](../spring-ai-agent-utils-a2a/README.md) - A2A protocol subagent implementation for remote agent orchestration
 
 ## Links
 

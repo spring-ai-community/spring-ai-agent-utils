@@ -24,22 +24,23 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springaicommunity.agent.common.task.subagent.SubagentDefinition;
+import org.springaicommunity.agent.common.task.subagent.SubagentExecutor;
+import org.springaicommunity.agent.common.task.subagent.SubagentReference;
+import org.springaicommunity.agent.common.task.subagent.SubagentResolver;
+import org.springaicommunity.agent.common.task.subagent.SubagentType;
+import org.springaicommunity.agent.common.task.subagent.TaskCall;
+import org.springaicommunity.agent.tools.task.repository.DefaultTaskRepository;
 import org.springaicommunity.agent.tools.task.repository.TaskRepository;
-import org.springaicommunity.agent.tools.task.subagent.SubagentDefinition;
-import org.springaicommunity.agent.tools.task.subagent.SubagentExecutor;
-import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
-import org.springaicommunity.agent.tools.task.subagent.SubagentResolver;
 import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentDefinition;
-import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentResolver;
 
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.util.Assert;
 
 /**
- * Tool for launching specialized subagents to handle complex, multi-step tasks.
- * Supports both synchronous and background execution modes.
+ * Tool for launching specialized subagents to handle complex, multi-step tasks. Supports
+ * both synchronous and background execution modes.
  *
  * @author Christian Tzolov
  */
@@ -119,15 +120,6 @@ public class TaskTool {
 			</example>
 			""";
 
-	public static record TaskCall( // @formatter:off
-			@ToolParam(description = "A short (3-5 word) description of the task") String description,
-			@ToolParam(description = "The task for the agent to perform") String prompt,
-			@ToolParam(description = "The type of specialized agent to use for this task") String subagent_type,
-			@ToolParam(description = "Optional model to use for this agent. If not specified, inherits from parent. Prefer small models for quick, straightforward tasks to minimize cost and latency.", required = false) String model,
-			@ToolParam(description = "Optional agent ID to resume from. If provided, the agent will continue from the previous execution transcript.", required = false) String resume,
-			@ToolParam(description = "Set to true to run this agent in the background. Use TaskOutput to read the output later.", required = false) Boolean run_in_background ) { // @formatter:on
-	}
-
 	public static class TaskFunction implements Function<TaskCall, String> {
 
 		private static final Logger logger = LoggerFactory.getLogger(TaskFunction.class);
@@ -187,28 +179,13 @@ public class TaskTool {
 
 		private List<SubagentReference> subagentReferences = new ArrayList<>();
 
-		private List<SubagentExecutor> subagentExecutors = new ArrayList<>();
-
-		private List<SubagentResolver> subagentResolvers = new ArrayList<>();
+		private List<SubagentType> subagentTypes = new ArrayList<>();
 
 		private String taskDescriptionTemplate = TASK_DESCRIPTION_TEMPLATE;
 
-		private TaskRepository taskRepository;
+		private TaskRepository taskRepository = new DefaultTaskRepository();
 
 		private Builder() {
-
-			// Register built-in Claude subagent references
-			this.subagentReferences.add(new SubagentReference("classpath:/agent/GENERAL_PURPOSE_SUBAGENT.md",
-					ClaudeSubagentDefinition.KIND, null));
-			this.subagentReferences.add(new SubagentReference("classpath:/agent/EXPLORE_SUBAGENT.md",
-					ClaudeSubagentDefinition.KIND, null));
-			this.subagentReferences.add(new SubagentReference("classpath:/agent/PLAN_SUBAGENT.md",
-					ClaudeSubagentDefinition.KIND, null));
-			this.subagentReferences.add(new SubagentReference("classpath:/agent/BASH_SUBAGENT.md",
-					ClaudeSubagentDefinition.KIND, null));
-
-			// Register built-in Claude subagent resolvers
-			this.subagentResolvers.add(new ClaudeSubagentResolver());
 		}
 
 		public Builder subagentReferences(List<SubagentReference> subagentReferences) {
@@ -218,26 +195,6 @@ public class TaskTool {
 
 		public Builder subagentReferences(SubagentReference... subagentReference) {
 			this.subagentReferences.addAll(List.of(subagentReference));
-			return this;
-		}
-
-		public Builder subagentExecutors(List<SubagentExecutor> subagentExecutors) {
-			this.subagentExecutors.addAll(subagentExecutors);
-			return this;
-		}
-
-		public Builder subagentExecutors(SubagentExecutor... subagentExecutors) {
-			this.subagentExecutors.addAll(List.of(subagentExecutors));
-			return this;
-		}
-
-		public Builder subagentResolvers(List<SubagentResolver> subagentResolvers) {
-			this.subagentResolvers.addAll(subagentResolvers);
-			return this;
-		}
-
-		public Builder subagentResolvers(SubagentResolver... subagentResolvers) {
-			this.subagentResolvers.addAll(List.of(subagentResolvers));
 			return this;
 		}
 
@@ -253,8 +210,20 @@ public class TaskTool {
 			return this;
 		}
 
+		public Builder subagentTypes(List<SubagentType> subagentTypes) {
+			Assert.notNull(subagentTypes, "subagentTypes must not be null");
+			this.subagentTypes.addAll(subagentTypes);
+			return this;
+		}
+
+		public Builder subagentTypes(SubagentType... subagentTypes) {
+			Assert.notNull(subagentTypes, "subagentTypes must not be null");
+			this.subagentTypes.addAll(List.of(subagentTypes));
+			return this;
+		}
+
 		private SubagentDefinition resolve(SubagentReference subagentReference) {
-			for (SubagentResolver subagentResolver : this.subagentResolvers) {
+			for (SubagentResolver subagentResolver : this.subagentTypes.stream().map(st -> st.resolver()).toList()) {
 				if (subagentResolver.canResolve(subagentReference)) {
 					return subagentResolver.resolve(subagentReference);
 				}
@@ -265,16 +234,33 @@ public class TaskTool {
 
 		public ToolCallback build() {
 			Assert.notNull(this.taskRepository, "taskRepository must be provided");
-			Assert.notEmpty(this.subagentExecutors, "At least one subagentExecutor must be provided");
 
-			List<SubagentDefinition> subagents = this.subagentReferences.stream().map(sr -> this.resolve(sr)).toList();
+			if (this.subagentTypes.stream().anyMatch(st -> st.kind().equals(ClaudeSubagentDefinition.KIND))) {
+				// Register built-in Claude subagent references
+				this.subagentReferences.add(new SubagentReference("classpath:/agent/GENERAL_PURPOSE_SUBAGENT.md",
+						ClaudeSubagentDefinition.KIND));
+				this.subagentReferences
+					.add(new SubagentReference("classpath:/agent/EXPLORE_SUBAGENT.md", ClaudeSubagentDefinition.KIND));
+				this.subagentReferences
+					.add(new SubagentReference("classpath:/agent/PLAN_SUBAGENT.md", ClaudeSubagentDefinition.KIND));
+				this.subagentReferences
+					.add(new SubagentReference("classpath:/agent/BASH_SUBAGENT.md", ClaudeSubagentDefinition.KIND));
+			}
 
-			String subagentRegistrations = subagents.stream()
+			Assert.notEmpty(this.subagentTypes, "At least one subagentTypes must be provided");
+
+			List<SubagentDefinition> subagentDefinitions = this.subagentReferences.stream()
+				.map(sr -> this.resolve(sr))
+				.toList();
+
+			String subagentRegistrations = subagentDefinitions.stream()
 				.map(sa -> sa.toSubagentRegistrations())
 				.collect(Collectors.joining("\n"));
 
+			var executors = this.subagentTypes.stream().map(st -> st.executor()).toList();
+
 			return FunctionToolCallback
-				.builder("Task", new TaskFunction(subagents, this.subagentExecutors, this.taskRepository))
+				.builder("Task", new TaskFunction(subagentDefinitions, executors, this.taskRepository))
 				.description(this.taskDescriptionTemplate.formatted(subagentRegistrations))
 				.inputType(TaskCall.class)
 				.build();

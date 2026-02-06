@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
+import org.springaicommunity.agent.common.task.subagent.SubagentReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

@@ -18,9 +18,9 @@ package org.springaicommunity.agent.tools.task.subagent.claude;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import org.springaicommunity.agent.tools.task.subagent.SubagentDefinition;
-import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
-import org.springaicommunity.agent.tools.task.subagent.SubagentResolver;
+import org.springaicommunity.agent.common.task.subagent.SubagentDefinition;
+import org.springaicommunity.agent.common.task.subagent.SubagentReference;
+import org.springaicommunity.agent.common.task.subagent.SubagentResolver;
 import org.springaicommunity.agent.utils.MarkdownParser;
 
 import org.springframework.core.io.DefaultResourceLoader;

@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
+import org.springaicommunity.agent.common.task.subagent.SubagentReference;
 
 import org.springframework.core.io.Resource;
 

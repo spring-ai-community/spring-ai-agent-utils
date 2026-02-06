@@ -10,10 +10,10 @@
 		<version>0.5.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>spring-ai-agent-utils</artifactId>
+	<artifactId>spring-ai-agent-utils-common</artifactId>
 	<version>0.5.0-SNAPSHOT</version>
-	<name>spring-ai-agent-utils</name>
-	<description>Spring AI Agent Utilities</description>
+	<name>spring-ai-agent-utils-common</name>
+	<description>Spring AI Agent Utilities Common</description>
 
 	<url>https://github.com/spring-ai-community/spring-ai-agent-utils</url>
 
@@ -57,18 +57,12 @@
 
 	<dependencies>
 		
-		<dependency>
-			<groupId>org.springaicommunity</groupId>
-			<artifactId>spring-ai-agent-utils-common</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 			<version>${spring-framework.version}</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
@@ -76,15 +70,15 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.vladsch.flexmark</groupId>
 			<artifactId>flexmark-html2md-converter</artifactId>
 			<version>${flexmark.version}</version>
-		</dependency>
+		</dependency> -->
 
 
 		<!-- Test dependencies -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
 			<version>5.10.2</version>
@@ -113,7 +107,7 @@
 			<artifactId>micrometer-observation</artifactId>
 			<version>1.12.4</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency> -->
 	</dependencies>
 
 	<dependencyManagement>

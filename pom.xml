@@ -81,7 +81,9 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>spring-ai-agent-utils-common</module>
         <module>spring-ai-agent-utils</module>
+        <module>spring-ai-agent-utils-a2a</module>
         <module>examples</module>
     </modules>
 
@@ -270,7 +272,7 @@
                         <configuration>
                             <publishingServerId>central</publishingServerId>
                             <excludeArtifacts>
-                                spring-ai-agent-utils-parent,examples-parent,tool-search-tool-app
+                                spring-ai-agent-utils-parent,examples-parent,travel-planner-demo-parent
                             </excludeArtifacts>
                             <autoPublish>true</autoPublish>
                         </configuration>

@@ -18,23 +18,26 @@ package org.springaicommunity.agent.tools.task.subagent.claude;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springaicommunity.agent.tools.task.TaskTool.TaskCall;
-import org.springaicommunity.agent.tools.task.subagent.SubagentDefinition;
-import org.springaicommunity.agent.tools.task.subagent.SubagentExecutor;
+import org.springaicommunity.agent.common.task.subagent.SubagentDefinition;
+import org.springaicommunity.agent.common.task.subagent.SubagentExecutor;
+import org.springaicommunity.agent.common.task.subagent.TaskCall;
+import org.springaicommunity.agent.utils.Skills;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Executes Claude subagent tasks using Spring AI ChatClient.
- * Configures chat client with appropriate tools based on subagent definition.
+ * Executes Claude subagent tasks using Spring AI ChatClient. Configures chat client with
+ * appropriate tools based on subagent definition.
  *
  * @author Christian Tzolov
  */
@@ -46,14 +49,20 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 
 	private final List<ToolCallback> tools;
 
-	public ClaudeSubagentExecutor(Map<String, ChatClient.Builder> chatClientBuilderMap, List<ToolCallback> tools) {
+	private final List<String> skillsDirectories;
+
+	public ClaudeSubagentExecutor(Map<String, ChatClient.Builder> chatClientBuilderMap, List<ToolCallback> tools,
+			List<String> skillsDirectories) {
 
 		Assert.notEmpty(chatClientBuilderMap, "chatClientBuilderMap must not be empty");
 		Assert.isTrue(chatClientBuilderMap.containsKey("default"),
 				"chatClientBuilderMap must contain a default ChatClient.Builder with key 'default'");
 
+		Assert.notNull(skillsDirectories, "skillsDirectories must not be null");
+
 		this.chatClientBuilderMap = chatClientBuilderMap;
 		this.tools = tools;
+		this.skillsDirectories = skillsDirectories;
 	}
 
 	@Override
@@ -67,8 +76,23 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 		var claudeSubagent = (ClaudeSubagentDefinition) subagent;
 		var taskChatClient = this.createTaskChatClient(claudeSubagent);
 
+		String preloadedSkillsSystemSuffix = "";
+
+		if (!CollectionUtils.isEmpty(claudeSubagent.skills()) && !CollectionUtils.isEmpty(this.skillsDirectories)) {
+
+			// TODO Optimize loading skills only once and cache them.
+			var skills = Skills.loadDirectories(this.skillsDirectories);
+
+			preloadedSkillsSystemSuffix = "\n"
+					+ skills.stream().filter(s -> claudeSubagent.skills().contains(s.name())).map(skill -> {
+						var skillBaseDirectory = skill.path().getParent().toString();
+						return "%s\nBase directory for this skill: %s\n\n%s".formatted(skill.toXml(),
+								skillBaseDirectory, skill.content());
+					}).collect(Collectors.joining("\n\n"));
+		}
+
 		return taskChatClient.prompt()
-			.system(claudeSubagent.getContent()) // Todo add the system suffix
+			.system(claudeSubagent.getContent() + preloadedSkillsSystemSuffix)
 			.user(taskCall.prompt())
 			// Todo set model if provided.
 			.call()
@@ -77,7 +101,7 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 
 	private ChatClient createTaskChatClient(ClaudeSubagentDefinition claudeSubagent) {
 
-		var builder = this.findChatClientBuilder(claudeSubagent).clone();
+		var builder = this.doFindChatClientBuilder(claudeSubagent).clone();
 
 		if (!CollectionUtils.isEmpty(this.tools)) {
 
@@ -100,30 +124,43 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 			builder.defaultToolCallbacks(subagentTools);
 		}
 
-
 		if (!claudeSubagent.permissionMode().equals("default")) {
 			logger.warn("The task permissionMode is not supported yet. permissionMode = "
 					+ claudeSubagent.permissionMode());
 		}
 
-		// 		if (!CollectionUtils.isEmpty(claudeSubagent.skills()) && this.skillsTool != null) {
-		// 	// this.skillsTool.
-		// }
-
-		// if (!CollectionUtils.isEmpty(taskType.skills())) {
-		// logger.warn(
-		// "The task skills filtering are not supported yet. skills = " + String.join(",",
-		// taskType.skills()));
-		// }
-
+		// TODO Add ToolCallAdvisors only if not already present in the
+		// ChatClient.Builder.
 		return builder.defaultAdvisors(ToolCallAdvisor.builder().build()).build();
 	}
 
-	private ChatClient.Builder findChatClientBuilder(ClaudeSubagentDefinition claudeSubagent) {
+	private static final Map<String, String> MODEL_NAME_MAPPER = Map.of("opus", "claude-opus-4-64k", "haiku",
+			"claude-haiku-4-5-20251001", "sonnet", "claude-sonnet-4-5-20250929");
 
-		if (StringUtils.hasText(claudeSubagent.getModel())
-				&& this.chatClientBuilderMap.containsKey(claudeSubagent.getModel())) {
-			return this.chatClientBuilderMap.get(claudeSubagent.getModel());
+	protected ChatClient.Builder doFindChatClientBuilder(ClaudeSubagentDefinition claudeSubagent) {
+
+		if (StringUtils.hasText(claudeSubagent.getModel())) {
+			var providerName = "default";
+
+			var modelRef = claudeSubagent.getModel();
+			var modelName = modelRef.trim();
+
+			if (modelRef.contains(":")) {
+				var parts = modelRef.split(":");
+				providerName = parts[0].trim();
+				modelName = parts[1].trim();
+			}
+
+			if (this.chatClientBuilderMap.containsKey(providerName)) {
+				var builder = this.chatClientBuilderMap.get(providerName);
+				if (StringUtils.hasText(modelName)) {
+					if (MODEL_NAME_MAPPER.containsKey(modelName)) {
+						modelName = MODEL_NAME_MAPPER.get(modelName);
+					}
+					builder = builder.clone().defaultOptions(ChatOptions.builder().model(modelName).build());
+				}
+				return builder;
+			}
 		}
 
 		// Return default chat client builder.

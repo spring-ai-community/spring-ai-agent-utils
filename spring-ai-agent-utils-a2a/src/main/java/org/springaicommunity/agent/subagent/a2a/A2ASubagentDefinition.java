@@ -1,5 +1,5 @@
 /*
-* Copyright 2025 - 2025 the original author or authors.
+* Copyright 2026 - 2026 the original author or authors.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -13,12 +13,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.springaicommunity.agent.a2a;
+package org.springaicommunity.agent.subagent.a2a;
 
 
 import io.a2a.spec.AgentCard;
-import org.springaicommunity.agent.tools.task.subagent.SubagentDefinition;
-import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
+import org.springaicommunity.agent.common.task.subagent.SubagentDefinition;
+import org.springaicommunity.agent.common.task.subagent.SubagentReference;
 
 /**
  * A2A protocol subagent definition wrapping an AgentCard.

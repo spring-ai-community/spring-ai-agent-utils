@@ -21,8 +21,8 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springaicommunity.agent.tools.task.subagent.SubagentDefinition;
-import org.springaicommunity.agent.tools.task.subagent.SubagentReference;
+import org.springaicommunity.agent.common.task.subagent.SubagentDefinition;
+import org.springaicommunity.agent.common.task.subagent.SubagentReference;
 
 import org.springframework.util.StringUtils;
 
@@ -135,11 +135,8 @@ public class ClaudeSubagentDefinition implements SubagentDefinition {
 	}
 
 	/**
-	 * Skills to load into the subagent’s context at startup. The full skill content is
-	 * injected, not just made available for invocation. Subagents don’t inherit skills
-	 * from the parent conversation
-	 *
-	 * https://code.claude.com/docs/en/sub-agents#supported-frontmatter-fields
+	 * Permission mode: default, acceptEdits, dontAsk, bypassPermissions, or plan
+	 * 
 	 * @return permission mode
 	 */
 	public String permissionMode() {

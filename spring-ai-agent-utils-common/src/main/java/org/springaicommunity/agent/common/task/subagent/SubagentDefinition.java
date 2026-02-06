@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.springaicommunity.agent.tools.task.subagent;
+package org.springaicommunity.agent.common.task.subagent;
 
 /**
  * Defines a subagent's identity and configuration metadata.
