@@ -21,10 +21,10 @@ import org.springaicommunity.agent.common.task.subagent.SubagentDefinition;
 import org.springaicommunity.agent.common.task.subagent.SubagentExecutor;
 import org.springaicommunity.agent.common.task.subagent.SubagentType;
 import org.springaicommunity.agent.common.task.subagent.TaskCall;
+import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentDefinition;
+import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentResolver;
 import org.springaicommunity.agent.tools.task.repository.DefaultTaskRepository;
 import org.springaicommunity.agent.tools.task.repository.TaskRepository;
-import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentDefinition;
-import org.springaicommunity.agent.tools.task.subagent.claude.ClaudeSubagentResolver;
 
 import org.springframework.ai.tool.ToolCallback;
 
