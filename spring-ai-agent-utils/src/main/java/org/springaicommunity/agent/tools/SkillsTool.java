@@ -15,7 +15,6 @@
 */
 package org.springaicommunity.agent.tools;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,8 +76,7 @@ public class SkillsTool {
 			Skill skill = this.skillsMap.get(input.command());
 
 			if (skill != null) {
-				var skillBaseDirectory = skill.path().getParent().toString();
-				return "Base directory for this skill: %s\n\n%s".formatted(skillBaseDirectory, skill.content());
+				return "Base directory for this skill: %s\n\n%s".formatted(skill.basePath(), skill.content());
 			}
 
 			return "Skill not found: " + input.command();
@@ -143,11 +141,11 @@ public class SkillsTool {
 	/**
 	 * Represents a SKILL.md file with its location and parsed content.
 	 */
-	public static record Skill(Path path, Map<String, Object> frontMatter, String content) {
+	public static record Skill(String basePath, Map<String, Object> frontMatter, String content) {
 
 		public String name() {
 			return this.frontMatter().get("name").toString();
-		}	
+		}
 
 		public String toXml() {
 			String frontMatterXml = this.frontMatter()

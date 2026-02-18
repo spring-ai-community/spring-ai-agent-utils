@@ -85,9 +85,8 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 
 			preloadedSkillsSystemSuffix = "\n"
 					+ skills.stream().filter(s -> claudeSubagent.skills().contains(s.name())).map(skill -> {
-						var skillBaseDirectory = skill.path().getParent().toString();
 						return "%s\nBase directory for this skill: %s\n\n%s".formatted(skill.toXml(),
-								skillBaseDirectory, skill.content());
+								skill.basePath(), skill.content());
 					}).collect(Collectors.joining("\n\n"));
 		}
 
