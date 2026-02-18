@@ -114,6 +114,12 @@
 			<version>1.12.4</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.skillsjars</groupId>
+			<artifactId>anthropics__skills__pdf</artifactId>
+			<version>2026_02_06-1ed29a0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
