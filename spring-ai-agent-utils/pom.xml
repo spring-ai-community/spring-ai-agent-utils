@@ -56,13 +56,13 @@
 	</properties>
 
 	<dependencies>
-		
+
 		<dependency>
 			<groupId>org.springaicommunity</groupId>
 			<artifactId>spring-ai-agent-utils-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
@@ -118,6 +118,12 @@
 			<groupId>com.skillsjars</groupId>
 			<artifactId>anthropics__skills__pdf</artifactId>
 			<version>2026_02_06-1ed29a0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.skillsjars</groupId>
+			<artifactId>sivaprasadreddy__sivalabs-agent-skills__spring-boot</artifactId>
+			<version>2026_02_23-dba3310</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
