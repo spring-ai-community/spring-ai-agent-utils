@@ -219,6 +219,24 @@ class SkillsToolTest {
 			assertThat(result).contains("PDF");
 		}
 
+		@Test
+		@DisplayName("should load spring-boot skill from sivalabs skills JAR on classpath")
+		void shouldLoadSpringBootSkillFromClasspathJar() {
+			// sivalabs JAR uses META-INF/skills/ (not META-INF/resources/skills/)
+			// and includes explicit directory entries, exercising a different code path
+			ClassPathResource resource = new ClassPathResource(
+					"META-INF/skills/sivaprasadreddy/sivalabs-agent-skills");
+
+			ToolCallback callback = SkillsTool.builder().addSkillsResource(resource).build();
+
+			assertThat(callback).isNotNull();
+			assertThat(callback.getToolDefinition().description()).contains("spring-boot-skill");
+
+			String result = callback.call("{\"command\":\"spring-boot-skill\"}");
+			assertThat(result).contains("Base directory for this skill:");
+			assertThat(result).contains("Spring Boot");
+		}
+
 	}
 
 	@Nested
