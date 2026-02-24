@@ -9,6 +9,7 @@ Extend AI agent capabilities with reusable, composable knowledge modules defined
 - Progressive disclosure of detailed information
 - Project-wide or user-wide skill scopes
 - Customizable tool descriptions and templates
+- Load skills from filesystem directories, classpath JARs, or remote JAR dependencies
 
 ## Overview
 
@@ -31,7 +32,7 @@ description: Use when user asks to explain technical concepts
 [Detailed skill documentation...]
 ```
 
-Skills can include executable scripts and reference materials, loaded dynamically from `examples/.claude/skills/` directories.
+Skills can include executable scripts and reference materials, loaded dynamically from filesystem directories, classpath locations, or packaged JAR dependencies.
 
 ## Basic Usage
 
@@ -178,16 +179,18 @@ model: claude-opus-4-5-20251101
 
 ## Skill Locations
 
-Where you store a skill determines its scope:
+Skills can come from multiple sources — filesystem directories, classpath resources, or packaged JAR dependencies.
 
-| Location | Path | Scope |
-|----------|------|-------|
-| **Personal** | `~/.claude/skills/` | User, across all projects |
-| **Project** | `examples/.claude/skills/` | Team in this repository |
+| Source | Example | Scope |
+|--------|---------|-------|
+| **Personal directory** | `~/.claude/skills/` | User, across all projects |
+| **Project directory** | `.claude/skills/` | Team in this repository |
+| **Classpath / JAR** | `ClassPathResource("META-INF/skills/my-skills")` | Packaged with a library or dependency |
+| **Remote JAR** | `UrlResource("jar:https://…/skills.jar!/skills")` | Distributed skill packages |
 
 **Tip:** Use project skills (`.claude/skills/`) for team collaboration by committing them to version control.
 
-### Loading Multiple Directories
+### Loading from Directories
 
 ```java
 SkillsTool skillsTool = SkillsTool.builder()
@@ -209,7 +212,8 @@ SkillsTool skillsTool = SkillsTool.builder()
 
 ### Loading from Spring Resources
 
-For better integration with Spring Boot, you can load skills from Spring `Resource` objects:
+For better integration with Spring Boot, you can load skills from Spring `Resource` objects.
+This works for filesystem paths, classpath locations, and JAR entries.
 
 ```java
 import org.springframework.core.io.Resource;
@@ -247,6 +251,58 @@ public SkillsTool skillsTool() {
         .build();
 }
 ```
+
+### Loading from Classpath JARs (SkillsJars)
+
+Skills can be packaged inside JAR files and distributed as Maven/Gradle dependencies — referred to as **SkillsJars**. This allows teams to share reusable skill libraries across projects.
+
+A SkillsJar is a regular JAR that stores `SKILL.md` files under a well-known path:
+
+```
+META-INF/
+└── skills/
+    └── my-org/
+        └── my-skills/
+            └── pdf/
+                └── SKILL.md
+```
+
+Add the JAR as a dependency, then point `SkillsTool` at the classpath prefix:
+
+```java
+// pom.xml
+<dependency>
+    <groupId>com.skillsjars</groupId>
+    <artifactId>anthropics__skills__pdf</artifactId>
+    <version>2026_02_06-1ed29a0</version>
+</dependency>
+```
+
+```java
+SkillsTool skillsTool = SkillsTool.builder()
+    .addSkillsResource(new ClassPathResource("META-INF/resources/skills/anthropics/skills"))
+    .build();
+```
+
+You can mix sources freely — filesystem directories, classpath JARs, and explicit JAR URLs:
+
+```java
+SkillsTool skillsTool = SkillsTool.builder()
+    .addSkillsDirectory(".claude/skills")                                         // Local filesystem
+    .addSkillsResource(new ClassPathResource("META-INF/skills/my-org/my-skills")) // From a dependency JAR
+    .addSkillsResource(new UrlResource("jar:file:/opt/skills.jar!/skills"))       // Explicit JAR URL
+    .build();
+```
+
+#### How JAR Loading Works
+
+`Skills.loadResource()` resolves JAR-based resources using three strategies, in order:
+
+1. **Spring `PathMatchingResourcePatternResolver`** — scans `classpath*:…/**/SKILL.md`. Works for well-formed JARs with explicit directory entries.
+2. **`JarURLConnection` direct scan** — used when the resource URL uses the `jar:` protocol (e.g., a `UrlResource`).
+3. **Manual classpath JAR scan** — fallback for `ClassPathResource` references pointing to directories inside JARs that lack explicit directory entries (a known limitation of Spring's resolver).
+
+All three strategies produce the same result: a list of `Skill` objects ready for use.
 
 ## Builder Configuration
 
@@ -298,6 +354,22 @@ public SkillsTool skillsTool(ResourceLoader resourceLoader) {
     return SkillsTool.builder()
         .addSkillsResource(projectSkills)
         .addSkillsResource(userSkills)
+        .build();
+}
+```
+
+### With JAR / Classpath Dependencies
+
+```java
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.UrlResource;
+
+@Bean
+public SkillsTool skillsTool() {
+    return SkillsTool.builder()
+        .addSkillsDirectory(".claude/skills")                                         // Local filesystem
+        .addSkillsResource(new ClassPathResource("META-INF/skills/my-org/my-skills")) // From a dependency JAR
+        .addSkillsResource(new UrlResource("jar:file:/opt/skills.jar!/skills"))       // Explicit JAR URL
         .build();
 }
 ```
@@ -717,6 +789,23 @@ ChatClient chatClient = chatClientBuilder
     .build();
 ```
 
+### Skills Not Found in JAR
+
+**Problem:** `SkillsTool` loads 0 skills from a `ClassPathResource` pointing inside a JAR
+
+**Cause:** The JAR lacks explicit directory entries (common with some build tools), so Spring's `PathMatchingResourcePatternResolver` can't enumerate the contents.
+
+**Solution:** `Skills.loadResource()` automatically falls back to scanning all classpath JARs via `ClassLoader.getResources("META-INF/MANIFEST.MF")`. If skills are still not found, verify the JAR entry prefix matches the `ClassPathResource` path:
+
+```bash
+# Inspect JAR entries
+jar tf my-skills.jar | grep SKILL.md
+# META-INF/skills/my-org/my-skills/pdf/SKILL.md
+
+# Use the matching prefix
+new ClassPathResource("META-INF/skills/my-org/my-skills")
+```
+
 ### Multiple Skills with Same Name
 
 **Problem:** Naming collision between skills
@@ -744,10 +833,11 @@ name: project-name:skill-name
 4. **Progressive disclosure**: Use supporting files for details
 5. **Provide examples**: Show concrete usage patterns
 6. **Register tools**: FileSystemTools for files, ShellTools for scripts
-7. **Version control**: Commit project skills to git
+7. **Version control**: Commit project skills to git, or package them as SkillsJar dependencies
 8. **Test thoroughly**: Verify AI invokes skill correctly
 9. **Document well**: Clear instructions for AI to follow
 10. **Maintain skills**: Update as requirements change
+11. **Share via JARs**: Package reusable skills as Maven/Gradle dependencies (SkillsJars) for cross-project sharing
 
 ## See Also
 
