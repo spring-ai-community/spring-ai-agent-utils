@@ -38,12 +38,34 @@ While these tools can be used standalone, truly agentic behavior emerges when th
 
 ## Installation
 
-**Maven:**
+**Maven (recommended — using the BOM):**
+```xml
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.springaicommunity</groupId>
+            <artifactId>spring-ai-agent-utils-bom</artifactId>
+            <version>0.5.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+
+<dependencies>
+    <dependency>
+        <groupId>org.springaicommunity</groupId>
+        <artifactId>spring-ai-agent-utils</artifactId>
+    </dependency>
+</dependencies>
+```
+
+**Maven (direct):**
 ```xml
 <dependency>
     <groupId>org.springaicommunity</groupId>
     <artifactId>spring-ai-agent-utils</artifactId>
-    <version>0.4.2</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 
@@ -511,6 +533,7 @@ Apache License 2.0
 
 - [**spring-ai-agent-utils-common**](../spring-ai-agent-utils-common/README.md) - Shared subagent SPI (SubagentDefinition, SubagentResolver, SubagentExecutor, SubagentType)
 - [**spring-ai-agent-utils-a2a**](../spring-ai-agent-utils-a2a/README.md) - A2A protocol subagent implementation for remote agent orchestration
+- [**spring-ai-agent-utils-bom**](../spring-ai-agent-utils-bom/pom.xml) - Bill of Materials for consistent version management across all modules
 
 ## Links
 

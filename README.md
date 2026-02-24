@@ -22,6 +22,7 @@ spring-ai-agent-utils/
 ├── spring-ai-agent-utils-common/   # Shared subagent SPI (interfaces & records)
 ├── spring-ai-agent-utils/          # Core library (tools, skills, Claude subagents)
 ├── spring-ai-agent-utils-a2a/      # A2A protocol subagent implementation
+├── spring-ai-agent-utils-bom/      # Bill of Materials for version management
 │
 └── examples/
     ├── code-agent-demo/            # Full-featured AI coding assistant
@@ -67,6 +68,7 @@ While these tools can be used standalone, truly agentic behavior emerges when th
 | [**spring-ai-agent-utils**](spring-ai-agent-utils/README.md) | Core library - tools, skills, Claude subagents, and full API reference |
 | [**spring-ai-agent-utils-common**](spring-ai-agent-utils-common/README.md) | Shared subagent SPI (SubagentDefinition, SubagentResolver, SubagentExecutor, SubagentType) |
 | [**spring-ai-agent-utils-a2a**](spring-ai-agent-utils-a2a/README.md) | A2A protocol subagent for remote agent orchestration |
+| [**spring-ai-agent-utils-bom**](spring-ai-agent-utils-bom/pom.xml) | Bill of Materials for consistent version management across all modules |
 | [**Examples**](#examples) | Working demos showcasing different use cases |
 
 
@@ -74,11 +76,36 @@ While these tools can be used standalone, truly agentic behavior emerges when th
 
 **1. Add dependency:**
 
+Use the BOM to manage versions consistently across all modules:
+
+```xml
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.springaicommunity</groupId>
+            <artifactId>spring-ai-agent-utils-bom</artifactId>
+            <version>0.5.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+
+<dependencies>
+    <dependency>
+        <groupId>org.springaicommunity</groupId>
+        <artifactId>spring-ai-agent-utils</artifactId>
+    </dependency>
+</dependencies>
+```
+
+Or add the core library directly:
+
 ```xml
 <dependency>
     <groupId>org.springaicommunity</groupId>
     <artifactId>spring-ai-agent-utils</artifactId>
-    <version>0.4.2</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 

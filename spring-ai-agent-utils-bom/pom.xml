@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2025-2025 the original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springaicommunity</groupId>
+		<artifactId>spring-ai-agent-utils-parent</artifactId>
+		<version>0.5.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>spring-ai-agent-utils-bom</artifactId>
+	<version>0.5.0-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
+	<name>Spring AI Agent Utilities BOM</name>
+	<description>Bill of Materials POM (BOM) for the Spring AI Agent Utilities modules</description>
+
+    <url>https://github.com/spring-ai-community/spring-ai-agent-utils</url>
+
+    <scm>
+        <url>https://github.com/spring-ai-community/spring-ai-agent-utils</url>
+        <connection>git://github.com/spring-ai-community/spring-ai-agent-utils.git</connection>
+        <developerConnection>git@github.com:spring-ai-community/spring-ai-agent-utils.git</developerConnection>
+    </scm>
+
+    <organization>
+        <name>Spring AI Community</name>
+        <url>https://github.com/spring-ai-community</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Christian Tzolov</name>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <system>Github Issues</system>
+        <url>https://github.com/spring-ai-community/spring-ai-agent-utils/issues</url>
+    </issueManagement>
+    <ciManagement>
+        <system>Github Actions</system>
+        <url>https://github.com/spring-ai-community/spring-ai-agent-utils/actions</url>
+    </ciManagement>
+
+	<properties>
+		<flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
+		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>org.springaicommunity</groupId>
+				<artifactId>spring-ai-agent-utils-common</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springaicommunity</groupId>
+				<artifactId>spring-ai-agent-utils</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springaicommunity</groupId>
+				<artifactId>spring-ai-agent-utils-a2a</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
+
+	</dependencyManagement>
+
+	<repositories>
+		<repository>
+			<name>Central Portal Snapshots</name>
+			<id>central-portal-snapshots</id>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>maven-central</id>
+			<url>https://repo.maven.apache.org/maven2/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>spring-snapshots</id>
+			<name>Spring Snapshots</name>
+			<url>https://repo.spring.io/snapshot</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+				<version>${flatten-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>flatten</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>flatten</goal>
+						</goals>
+						<configuration>
+							<updatePomFile>true</updatePomFile>
+							<flattenMode>ossrh</flattenMode>
+							<pomElements>
+								<distributionManagement>remove</distributionManagement>
+								<dependencyManagement>keep</dependencyManagement>
+								<repositories>remove</repositories>
+								<scm>keep</scm>
+								<url>keep</url>
+								<organization>resolve</organization>
+							</pomElements>
+						</configuration>
+					</execution>
+					<execution>
+						<id>clean</id>
+						<phase>clean</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>${maven-deploy-plugin.version}</version>
+			</plugin>
+		</plugins>
+	</build>
+</project>
