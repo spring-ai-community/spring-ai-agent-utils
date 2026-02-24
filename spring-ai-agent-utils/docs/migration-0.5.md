@@ -9,6 +9,7 @@ The single `spring-ai-agent-utils` module has been split into three:
 | `spring-ai-agent-utils-common` | Shared subagent SPI (interfaces & records) |
 | `spring-ai-agent-utils` | Core library (tools, skills, Claude subagents) |
 | `spring-ai-agent-utils-a2a` | A2A protocol subagent implementation |
+| `spring-ai-agent-utils-bom` | Bill of Materials for version management |
 
 Add `spring-ai-agent-utils-common` as a transitive dependency (pulled in automatically by the core module). Add `spring-ai-agent-utils-a2a` only if you use A2A subagents:
 

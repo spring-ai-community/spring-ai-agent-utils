@@ -84,6 +84,7 @@
         <module>spring-ai-agent-utils-common</module>
         <module>spring-ai-agent-utils</module>
         <module>spring-ai-agent-utils-a2a</module>
+        <module>spring-ai-agent-utils-bom</module>
         <module>examples</module>
     </modules>
 
