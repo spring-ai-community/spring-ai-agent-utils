@@ -17,6 +17,8 @@ package org.springaicommunity.agent.tools;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -235,6 +237,62 @@ class SkillsToolTest {
 			String result = callback.call("{\"command\":\"spring-boot-skill\"}");
 			assertThat(result).contains("Base directory for this skill:");
 			assertThat(result).contains("Spring Boot");
+		}
+
+		@Test
+		@DisplayName("should load skills from multiple JARs with same directory name")
+		void shouldLoadSkillsFromMultipleJars(@TempDir Path tempDir) throws Exception {
+			// Create JAR 1 with skill1
+			Path jar1 = tempDir.resolve("jar1.jar");
+			createJar(jar1, "META-INF/myskills/skill1/SKILL.md", """
+					---
+					name: skill1
+					description: Skill 1
+					---
+					Skill 1 content.
+					""");
+
+			// Create JAR 2 with skill2
+			Path jar2 = tempDir.resolve("jar2.jar");
+			createJar(jar2, "META-INF/myskills/skill2/SKILL.md", """
+					---
+					name: skill2
+					description: Skill 2
+					---
+					Skill 2 content.
+					""");
+
+			// Create a custom ClassLoader that includes both JARs
+			URL[] urls = { jar1.toUri().toURL(), jar2.toUri().toURL() };
+			try (URLClassLoader classLoader = new URLClassLoader(urls, null)) {
+
+				// Simulating what SkillsTool.builder().addSkillsResource(new
+				// ClassPathResource("META-INF/myskills")) does
+				// but we need to ensure the ClassPathResource uses our custom classloader
+				ClassPathResource resource = new ClassPathResource("META-INF/myskills", classLoader);
+
+				// This should now load both skills across JARs
+				ToolCallback callback = SkillsTool.builder().addSkillsResource(resource).build();
+
+				String description = callback.getToolDefinition().description();
+				assertThat(description).contains("skill1");
+				assertThat(description).as("Should contain skill2").contains("skill2");
+			}
+		}
+
+		private void createJar(Path jarPath, String entryPath, String content) throws IOException {
+			try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(jarPath.toFile()))) {
+				String[] parts = entryPath.split("/");
+				StringBuilder currentPath = new StringBuilder();
+				for (int i = 0; i < parts.length - 1; i++) {
+					currentPath.append(parts[i]).append("/");
+					jos.putNextEntry(new JarEntry(currentPath.toString()));
+					jos.closeEntry();
+				}
+				jos.putNextEntry(new JarEntry(entryPath));
+				jos.write(content.getBytes(StandardCharsets.UTF_8));
+				jos.closeEntry();
+			}
 		}
 
 	}
