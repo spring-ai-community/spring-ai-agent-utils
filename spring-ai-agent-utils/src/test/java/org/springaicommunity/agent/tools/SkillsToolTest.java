@@ -81,7 +81,8 @@ class SkillsToolTest {
 				.build();
 
 			assertThat(callback).isNotNull();
-			assertThat(callback.getToolDefinition().description()).contains("test-skill");
+			assertThat(callback.getToolDefinition().name()).isEqualTo("Skill");
+			assertThat(callback.getToolDefinition().description()).contains("\"test-skill\"");
 		}
 
 		@Test
@@ -96,7 +97,7 @@ class SkillsToolTest {
 				.build();
 
 			assertThat(callback).isNotNull();
-			assertThat(callback.getToolDefinition().description()).contains("test-skill");
+			assertThat(callback.getToolDefinition().description()).contains("\"test-skill\"");
 		}
 
 		@Test
@@ -116,8 +117,8 @@ class SkillsToolTest {
 
 			assertThat(callback).isNotNull();
 			String description = callback.getToolDefinition().description();
-			assertThat(description).contains("test-skill");
-			assertThat(description).contains("another-skill");
+			assertThat(description).contains("\"test-skill\"");
+			assertThat(description).contains("\"another-skill\"");
 		}
 
 		@Test
@@ -182,8 +183,8 @@ class SkillsToolTest {
 
 			assertThat(callback).isNotNull();
 			String description = callback.getToolDefinition().description();
-			assertThat(description).contains("test-skill");
-			assertThat(description).contains("another-skill");
+			assertThat(description).contains("\"test-skill\"");
+			assertThat(description).contains("\"another-skill\"");
 		}
 
 		@Test
@@ -196,7 +197,7 @@ class SkillsToolTest {
 
 			assertThat(callback).isNotNull();
 			String description = callback.getToolDefinition().description();
-			assertThat(description).contains("test-skill");
+			assertThat(description).contains("\"test-skill\"");
 		}
 
 	}
@@ -214,7 +215,7 @@ class SkillsToolTest {
 			ToolCallback callback = SkillsTool.builder().addSkillsResource(resource).build();
 
 			assertThat(callback).isNotNull();
-			assertThat(callback.getToolDefinition().description()).contains("pdf");
+			assertThat(callback.getToolDefinition().description()).contains("\"pdf\"");
 
 			String result = callback.call("{\"command\":\"pdf\"}");
 			assertThat(result).contains("Base directory for this skill:");
@@ -232,7 +233,7 @@ class SkillsToolTest {
 			ToolCallback callback = SkillsTool.builder().addSkillsResource(resource).build();
 
 			assertThat(callback).isNotNull();
-			assertThat(callback.getToolDefinition().description()).contains("spring-boot-skill");
+			assertThat(callback.getToolDefinition().description()).contains("\"spring-boot-skill\"");
 
 			String result = callback.call("{\"command\":\"spring-boot-skill\"}");
 			assertThat(result).contains("Base directory for this skill:");
@@ -266,17 +267,13 @@ class SkillsToolTest {
 			URL[] urls = { jar1.toUri().toURL(), jar2.toUri().toURL() };
 			try (URLClassLoader classLoader = new URLClassLoader(urls, null)) {
 
-				// Simulating what SkillsTool.builder().addSkillsResource(new
-				// ClassPathResource("META-INF/myskills")) does
-				// but we need to ensure the ClassPathResource uses our custom classloader
 				ClassPathResource resource = new ClassPathResource("META-INF/myskills", classLoader);
 
-				// This should now load both skills across JARs
 				ToolCallback callback = SkillsTool.builder().addSkillsResource(resource).build();
 
 				String description = callback.getToolDefinition().description();
-				assertThat(description).contains("skill1");
-				assertThat(description).as("Should contain skill2").contains("skill2");
+				assertThat(description).contains("\"skill1\"");
+				assertThat(description).as("Should contain skill2").contains("\"skill2\"");
 			}
 		}
 
@@ -293,6 +290,39 @@ class SkillsToolTest {
 				jos.write(content.getBytes(StandardCharsets.UTF_8));
 				jos.closeEntry();
 			}
+		}
+
+	}
+
+	@Nested
+	@DisplayName("Tool Description")
+	class ToolDescriptionTests {
+
+		@Test
+		@DisplayName("description should not use XML tags that look like tool names")
+		void descriptionShouldNotUseXmlTags(@TempDir Path tempDir) throws IOException {
+			Path skillDir = tempDir.resolve("my-skill");
+			Files.createDirectories(skillDir);
+			Files.writeString(skillDir.resolve("SKILL.md"), SKILL_MD_CONTENT, StandardCharsets.UTF_8);
+
+			ToolCallback callback = SkillsTool.builder()
+				.addSkillsDirectory(tempDir.toString())
+				.build();
+
+			String description = callback.getToolDefinition().description();
+
+			// Should NOT contain XML like <name>test-skill</name> which confuses the LLM
+			assertThat(description).doesNotContain("<name>");
+			assertThat(description).doesNotContain("</name>");
+
+			// Should contain the skill name in a command-list format
+			assertThat(description).contains("\"test-skill\"");
+
+			// Should explain how to call it
+			assertThat(description).contains("Skill({\"command\":");
+
+			// Should clarify these are NOT tool names
+			assertThat(description).contains("NOT");
 		}
 
 	}
