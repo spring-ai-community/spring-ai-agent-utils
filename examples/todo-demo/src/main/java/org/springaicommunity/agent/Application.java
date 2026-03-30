@@ -62,7 +62,7 @@ public class Application {
 
 				// Advisors
 				.defaultAdvisors(
-					ToolCallAdvisor.builder().conversationHistoryEnabled(false).build(),
+					ToolCallAdvisor.builder().disableInternalConversationHistory().build(),
 					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build()) .build())
 				.build();
 				// @formatter:on

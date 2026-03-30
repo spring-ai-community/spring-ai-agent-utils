@@ -25,6 +25,11 @@
 
 	<dependencies>
 
+		<!-- <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency> -->
+
 		<dependency>
 			<groupId>org.springaicommunity</groupId>
 			<artifactId>spring-ai-agent-utils</artifactId>

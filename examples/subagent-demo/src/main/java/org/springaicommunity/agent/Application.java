@@ -68,15 +68,15 @@ public class Application {
 				.defaultToolCallbacks(taskTools)
 
 				// skills tool
-				.defaultToolCallbacks(SkillsTool.builder().addSkillsResources(skillPaths).build())
+				// .defaultToolCallbacks(SkillsTool.builder().addSkillsResources(skillPaths).build())
 				
 				.defaultTools(
 					// task orchestration tools
-					TodoWriteTool.builder().build(),
+					// TodoWriteTool.builder().build(),
 
 					// common agentic tools
-					GlobTool.builder().build(),
-					GrepTool.builder().build(),
+					// GlobTool.builder().build(),
+					// GrepTool.builder().build(),
 					ShellTools.builder().build(),
 					FileSystemTools.builder().build(),
 

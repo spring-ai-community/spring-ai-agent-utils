@@ -35,9 +35,7 @@ public class Application {
 					.build())
 
 				.defaultAdvisors(
-					// Tool calling advisor
-					ToolCallAdvisor.builder().conversationHistoryEnabled(false).build(),
-					// Chat memory advisor - after the tool calling advisor to remember tool calls
+					ToolCallAdvisor.builder().disableInternalConversationHistory().build(),
 					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build()).build())
 
 				.build();
