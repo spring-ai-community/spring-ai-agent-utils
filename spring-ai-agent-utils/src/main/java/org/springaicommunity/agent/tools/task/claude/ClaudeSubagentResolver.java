@@ -15,6 +15,7 @@
 */
 package org.springaicommunity.agent.tools.task.claude;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -46,7 +47,10 @@ public class ClaudeSubagentResolver implements SubagentResolver {
 				"ClaudeSubagentResolver can resolve only subagents of kind: " + ClaudeSubagentDefinition.KIND);
 
 		try {
-			String uri = (subagentRef.uri().startsWith("/"))? "file:" + subagentRef.uri() : subagentRef.uri();
+			String uri = subagentRef.uri();
+			if (new File(uri).isAbsolute()) {
+				uri = "file:" + uri;
+			}
 			var resource = new DefaultResourceLoader().getResource(uri);
 			String markdown = resource.getContentAsString(StandardCharsets.UTF_8);
 			MarkdownParser parser = new MarkdownParser(markdown);
