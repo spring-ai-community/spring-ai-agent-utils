@@ -14,6 +14,44 @@ If the prompt carries no `ToolCallingChatOptions` the request is returned unchan
 
 `after()` is a passthrough. Memory persistence is driven entirely by the model via tool calls during the conversation; no post-processing is needed.
 
+## Long-term memory vs. session memory
+
+`AutoMemoryToolsAdvisor` is a **long-term memory** mechanism. It is designed to complement, not replace, Spring AI's built-in short-term conversation memory (e.g. `MessageChatMemoryAdvisor` + `MessageWindowChatMemory`). The two layers serve fundamentally different purposes and should normally be used together:
+
+| | Session memory (`MessageChatMemoryAdvisor`) | Long-term memory (`AutoMemoryToolsAdvisor`) |
+|---|---|---|
+| **Scope** | Current conversation only | Persists across conversations |
+| **Storage** | In-process (`ChatMemory`) | Files on disk via `MemoryTools` |
+| **Content** | Full message exchange — every turn | Curated facts worth keeping forever |
+| **Managed by** | Spring AI automatically | The model itself via tool calls |
+| **Expires** | When the process stops (or window fills) | Never — until the model deletes a file |
+
+A typical agent setup combines both:
+
+```java
+ChatClient chatClient = ChatClient.builder(chatModel)
+    .defaultAdvisors(
+        // Long-term memory — facts that survive across sessions
+        AutoMemoryToolsAdvisor.builder()
+            .memoriesRootDirectory("/home/user/.agent/memories")
+            .build(),
+
+        // Short-term memory — full conversation history for this session
+        MessageChatMemoryAdvisor.builder(
+            MessageWindowChatMemory.builder().maxMessages(100).build())
+            .build(),
+
+        // Tool calling
+        ToolCallAdvisor.builder().build())
+    .build();
+```
+
+In this setup the model has the best of both worlds: the full context of the current conversation via the session window, and persistent knowledge about the user and project that it accumulated over previous sessions via the memory files.
+
+**Rule of thumb:**
+- Ephemeral details — what was said in this session, in-progress task state — belong in session memory.
+- Durable facts worth having next week — user preferences, project decisions, behavioural feedback — belong in long-term memory.
+
 ## Quick Start
 
 ```java
