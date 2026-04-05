@@ -37,6 +37,9 @@
         <module>subagent-demo</module>
         <module>subagent-a2a-demo</module>
         <module>todo-demo</module>
+        <module>memory/memory-tools-demo</module>
+        <module>memory/memory-tools-advisor-demo</module>
+        <module>memory/memory-filesystem-tools-demo</module>
     </modules>
 
     <repositories>
