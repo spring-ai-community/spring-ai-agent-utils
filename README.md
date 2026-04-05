@@ -19,17 +19,22 @@ This project demonstrates how to reverse-engineer and reimplement Claude Code's 
 
 ```
 spring-ai-agent-utils/
-├── spring-ai-agent-utils-common/   # Shared subagent SPI (interfaces & records)
-├── spring-ai-agent-utils/          # Core library (tools, skills, Claude subagents)
-├── spring-ai-agent-utils-a2a/      # A2A protocol subagent implementation
-├── spring-ai-agent-utils-bom/      # Bill of Materials for version management
+├── spring-ai-agent-utils-common/        # Shared subagent SPI (interfaces & records)
+├── spring-ai-agent-utils/               # Core library (tools, advisors, skills, Claude subagents)
+├── spring-ai-agent-utils-a2a/           # A2A protocol subagent implementation
+├── spring-ai-agent-utils-bom/           # Bill of Materials for version management
 │
 └── examples/
-    ├── code-agent-demo/            # Full-featured AI coding assistant
-    ├── ask-user-question-demo/     # Interactive question-answer demo
-    ├── skills-demo/                # Focused skills system demo
-    ├── subagent-demo/              # Markdown-defined local sub-agents
-    └── subagent-a2a-demo/          # A2A protocol remote sub-agents
+    ├── code-agent-demo/                 # Full-featured AI coding assistant
+    ├── ask-user-question-demo/          # Interactive question-answer demo
+    ├── skills-demo/                     # Focused skills system demo
+    ├── subagent-demo/                   # Markdown-defined local sub-agents
+    ├── subagent-a2a-demo/               # A2A protocol remote sub-agents
+    ├── todo-demo/                       # TodoWriteTool task management demo
+    └── memory/
+        ├── memory-tools-demo/           # Long-term memory with MemoryTools (manual setup)
+        ├── memory-filesystem-tools-demo/# Long-term memory with general FileSystemTools
+        └── memory-tools-advisor-demo/   # Long-term memory via AutoMemoryToolsAdvisor
 ```
 
 ## Agentic Utils
@@ -53,6 +58,11 @@ These are the agent tools needed to implement any agentic behavior
 #### Agent Skills
 
 - **[SkillsTool](spring-ai-agent-utils/docs/SkillsTool.md)** - Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter
+
+#### Long-term memory
+
+- **[MemoryTools](spring-ai-agent-utils/docs/MemoryTools.md)** - Persistent, file-based long-term memory that survives across conversations. Agents store typed memory files (`user`, `feedback`, `project`, `reference`) in a sandboxed directory and navigate them via a `MEMORY.md` index. Requires the companion `classpath:/prompt/MEMORY_TOOLS_SYSTEM_PROMPT.md` system prompt (bundled in the jar) to instruct the agent on when and how to use the tools. Inspired by [Claude Code memory](https://code.claude.com/docs/en/memory) and the [Claude API SDK memory tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool).
+- **[AutoMemoryToolsAdvisor](spring-ai-agent-utils/docs/AutoMemoryToolsAdvisor.md)** - A `ChatClient` advisor that wires `MemoryTools` and its companion system prompt into the request pipeline automatically. Eliminates manual tool and prompt registration, deduplicates callbacks, and supports an optional `memoryConsolidationTrigger` to prompt the model to summarise and clean up memories on a schedule.
 
 #### Task orchestration & multi-agent
 
@@ -84,7 +94,7 @@ Use the BOM to manage versions consistently across all modules:
         <dependency>
             <groupId>org.springaicommunity</groupId>
             <artifactId>spring-ai-agent-utils-bom</artifactId>
-            <version>0.5.0</version>
+            <version>0.6.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -105,7 +115,7 @@ Or add the core library directly:
 <dependency>
     <groupId>org.springaicommunity</groupId>
     <artifactId>spring-ai-agent-utils</artifactId>
-    <version>0.5.0</version>
+    <version>0.6.0</version>
 </dependency>
 ```
 
@@ -222,6 +232,9 @@ mvn spring-boot:run
 | [subagent-a2a-demo](examples/subagent-a2a-demo) | A2A protocol integration for delegating tasks to remote agents |
 | [skills-demo](examples/skills-demo) | SkillsTool system with custom skill development and the ai-tuto example |
 | [ask-user-question-demo](examples/ask-user-question-demo) | Interactive agent-user communication with `AskUserQuestionTool` |
+| [memory/memory-tools-demo](examples/memory/memory-tools-demo) | Long-term memory across conversations using dedicated, sandboxed `MemoryTools` (manual setup) |
+| [memory/memory-filesystem-tools-demo](examples/memory/memory-filesystem-tools-demo) | Long-term memory using general-purpose `FileSystemTools` — no dedicated memory tooling required |
+| [memory/memory-tools-advisor-demo](examples/memory/memory-tools-advisor-demo) | Long-term memory via `AutoMemoryToolsAdvisor` — advisor-based setup with consolidation trigger |
 
 See [examples/README.md](examples/README.md) for setup and usage details.
 
