@@ -1,0 +1,107 @@
+site_name: Spring AI Agent Utils
+site_url: https://spring-ai-community.github.io/spring-ai-agent-utils/
+site_description: Claude Code-inspired tools and agent skills for Spring AI applications
+repo_url: https://github.com/spring-ai-community/spring-ai-agent-utils
+repo_name: spring-ai-community/spring-ai-agent-utils
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  logo: images/logo.png
+  favicon: images/logo.png
+  palette:
+    - scheme: default
+      primary: green
+      accent: light green
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: green
+      accent: light green
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - navigation.path
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+
+nav:
+  - Home: index.md
+  - Common Tools:
+    - Agent Environment: tools/AgentEnvironment.md
+    - File System: tools/FileSystemTools.md
+    - Shell: tools/ShellTools.md
+    - Grep: tools/GrepTool.md
+    - Glob: tools/GlobTool.md
+    - Smart Web Fetch: tools/SmartWebFetchTool.md
+    - Brave Web Search: tools/BraveWebSearchTool.md
+  - Ask User Question:
+    - Ask User Question Tool: tools/AskUserQuestionTool.md
+  - Todo orchestration:
+    - Todo Write Tool:  tools/TodoWriteTool.md
+  - Agent Skills:
+    - Skills Tool: tools/SkillsTool.md    
+  - Memory:
+    - AutoMemoryTools: tools/AutoMemoryTools.md
+    - AutoMemoryToolsAdvisor: tools/AutoMemoryToolsAdvisor.md
+  - Multi-Agent:
+    - Task Tools: tools/TaskTools.md
+    - Subagent Framework: tools/Subagent.md
+  - Migration:
+    - 0.4.x to 0.5.0: tools/migration-0.5.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.mark
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.tilde
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+extra:
+  version:
+    provider: mike
+    default:
+      - latest-snapshot
+      - latest
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/spring-ai-community/spring-ai-agent-utils
+  generator: false
+
+plugins:
+  - search

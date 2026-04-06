@@ -17,7 +17,7 @@ Add `spring-ai-agent-utils-common` as a transitive dependency (pulled in automat
 <dependency>
     <groupId>org.springaicommunity</groupId>
     <artifactId>spring-ai-agent-utils-a2a</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>0.5.0-SNAPSHOT</version>
 </dependency>
 ```
 
