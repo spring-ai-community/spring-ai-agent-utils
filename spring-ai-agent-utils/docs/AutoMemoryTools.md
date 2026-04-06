@@ -1,10 +1,10 @@
-# MemoryTools
+# AutoMemoryTools
 
 A persistent, file-based **long-term memory** toolkit for AI agents. Complements the built-in session/conversation history by giving agents a durable store that survives across conversations — user preferences, project context, behavioral feedback, and external references — organized in a dedicated memories directory.
 
 ## Long-term memory vs. conversation history
 
-| | Conversation history | MemoryTools (long-term memory) |
+| | Conversation history | AutoMemoryTools (long-term memory) |
 |---|---|---|
 | **Scope** | Current session only | Persists across sessions |
 | **Storage** | In-process (RAM / `ChatMemory`) | Files on disk |
@@ -12,7 +12,7 @@ A persistent, file-based **long-term memory** toolkit for AI agents. Complements
 | **Size** | Bounded by context window | Grows over time; agent loads selectively |
 | **Managed by** | Spring AI `ChatMemory` / advisors | Agent via tool calls |
 
-Use conversation history for the short-term working context of the current task. Use `MemoryTools` for facts that should still be available in the next conversation, next week, or next month — things the agent would otherwise have to re-learn from scratch every time.
+Use conversation history for the short-term working context of the current task. Use `AutoMemoryTools` for facts that should still be available in the next conversation, next week, or next month — things the agent would otherwise have to re-learn from scratch every time.
 
 **Features:**
 - Six targeted tools covering the full memory lifecycle (view, create, edit, insert, delete, rename)
@@ -26,12 +26,12 @@ Use conversation history for the short-term working context of the current task.
 ## Quick Start
 
 ```java
-MemoryTools memoryTools = MemoryTools.builder()
+AutoMemoryTools memoryTools = AutoMemoryTools.builder()
     .memoriesDir("/path/to/memory")
     .build();
 
 ChatClient chatClient = chatClientBuilder
-    .defaultSystem(systemPrompt)            // include MEMORY_TOOLS_SYSTEM_PROMPT.md
+    .defaultSystem(systemPrompt)            // include AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md
     .defaultTools(memoryTools)
     .defaultAdvisors(ToolCallAdvisor.builder().build())
     .build();
@@ -40,7 +40,7 @@ ChatClient chatClient = chatClientBuilder
 Load the companion system prompt from the classpath (available inside the `spring-ai-agent-utils` jar):
 
 ```java
-@Value("classpath:/prompt/MEMORY_TOOLS_SYSTEM_PROMPT.md")
+@Value("classpath:/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md")
 Resource memorySystemPrompt;
 
 // Inject the memories root path into the prompt template
@@ -281,7 +281,7 @@ memoryTools.memoryRename("old_project.md", "archived/old_project.md");
 ## Builder Configuration
 
 ```java
-MemoryTools tools = MemoryTools.builder()
+AutoMemoryTools tools = AutoMemoryTools.builder()
     .memoriesDir("/path/to/memory")   // Path or String; default: /memories
     .build();
 ```
@@ -304,9 +304,9 @@ The check uses `Path.isAbsolute()` before resolving, then verifies that the norm
 
 ## System Prompt
 
-The companion system prompt `MEMORY_TOOLS_SYSTEM_PROMPT.md` is bundled in the jar at `classpath:/prompt/MEMORY_TOOLS_SYSTEM_PROMPT.md`. Include it alongside your main system prompt to instruct the agent on:
+The companion system prompt `AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md` is bundled in the jar at `classpath:/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md`. Include it alongside your main system prompt to instruct the agent on:
 
-- The distinction between long-term memory (MemoryTools) and the current session's conversation history — only facts worth keeping across conversations belong in memory files
+- The distinction between long-term memory (AutoMemoryTools) and the current session's conversation history — only facts worth keeping across conversations belong in memory files
 - When and how to read, save, update, and delete memories
 - The two-step save workflow
 - The four memory types and their purposes
@@ -325,24 +325,24 @@ chatClientBuilder.defaultSystem(p -> p
 
 See [memory-tools-demo](../../../examples/memory/memory-tools-demo) for a complete working example. It demonstrates:
 
-- Combining `MAIN_AGENT_SYSTEM_PROMPT_V2.md` and `MEMORY_TOOLS_SYSTEM_PROMPT.md`
-- Configuring `MemoryTools` with a path from `application.properties`
+- Combining `MAIN_AGENT_SYSTEM_PROMPT_V2.md` and `AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md`
+- Configuring `AutoMemoryTools` with a path from `application.properties`
 - Using `ToolCallAdvisor` for recursive tool calling
 - A console chat loop that builds up memory across turns
 
 ## Inspiration
 
-`MemoryTools` is a Spring AI implementation of the memory patterns pioneered by Anthropic:
+`AutoMemoryTools` is a Spring AI implementation of the memory patterns pioneered by Anthropic:
 
 - **[Claude Code — Memory](https://code.claude.com/docs/en/memory)** — describes how Claude Code uses a file-based memory system (`MEMORY.md` index, typed memory files, two-step save workflow) to persist knowledge across coding sessions. The file conventions, memory types (`user`, `feedback`, `project`, `reference`), and `MEMORY.md` index pattern in this library are directly inspired by that design.
 
-- **[Claude API SDK — Memory Tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool)** — the official Anthropic memory tool specification that defines the six memory operations (`view`, `create`, `str_replace`, `insert`, `delete`, `rename`) and the sandboxed `/memories` directory model. Each `MemoryTools` method maps one-to-one to an operation in that spec.
+- **[Claude API SDK — Memory Tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool)** — the official Anthropic memory tool specification that defines the six memory operations (`view`, `create`, `str_replace`, `insert`, `delete`, `rename`) and the sandboxed `/memories` directory model. Each `AutoMemoryTools` method maps one-to-one to an operation in that spec.
 
-`MemoryTools` brings both designs to any Spring AI application regardless of the underlying model provider.
+`AutoMemoryTools` brings both designs to any Spring AI application regardless of the underlying model provider.
 
 ## See Also
 
-- [Claude Code — Memory](https://code.claude.com/docs/en/memory) — the file-based memory system this library is modelled after
+- [Claude Code — Auto-Memory](https://code.claude.com/docs/en/memory#auto-memory) — the file-based memory system this library is modelled after
 - [Claude API SDK — Memory Tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool) — the official tool specification
 - [FileSystemTools](FileSystemTools.md) — general-purpose file read/write/edit (not scoped to a sandbox)
 - [TodoWriteTool](TodoWriteTool.md) — task tracking within a single conversation

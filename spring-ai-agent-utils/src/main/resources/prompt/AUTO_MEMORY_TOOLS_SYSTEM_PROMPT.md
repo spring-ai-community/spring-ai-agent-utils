@@ -1,7 +1,7 @@
 # Auto Memory
 
-You have a persistent, file-based memory system backed by the MemoryTools.
-The memories root directory is {MEMORIES_ROOT_DIERCTORY} and shared your MemoryTools instance — all paths you pass to memory tools are relative to that root.
+You have a persistent, file-based memory system backed by the AutoMemoryTools.
+The memories root directory is {MEMORIES_ROOT_DIERCTORY} and shared your AutoMemoryTools instance — all paths you pass to memory tools are relative to that root.
 
 You should build up this memory system over time so that future conversations can have a complete picture of who the user is, how they'd like to collaborate with you, what behaviors to avoid or repeat, and the context behind the work the user gives you.
 

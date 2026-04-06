@@ -39,7 +39,7 @@ public class Application {
 			@Value("${agent.model:Unknown}") String agentModel,
 			@Value("${agent.model.knowledge.cutoff:Unknown}") String agentModelKnowledgeCutoff,
 			@Value("classpath:/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md") Resource systemPrompt,
-			@Value("classpath:/prompt/MEMORY_FILESYSTEM_TOOLS_SYSTEM_PROMPT.md") Resource memorySystemPrompt,
+			@Value("classpath:/prompt/AUTO_MEMORY_FILESYSTEM_TOOLS_SYSTEM_PROMPT.md") Resource memorySystemPrompt,
 			@Value("${agent.memory.dir}") String memoryDir) throws IOException {
 
 		return args -> {

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Scanner;
 
-import org.springaicommunity.agent.tools.MemoryTools;
+import org.springaicommunity.agent.tools.AutoMemoryTools;
 import org.springaicommunity.agent.tools.TodoWriteTool;
 import org.springaicommunity.agent.utils.AgentEnvironment;
 
@@ -38,7 +38,7 @@ public class Application {
 			@Value("${agent.model:Unknown}") String agentModel,
 			@Value("${agent.model.knowledge.cutoff:Unknown}") String agentModelKnowledgeCutoff,
 			@Value("classpath:/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md") Resource systemPrompt,
-			@Value("classpath:/prompt/MEMORY_TOOLS_SYSTEM_PROMPT.md") Resource memorySystemPrompt,
+			@Value("classpath:/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md") Resource memorySystemPrompt,
 			@Value("${agent.memory.dir}") String memoryDir) throws IOException {
 
 		return args -> {
@@ -56,7 +56,7 @@ public class Application {
 
 				// Built-in tools
 				.defaultTools(
-					MemoryTools.builder().memoriesDir(memoryDir).build(),
+					AutoMemoryTools.builder().memoriesDir(memoryDir).build(),
 					TodoWriteTool.builder().build()
 				)
 				

@@ -30,21 +30,21 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link MemoryTools}.
+ * Tests for {@link AutoMemoryTools}.
  *
  * @author Christian Tzolov
  */
-@DisplayName("MemoryTools Tests")
-class MemoryToolsTest {
+@DisplayName("AutoMemoryTools Tests")
+class AutoMemoryToolsTest {
 
 	@TempDir
 	Path tempDir;
 
-	private MemoryTools tools;
+	private AutoMemoryTools tools;
 
 	@BeforeEach
 	void setUp() {
-		tools = MemoryTools.builder().memoriesDir(tempDir).build();
+		tools = AutoMemoryTools.builder().memoriesDir(tempDir).build();
 	}
 
 	// -------------------------------------------------------------------------
@@ -352,7 +352,7 @@ class MemoryToolsTest {
 		@DisplayName("Auto-creates memories directory on build()")
 		void autoCreatesDir(@TempDir Path base) {
 			Path newDir = base.resolve("memories");
-			MemoryTools.builder().memoriesDir(newDir).build();
+			AutoMemoryTools.builder().memoriesDir(newDir).build();
 			assertThat(newDir).isDirectory();
 		}
 
@@ -360,7 +360,7 @@ class MemoryToolsTest {
 		@DisplayName("Accepts string path")
 		void acceptsStringPath(@TempDir Path base) {
 			Path newDir = base.resolve("str-mem");
-			MemoryTools t = MemoryTools.builder().memoriesDir(newDir.toString()).build();
+			AutoMemoryTools t = AutoMemoryTools.builder().memoriesDir(newDir.toString()).build();
 			assertThat(t.getMemoriesDir()).isEqualTo(newDir.normalize());
 		}
 
@@ -371,7 +371,7 @@ class MemoryToolsTest {
 			Files.createDirectory(sub);
 			// Pass a non-normalized path using ".."
 			Path nonNormalized = sub.resolve("../a");
-			MemoryTools t = MemoryTools.builder().memoriesDir(nonNormalized).build();
+			AutoMemoryTools t = AutoMemoryTools.builder().memoriesDir(nonNormalized).build();
 			assertThat(t.getMemoriesDir()).isEqualTo(sub.normalize());
 		}
 
@@ -382,15 +382,15 @@ class MemoryToolsTest {
 	// -------------------------------------------------------------------------
 
 	@Nested
-	@DisplayName("MEMORY_TOOLS_SYSTEM_PROMPT.md")
+	@DisplayName("AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md")
 	class SystemPromptTests {
 
 		private String prompt;
 
 		@BeforeEach
 		void loadPrompt() throws IOException {
-			try (InputStream in = getClass().getResourceAsStream("/prompt/MEMORY_TOOLS_SYSTEM_PROMPT.md")) {
-				assertThat(in).as("MEMORY_TOOLS_SYSTEM_PROMPT.md must exist on classpath").isNotNull();
+			try (InputStream in = getClass().getResourceAsStream("/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md")) {
+				assertThat(in).as("AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md must exist on classpath").isNotNull();
 				prompt = new String(in.readAllBytes(), StandardCharsets.UTF_8);
 			}
 		}

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
-import org.springaicommunity.agent.tools.MemoryTools;
+import org.springaicommunity.agent.tools.AutoMemoryTools;
 
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
@@ -46,7 +46,7 @@ import org.springframework.util.Assert;
 public class AutoMemoryToolsAdvisor implements BaseChatMemoryAdvisor {
 
 	private static final Resource DEFAULT_MEMORY_SYSTEM_PROMPT = new DefaultResourceLoader()
-		.getResource("classpath:/prompt/MEMORY_TOOLS_SYSTEM_PROMPT.md");
+		.getResource("classpath:/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md");
 
 	private final int order;
 
@@ -156,7 +156,7 @@ public class AutoMemoryToolsAdvisor implements BaseChatMemoryAdvisor {
 			Assert.hasText(this.memoriesRootDirectory, "Memories root directory must not be empty");
 
 			List<ToolCallback> memoryToolCallbacks = Arrays.asList(MethodToolCallbackProvider.builder()
-				.toolObjects(MemoryTools.builder().memoriesDir(this.memoriesRootDirectory).build())
+				.toolObjects(AutoMemoryTools.builder().memoriesDir(this.memoriesRootDirectory).build())
 				.build()
 				.getToolCallbacks());
 

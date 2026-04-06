@@ -1,6 +1,6 @@
 # Memory Tools Demo
 
-Demonstrates **long-term memory** for AI agents using `MemoryTools` with Spring AI. The agent remembers facts about the user, project context, and behavioral feedback across independent conversations — information that would otherwise be lost when the session ends.
+Demonstrates **long-term memory** for AI agents using `AutoMemoryTools` with Spring AI. The agent remembers facts about the user, project context, and behavioral feedback across independent conversations — information that would otherwise be lost when the session ends.
 
 ## Overview
 
@@ -15,7 +15,7 @@ Session 1:                          Session 2 (new JVM process):
 
 This is **long-term memory** sitting alongside the session's conversation history:
 
-| | Conversation history | MemoryTools (long-term) |
+| | Conversation history | AutoMemoryTools (long-term) |
 |---|---|---|
 | Scope | Current session | Persists across sessions |
 | Storage | In-process (`ChatMemory`) | Files on disk |
@@ -62,20 +62,20 @@ ASSISTANT> You're Alice, a backend engineer. You prefer short answers.
 ```
 memory-tools-demo/
 ├── src/main/java/org/springaicommunity/agent/
-│   ├── Application.java          # Main app, wires MemoryTools + chat loop
+│   ├── Application.java          # Main app, wires AutoMemoryTools + chat loop
 │   └── MyLoggingAdvisor.java     # Logs tool calls and responses to stdout
 ├── src/main/resources/
 │   └── application.properties    # Model and memory directory configuration
 ```
 
-The `classpath:/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md` and `classpath:/prompt/MEMORY_TOOLS_SYSTEM_PROMPT.md` prompts are loaded from the `spring-ai-agent-utils` dependency jar — no local copies needed.
+The `classpath:/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md` and `classpath:/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md` prompts are loaded from the `spring-ai-agent-utils` dependency jar — no local copies needed.
 
 ## How It Works
 
 ### Application Wiring
 
 ```java
-MemoryTools memoryTools = MemoryTools.builder()
+AutoMemoryTools memoryTools = AutoMemoryTools.builder()
     .memoriesDir(memoryDir)          // from application.properties
     .build();
 
@@ -177,7 +177,7 @@ agent.model.knowledge.cutoff=2025-08-07
 
 ## Related Documentation
 
-- [MemoryTools Documentation](../../spring-ai-agent-utils/docs/MemoryTools.md) — full API reference, security model, and system prompt guide
+- [AutoMemoryTools Documentation](../../spring-ai-agent-utils/docs/AutoMemoryTools.md) — full API reference, security model, and system prompt guide
 - [Claude Code — Memory](https://code.claude.com/docs/en/memory) — the file-based memory pattern this demo implements
 - [Claude API SDK — Memory Tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool) — the tool specification the operations are modelled after
 - [TodoWriteTool Documentation](../../spring-ai-agent-utils/docs/TodoWriteTool.md) — the other tool included in this demo

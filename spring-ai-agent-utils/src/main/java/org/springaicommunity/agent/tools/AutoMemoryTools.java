@@ -37,11 +37,11 @@ import org.springframework.util.StringUtils;
  *
  * @author Christian Tzolov
  */
-public class MemoryTools {
+public class AutoMemoryTools {
 
 	private final Path memoriesDir;
 
-	protected MemoryTools(Path memoriesDir) {
+	protected AutoMemoryTools(Path memoriesDir) {
 		Assert.notNull(memoriesDir, "memoriesDir must not be null");
 		this.memoriesDir = memoriesDir.normalize();
 	}
@@ -575,14 +575,14 @@ public class MemoryTools {
 			return this;
 		}
 
-		public MemoryTools build() {
+		public AutoMemoryTools build() {
 			try {
 				Files.createDirectories(memoriesDir);
 			}
 			catch (IOException e) {
 				throw new IllegalStateException("Failed to create memories directory: " + memoriesDir, e);
 			}
-			return new MemoryTools(memoriesDir);
+			return new AutoMemoryTools(memoriesDir);
 		}
 
 	}

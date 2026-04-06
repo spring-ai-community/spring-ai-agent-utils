@@ -1,13 +1,13 @@
-# AutoMemoryToolsAdvisor
+# AutoAutoMemoryToolsAdvisor
 
-A Spring AI `ChatClient` advisor that gives any agent **automatic long-term memory** by wiring [`MemoryTools`](MemoryTools.md) and its companion system prompt into the request pipeline as a single, self-contained unit.
+A Spring AI `ChatClient` advisor that gives any agent **automatic long-term memory** by wiring [`AutoMemoryTools`](AutoMemoryTools.md) and its companion system prompt into the request pipeline as a single, self-contained unit.
 
 ## What it does
 
 On every `before()` call the advisor:
 
-1. **Augments the system message** — appends `MEMORY_TOOLS_SYSTEM_PROMPT.md` (with the configured memories root path rendered in) to whatever system message is already present.
-2. **Injects the six `MemoryTools`** — registers `MemoryView`, `MemoryCreate`, `MemoryStrReplace`, `MemoryInsert`, `MemoryDelete`, and `MemoryRename` into the prompt's `ToolCallingChatOptions`. Existing callbacks with the same name are never duplicated.
+1. **Augments the system message** — appends `AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md` (with the configured memories root path rendered in) to whatever system message is already present.
+2. **Injects the six `AutoMemoryTools`** — registers `MemoryView`, `MemoryCreate`, `MemoryStrReplace`, `MemoryInsert`, `MemoryDelete`, and `MemoryRename` into the prompt's `ToolCallingChatOptions`. Existing callbacks with the same name are never duplicated.
 3. **Optionally appends a consolidation reminder** — if the configurable `memoryConsolidationTrigger` predicate returns `true`, a `<system-reminder>` block is appended to the system message instructing the model to summarise and remove redundant memories.
 
 If the prompt carries no `ToolCallingChatOptions` the request is returned unchanged — both the tool injection and the system prompt augmentation are skipped.
@@ -16,12 +16,12 @@ If the prompt carries no `ToolCallingChatOptions` the request is returned unchan
 
 ## Long-term memory vs. session memory
 
-`AutoMemoryToolsAdvisor` is a **long-term memory** mechanism. It is designed to complement, not replace, Spring AI's built-in short-term conversation memory (e.g. `MessageChatMemoryAdvisor` + `MessageWindowChatMemory`). The two layers serve fundamentally different purposes and should normally be used together:
+`AutoAutoMemoryToolsAdvisor` is a **long-term memory** mechanism. It is designed to complement, not replace, Spring AI's built-in short-term conversation memory (e.g. `MessageChatMemoryAdvisor` + `MessageWindowChatMemory`). The two layers serve fundamentally different purposes and should normally be used together:
 
-| | Session memory (`MessageChatMemoryAdvisor`) | Long-term memory (`AutoMemoryToolsAdvisor`) |
+| | Session memory (`MessageChatMemoryAdvisor`) | Long-term memory (`AutoAutoMemoryToolsAdvisor`) |
 |---|---|---|
 | **Scope** | Current conversation only | Persists across conversations |
-| **Storage** | In-process (`ChatMemory`) | Files on disk via `MemoryTools` |
+| **Storage** | In-process (`ChatMemory`) | Files on disk via `AutoMemoryTools` |
 | **Content** | Full message exchange — every turn | Curated facts worth keeping forever |
 | **Managed by** | Spring AI automatically | The model itself via tool calls |
 | **Expires** | When the process stops (or window fills) | Never — until the model deletes a file |
@@ -32,7 +32,7 @@ A typical agent setup combines both:
 ChatClient chatClient = ChatClient.builder(chatModel)
     .defaultAdvisors(
         // Long-term memory — facts that survive across sessions
-        AutoMemoryToolsAdvisor.builder()
+        AutoAutoMemoryToolsAdvisor.builder()
             .memoriesRootDirectory("/home/user/.agent/memories")
             .build(),
 
@@ -55,7 +55,7 @@ In this setup the model has the best of both worlds: the full context of the cur
 ## Quick Start
 
 ```java
-AutoMemoryToolsAdvisor memoryAdvisor = AutoMemoryToolsAdvisor.builder()
+AutoAutoMemoryToolsAdvisor memoryAdvisor = AutoAutoMemoryToolsAdvisor.builder()
     .memoriesRootDirectory("/home/user/.agent/memories")
     .build();
 
@@ -69,7 +69,7 @@ That's all. On the first turn the model reads `MEMORY.md` via `MemoryView`, load
 ## Builder Configuration
 
 ```java
-AutoMemoryToolsAdvisor advisor = AutoMemoryToolsAdvisor.builder()
+AutoAutoMemoryToolsAdvisor advisor = AutoAutoMemoryToolsAdvisor.builder()
     .memoriesRootDirectory("/path/to/memories")          // required
     .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200)         // optional
     .memorySystemPrompt(customPromptResource)            // optional
@@ -81,7 +81,7 @@ AutoMemoryToolsAdvisor advisor = AutoMemoryToolsAdvisor.builder()
 |---|---|---|---|
 | `memoriesRootDirectory(String)` | `String` | — (**required**) | Root directory for all memory files. Created automatically if absent. |
 | `order(int)` | `int` | `HIGHEST_PRECEDENCE + 200` | Advisor order. Runs before the default `ToolCallingAdvisor` at `+300`. |
-| `memorySystemPrompt(Resource)` | `Resource` | `classpath:/prompt/MEMORY_TOOLS_SYSTEM_PROMPT.md` | Prompt template to inject. Must contain the `{MEMORIES_ROOT_DIERCTORY}` placeholder. |
+| `memorySystemPrompt(Resource)` | `Resource` | `classpath:/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md` | Prompt template to inject. Must contain the `{MEMORIES_ROOT_DIERCTORY}` placeholder. |
 | `memoryConsolidationTrigger(BiPredicate<ChatClientRequest, Instant>)` | `BiPredicate` | `(req, t) -> false` | Evaluated on each request. When `true`, a consolidation reminder is appended to the system message. |
 
 ### Validation
@@ -96,7 +96,7 @@ Over time the memory store can accumulate redundant or outdated entries. The `me
 
 ```java
 // Trigger consolidation roughly every 20 requests (stateless approximation)
-AutoMemoryToolsAdvisor advisor = AutoMemoryToolsAdvisor.builder()
+AutoAutoMemoryToolsAdvisor advisor = AutoAutoMemoryToolsAdvisor.builder()
     .memoriesRootDirectory("/path/to/memories")
     .memoryConsolidationTrigger((req, instant) ->
         Math.random() < 0.05)   // ~5 % of requests
@@ -141,9 +141,9 @@ The default order `BaseAdvisor.HIGHEST_PRECEDENCE + 200` places this advisor **b
 
 If you use other advisors that also modify tool options (e.g. additional `ToolCallingAdvisor` instances), verify that their relative order does not prevent the memory tools from reaching the model.
 
-## Relation to MemoryTools
+## Relation to AutoMemoryTools
 
-`AutoMemoryToolsAdvisor` is a thin orchestration layer. The six memory operations, sandboxing logic, and file conventions all live in [`MemoryTools`](MemoryTools.md). The advisor adds:
+`AutoMemoryToolsAdvisor` is a thin orchestration layer. The six memory operations, sandboxing logic, and file conventions all live in [`AutoMemoryTools`](AutoMemoryTools.md). The advisor adds:
 
 - Automatic system prompt injection (no need to configure the prompt separately on the `ChatClient`)
 - Automatic tool registration (no need to call `.defaultTools(memoryTools)`)
@@ -152,11 +152,11 @@ If you use other advisors that also modify tool options (e.g. additional `ToolCa
 
 ### Manual setup vs. advisor
 
-If you need full control over when and how the system prompt and tools are applied, you can wire `MemoryTools` directly without the advisor:
+If you need full control over when and how the system prompt and tools are applied, you can wire `AutoMemoryTools` directly without the advisor:
 
 ```java
 // Manual setup
-MemoryTools memoryTools = MemoryTools.builder()
+AutoMemoryTools memoryTools = AutoMemoryTools.builder()
     .memoriesDir("/path/to/memories")
     .build();
 
@@ -172,7 +172,7 @@ ChatClient chatClient = ChatClient.builder(chatModel)
 // Advisor setup — equivalent, less boilerplate
 ChatClient chatClient = ChatClient.builder(chatModel)
     .defaultAdvisors(
-        AutoMemoryToolsAdvisor.builder()
+        AutoAutoMemoryToolsAdvisor.builder()
             .memoriesRootDirectory("/path/to/memories")
             .build(),
         ToolCallAdvisor.builder().build())
@@ -181,7 +181,7 @@ ChatClient chatClient = ChatClient.builder(chatModel)
 
 ## System Prompt
 
-The default companion prompt (`MEMORY_TOOLS_SYSTEM_PROMPT.md`) is bundled in the jar at `classpath:/prompt/MEMORY_TOOLS_SYSTEM_PROMPT.md`. It instructs the model to:
+The default companion prompt (`AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md`) is bundled in the jar at `classpath:/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md`. It instructs the model to:
 
 - Read `MEMORY.md` at the start of sessions where prior context may be relevant
 - Use the two-step save workflow (`MemoryCreate` → `MemoryInsert` into `MEMORY.md`)
@@ -197,7 +197,7 @@ To use a custom prompt, provide any `Resource` that contains the same placeholde
 @Value("classpath:/my-custom-memory-prompt.md")
 Resource customPrompt;
 
-AutoMemoryToolsAdvisor.builder()
+AutoAutoMemoryToolsAdvisor.builder()
     .memoriesRootDirectory("/path/to/memories")
     .memorySystemPrompt(customPrompt)
     .build();
@@ -205,11 +205,11 @@ AutoMemoryToolsAdvisor.builder()
 
 ## Demo Application
 
-See [`memory-tools-advisor-demo`](../../../examples/memory/memory-tools-advisor-demo/README.md) for a complete runnable example showing `AutoMemoryToolsAdvisor` combined with `ToolCallAdvisor`, `MessageChatMemoryAdvisor`, and a custom logging advisor.
+See [`memory-tools-advisor-demo`](../../../examples/memory/memory-tools-advisor-demo/README.md) for a complete runnable example showing `AutoAutoMemoryToolsAdvisor` combined with `ToolCallAdvisor`, `MessageChatMemoryAdvisor`, and a custom logging advisor.
 
 ## See Also
 
-- [MemoryTools](MemoryTools.md) — the underlying tool implementations, file conventions, and security model
+- [AutoMemoryTools](AutoMemoryTools.md) — the underlying tool implementations, file conventions, and security model
 - [FileSystemTools](FileSystemTools.md) — general-purpose file read/write/edit (not sandboxed)
 - [Claude Code — Memory](https://code.claude.com/docs/en/memory) — the file-based memory design this library is modelled after
 - [Claude API SDK — Memory Tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool) — the official tool specification

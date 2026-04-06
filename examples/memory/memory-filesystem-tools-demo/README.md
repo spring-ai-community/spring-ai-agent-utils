@@ -8,14 +8,14 @@ Both demos implement the same long-term memory concept: typed memory files, a `M
 
 | | [memory-tools-demo](../../memory/memory-tools-demo) | **This demo** |
 |---|---|---|
-| **Tools** | Dedicated `MemoryTools` (6 purpose-built operations) | General-purpose `FileSystemTools` + `ShellTools` |
+| **Tools** | Dedicated `AutoMemoryTools` (6 purpose-built operations) | General-purpose `FileSystemTools` + `ShellTools` |
 | **Path model** | Relative paths, sandboxed to the memories root | Absolute paths, full filesystem access |
 | **Safety** | Built-in traversal guard, absolute path rejection | No sandbox — agent is trusted to stay in the memory dir |
-| **Memory dir** | Configured in `MemoryTools.builder()` | Injected into the system prompt as `{MEMORIES_ROOT_DIERCTORY}` |
+| **Memory dir** | Configured in `AutoMemoryTools.builder()` | Injected into the system prompt as `{MEMORIES_ROOT_DIERCTORY}` |
 | **Inspiration** | [Claude API SDK Memory Tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool) | [Claude Code auto memory](https://code.claude.com/docs/en/memory) |
 
 **When to choose this approach:**
-- The agent already has `FileSystemTools` / `ShellTools` for other tasks and you don't want to add a dependency on `MemoryTools`
+- The agent already has `FileSystemTools` / `ShellTools` for other tasks and you don't want to add a dependency on `AutoMemoryTools`
 - You want the agent to have full filesystem access alongside memory (e.g. read source files, then write memories about them)
 - You're following the Claude Code pattern directly
 
@@ -25,7 +25,7 @@ Both demos implement the same long-term memory concept: typed memory files, a `M
 
 ## Overview
 
-The agent manages memory using the same `Read`, `Write`, and `Edit` operations it uses for any other file work. The system prompt (`MEMORY_FILESYSTEM_TOOLS_SYSTEM_PROMPT.md`) tells it where to store memories and how to structure them. No special memory tooling is required.
+The agent manages memory using the same `Read`, `Write`, and `Edit` operations it uses for any other file work. The system prompt (`AUTO_MEMORY_FILESYSTEM_TOOLS_SYSTEM_PROMPT.md`) tells it where to store memories and how to structure them. No special memory tooling is required.
 
 ```
 Session 1:                              Session 2 (new JVM process):
@@ -83,15 +83,13 @@ memory-filesystem-tools-demo/
 │   └── MyLoggingAdvisor.java                     # Logs tool calls and responses to stdout
 ├── src/main/resources/
 │   ├── application.properties                    # Model configuration
-│   └── prompt/
-│       └── MEMORY_FILESYSTEM_TOOLS_SYSTEM_PROMPT.md  # Memory behaviour instructions
 └── target/
     └── memory/                                   # Memory files written here at runtime
         ├── MEMORY.md                             # Index of all memory entries
         └── user_profile.md                       # Example: user type memory
 ```
 
-The `classpath:/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md` prompt is loaded from the `spring-ai-agent-utils` dependency jar. `MEMORY_FILESYSTEM_TOOLS_SYSTEM_PROMPT.md` lives locally in this demo.
+The `classpath:/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md` prompt is loaded from the `spring-ai-agent-utils` dependency jar. `AUTO_MEMORY_FILESYSTEM_TOOLS_SYSTEM_PROMPT.md` lives locally in this demo.
 
 ## How It Works
 
@@ -147,7 +145,7 @@ On the next session the agent calls `Read` on `MEMORY.md` to load the index, the
 
 ### System Prompt Role
 
-All memory behaviour — when to save, how to structure files, how to maintain `MEMORY.md`, what not to save — is driven entirely by `MEMORY_FILESYSTEM_TOOLS_SYSTEM_PROMPT.md`. There are no dedicated tool semantics to fall back on. The prompt is the only guardrail.
+All memory behaviour — when to save, how to structure files, how to maintain `MEMORY.md`, what not to save — is driven entirely by `AUTO_MEMORY_FILESYSTEM_TOOLS_SYSTEM_PROMPT.md`. There are no dedicated tool semantics to fall back on. The prompt is the only guardrail.
 
 ## Configuration
 
@@ -190,8 +188,8 @@ agent.model.knowledge.cutoff=2025-08-07
 
 ## Related Documentation
 
-- [memory-tools-demo](../../memorymemory-tools-demo) — same pattern with dedicated, sandboxed `MemoryTools`
-- [MemoryTools Documentation](../../spring-ai-agent-utils/docs/MemoryTools.md) — full reference for the dedicated tool alternative
+- [memory-tools-demo](../../memorymemory-tools-demo) — same pattern with dedicated, sandboxed `AutoMemoryTools`
+- [AutoMemoryTools Documentation](../../spring-ai-agent-utils/docs/AutoMemoryTools.md) — full reference for the dedicated tool alternative
 - [FileSystemTools Documentation](../../spring-ai-agent-utils/docs/FileSystemTools.md) — the tools used in this demo
 - [Claude Code — Memory](https://code.claude.com/docs/en/memory) — the pattern this demo directly follows
 - [Claude API SDK — Memory Tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool) — the dedicated tool specification
