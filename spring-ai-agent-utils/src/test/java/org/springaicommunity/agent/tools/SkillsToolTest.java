@@ -17,6 +17,8 @@ package org.springaicommunity.agent.tools;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -79,7 +81,8 @@ class SkillsToolTest {
 				.build();
 
 			assertThat(callback).isNotNull();
-			assertThat(callback.getToolDefinition().description()).contains("test-skill");
+			assertThat(callback.getToolDefinition().name()).isEqualTo("Skill");
+			assertThat(callback.getToolDefinition().description()).contains("\"test-skill\"");
 		}
 
 		@Test
@@ -94,7 +97,7 @@ class SkillsToolTest {
 				.build();
 
 			assertThat(callback).isNotNull();
-			assertThat(callback.getToolDefinition().description()).contains("test-skill");
+			assertThat(callback.getToolDefinition().description()).contains("\"test-skill\"");
 		}
 
 		@Test
@@ -114,8 +117,8 @@ class SkillsToolTest {
 
 			assertThat(callback).isNotNull();
 			String description = callback.getToolDefinition().description();
-			assertThat(description).contains("test-skill");
-			assertThat(description).contains("another-skill");
+			assertThat(description).contains("\"test-skill\"");
+			assertThat(description).contains("\"another-skill\"");
 		}
 
 		@Test
@@ -180,8 +183,8 @@ class SkillsToolTest {
 
 			assertThat(callback).isNotNull();
 			String description = callback.getToolDefinition().description();
-			assertThat(description).contains("test-skill");
-			assertThat(description).contains("another-skill");
+			assertThat(description).contains("\"test-skill\"");
+			assertThat(description).contains("\"another-skill\"");
 		}
 
 		@Test
@@ -194,7 +197,7 @@ class SkillsToolTest {
 
 			assertThat(callback).isNotNull();
 			String description = callback.getToolDefinition().description();
-			assertThat(description).contains("test-skill");
+			assertThat(description).contains("\"test-skill\"");
 		}
 
 	}
@@ -212,7 +215,7 @@ class SkillsToolTest {
 			ToolCallback callback = SkillsTool.builder().addSkillsResource(resource).build();
 
 			assertThat(callback).isNotNull();
-			assertThat(callback.getToolDefinition().description()).contains("pdf");
+			assertThat(callback.getToolDefinition().description()).contains("\"pdf\"");
 
 			String result = callback.call("{\"command\":\"pdf\"}");
 			assertThat(result).contains("Base directory for this skill:");
@@ -230,11 +233,96 @@ class SkillsToolTest {
 			ToolCallback callback = SkillsTool.builder().addSkillsResource(resource).build();
 
 			assertThat(callback).isNotNull();
-			assertThat(callback.getToolDefinition().description()).contains("spring-boot-skill");
+			assertThat(callback.getToolDefinition().description()).contains("\"spring-boot-skill\"");
 
 			String result = callback.call("{\"command\":\"spring-boot-skill\"}");
 			assertThat(result).contains("Base directory for this skill:");
 			assertThat(result).contains("Spring Boot");
+		}
+
+		@Test
+		@DisplayName("should load skills from multiple JARs with same directory name")
+		void shouldLoadSkillsFromMultipleJars(@TempDir Path tempDir) throws Exception {
+			// Create JAR 1 with skill1
+			Path jar1 = tempDir.resolve("jar1.jar");
+			createJar(jar1, "META-INF/myskills/skill1/SKILL.md", """
+					---
+					name: skill1
+					description: Skill 1
+					---
+					Skill 1 content.
+					""");
+
+			// Create JAR 2 with skill2
+			Path jar2 = tempDir.resolve("jar2.jar");
+			createJar(jar2, "META-INF/myskills/skill2/SKILL.md", """
+					---
+					name: skill2
+					description: Skill 2
+					---
+					Skill 2 content.
+					""");
+
+			// Create a custom ClassLoader that includes both JARs
+			URL[] urls = { jar1.toUri().toURL(), jar2.toUri().toURL() };
+			try (URLClassLoader classLoader = new URLClassLoader(urls, null)) {
+
+				ClassPathResource resource = new ClassPathResource("META-INF/myskills", classLoader);
+
+				ToolCallback callback = SkillsTool.builder().addSkillsResource(resource).build();
+
+				String description = callback.getToolDefinition().description();
+				assertThat(description).contains("\"skill1\"");
+				assertThat(description).as("Should contain skill2").contains("\"skill2\"");
+			}
+		}
+
+		private void createJar(Path jarPath, String entryPath, String content) throws IOException {
+			try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(jarPath.toFile()))) {
+				String[] parts = entryPath.split("/");
+				StringBuilder currentPath = new StringBuilder();
+				for (int i = 0; i < parts.length - 1; i++) {
+					currentPath.append(parts[i]).append("/");
+					jos.putNextEntry(new JarEntry(currentPath.toString()));
+					jos.closeEntry();
+				}
+				jos.putNextEntry(new JarEntry(entryPath));
+				jos.write(content.getBytes(StandardCharsets.UTF_8));
+				jos.closeEntry();
+			}
+		}
+
+	}
+
+	@Nested
+	@DisplayName("Tool Description")
+	class ToolDescriptionTests {
+
+		@Test
+		@DisplayName("description should not use XML tags that look like tool names")
+		void descriptionShouldNotUseXmlTags(@TempDir Path tempDir) throws IOException {
+			Path skillDir = tempDir.resolve("my-skill");
+			Files.createDirectories(skillDir);
+			Files.writeString(skillDir.resolve("SKILL.md"), SKILL_MD_CONTENT, StandardCharsets.UTF_8);
+
+			ToolCallback callback = SkillsTool.builder()
+				.addSkillsDirectory(tempDir.toString())
+				.build();
+
+			String description = callback.getToolDefinition().description();
+
+			// Should NOT contain XML like <name>test-skill</name> which confuses the LLM
+			assertThat(description).doesNotContain("<name>");
+			assertThat(description).doesNotContain("</name>");
+
+			// Should contain the skill name in a command-list format
+			assertThat(description).contains("\"test-skill\"");
+
+			// Should explain how to call it
+			assertThat(description).contains("Skill({\"command\":");
+
+			// Should clarify these are NOT tool names
+			assertThat(description).contains("NOT");
 		}
 
 	}
