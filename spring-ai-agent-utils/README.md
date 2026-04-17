@@ -24,6 +24,17 @@ These are the agent tools needed to implement any agentic behavior
 
 - **[AskUserQuestionTool](docs/AskUserQuestionTool.md)** - Ask users clarifying questions with multiple-choice options during agent execution
 
+#### Advisors
+
+- **[AutoMemoryToolsAdvisor](docs/AutoMemoryToolsAdvisor.md)** - Automatic long-term memory prompt and tool wiring
+- **[ToolCallPolicyAdvisor](docs/ToolCallPolicyAdvisor.md)** - Allow, deny, or rewrite tool calls before execution
+- **[ToolApprovalAdvisor](docs/ToolApprovalAdvisor.md)** - Human-in-the-loop approval gates with `CompletableFuture` blocking
+- **[ToolArgumentValidationAdvisor](docs/ToolArgumentValidationAdvisor.md)** - Enforce maximum tool argument sizes
+- **[ToolTimeoutAdvisor](docs/ToolTimeoutAdvisor.md)** - Per-tool timeout enforcement
+- **[ToolRateLimitAdvisor](docs/ToolRateLimitAdvisor.md)** - Per-loop (per-request) tool call rate limiting
+- **[ToolFilterAdvisor](docs/ToolFilterAdvisor.md)** - Include/exclude tool callbacks by glob pattern
+- **[ReasoningTraceAdvisor](docs/ReasoningTraceAdvisor.md)** - Per-iteration reasoning trace and timing observability
+
 #### Agent Skills
 
 - **[SkillsTool](docs/SkillsTool.md)** - Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter
