@@ -24,6 +24,11 @@ These are the agent tools needed to implement any agentic behavior
 
 - **[AskUserQuestionTool](docs/AskUserQuestionTool.md)** - Ask users clarifying questions with multiple-choice options during agent execution
 
+#### Advisors
+
+- **[AutoMemoryToolsAdvisor](docs/AutoMemoryToolsAdvisor.md)** - Automatic long-term memory prompt and tool wiring
+- **[ToolCallPolicyAdvisor](docs/ToolCallPolicyAdvisor.md)** - Allow, deny, or rewrite tool calls before execution
+
 #### Agent Skills
 
 - **[SkillsTool](docs/SkillsTool.md)** - Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter
