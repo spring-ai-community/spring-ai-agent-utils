@@ -29,23 +29,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.util.Assert;
 
 /**
  * Spring AI tool that produces unified-diff output between two text blocks using
  * Eugene W. Myers' O(ND) difference algorithm. Output is compatible with the
  * {@code patch} utility and {@code git apply}.
  *
- * <p>
- * This tool has zero runtime dependencies beyond Spring AI core and the JDK. It
- * complements {@code FileSystemTools} by letting agents show what they changed.
- *
- * <p>
- * <strong>Thread Safety:</strong> This class and all its collaborators are stateless
- * and safe for concurrent use.
- *
  * @author Martin Vlčák
- *
  */
 public class DiffTool {
 
@@ -55,19 +45,9 @@ public class DiffTool {
 
 	private static final int MAX_CONTEXT = 10;
 
-	/**
-	 * An ordered list of {@link EditOp} operations that transforms one sequence into
-	 * another.
-	 *
-	 * @param <T> element type of the operations
-	 * @param ops the ordered edit operations; defensively copied on construction
-	 */
-	private static record EditScript<T>(List<EditOp<T>> ops) {
+	private record EditScript<T>(List<EditOp<T>> ops) {
 
 		public EditScript {
-			if (ops == null) {
-				throw new IllegalArgumentException("ops must not be null");
-			}
 			ops = List.copyOf(ops);
 		}
 
@@ -81,73 +61,29 @@ public class DiffTool {
 
 	}
 
-	/**
-	 * A single operation in an edit script produced by the Myers diff algorithm. An edit
-	 * script is a sequence of {@link Equal}, {@link Delete}, and {@link Insert} ops that,
-	 * applied in order, transform the {@code before} sequence into the {@code after}
-	 * sequence.
-	 *
-	 * @param <T> element type carried by the operation (typically {@link String} for
-	 * line-level diffing)
-	 */
 	private sealed interface EditOp<T> permits EditOp.Equal, EditOp.Delete, EditOp.Insert {
 
-		/**
-		 * Returns the element this operation carries.
-		 */
 		T value();
 
-		/**
-		 * Element that appears unchanged in both {@code before} and {@code after}.
-		 */
 		record Equal<T>(T value) implements EditOp<T> {
 		}
 
-		/**
-		 * Element that appears in {@code before} but not in {@code after}.
-		 */
 		record Delete<T>(T value) implements EditOp<T> {
 		}
 
-		/**
-		 * Element that appears in {@code after} but not in {@code before}.
-		 */
 		record Insert<T>(T value) implements EditOp<T> {
 		}
 
 	}
 
-	/**
-	 * A contiguous region of an edit script containing one or more changes surrounded by
-	 * matching context lines, ready to be rendered as a unified-diff hunk.
-	 *
-	 * <p>
-	 * {@code beforeStart} and {@code afterStart} are 1-based line numbers referring to the
-	 * first line of the hunk in the corresponding side.
-	 *
-	 * @param beforeStart 1-based line number of the hunk's first line on the before side
-	 * @param beforeCount number of lines the hunk covers on the before side
-	 * @param afterStart 1-based line number of the hunk's first line on the after side
-	 * @param afterCount number of lines the hunk covers on the after side
-	 * @param ops the edit operations making up the hunk, in order
-	 */
-	private static record Hunk(int beforeStart, int beforeCount, int afterStart, int afterCount, List<EditOp<String>> ops) {
+	private record Hunk(int beforeStart, int beforeCount, int afterStart, int afterCount, List<EditOp<String>> ops) {
 
 		public Hunk {
-			if (ops == null) {
-				throw new IllegalArgumentException("ops must not be null");
-			}
 			ops = List.copyOf(ops);
 		}
 
 	}
 
-	/**
-	 * Groups an {@link EditScript} into {@link Hunk hunks} with {@code contextLines}
-	 * unchanged lines on each side of a change region. Two change regions separated by
-	 * {@code 2 * contextLines + 1} or more unchanged lines produce two hunks; a shorter
-	 * gap is merged into a single hunk.
-	 */
 	private List<Hunk> buildHunk(EditScript<String> script, int contextLines) {
 		List<EditOp<String>> ops = script.ops();
 		int n = ops.size();
@@ -229,9 +165,6 @@ public class DiffTool {
 
 	private String formatUnifiedDiff(List<Hunk> hunks, String beforeLabel, String afterLabel, boolean beforeEndsWithNewline,
 									boolean afterEndsWithNewline, String terminator) {
-		if (hunks == null) {
-			throw new IllegalArgumentException("hunks must not be null");
-		}
 		if (hunks.isEmpty()) {
 			return "";
 		}
@@ -311,22 +244,6 @@ public class DiffTool {
 		return -1;
 	}
 
-	/**
-	 * Tokenizes both sides, computes the Myers edit script, groups it into hunks,
-	 * and renders the unified-diff body. Returns an empty string when the two
-	 * sides are equivalent under {@code ws}.
-	 *
-	 * <p>Output uses the terminator dominant in {@code before}, or in {@code after}
-	 * when {@code before} has no lines.
-	 *
-	 * @param before raw text of the original side
-	 * @param after raw text of the modified side
-	 * @param beforeLabel label emitted on the {@code ---} header line
-	 * @param afterLabel label emitted on the {@code +++} header line
-	 * @param contextLines number of unchanged lines to include around each change region
-	 * @param ws whitespace-sensitivity mode for line comparison
-	 * @return unified-diff text, or empty string if the inputs are equivalent under {@code ws}
-	 */
 	private String renderDiff(String before, String after, String beforeLabel, String afterLabel, int contextLines,
 	                          WhitespaceMode ws) {
 		Tokenized bt = tokenize(before);
@@ -339,12 +256,6 @@ public class DiffTool {
 				bt.endsWithNewline(), at.endsWithNewline(), term);
 	}
 
-	/**
-	 * When the two sides differ only by their trailing newline, the pure content-based
-	 * edit script is empty even though the files differ. Rewrite the final {@code Equal}
-	 * op as a {@code Delete} + {@code Insert} so the formatter can render the mandatory
-	 * {@code \ No newline at end of file} marker.
-	 */
 	private EditScript<String> forceTrailingChangeIfNewlineMismatch(EditScript<String> script,
 	                                                                Tokenized bt, Tokenized at) {
 		if (bt.endsWithNewline() == at.endsWithNewline()) {
@@ -368,25 +279,7 @@ public class DiffTool {
 		return new EditScript<>(rewritten);
 	}
 
-
-
-	/**
-	 * Computes the edit script using a custom element equator.
-	 * @param before the original sequence
-	 * @param after the modified sequence
-	 * @param equator equality predicate
-	 * @return a minimal edit script
-	 */
 	private EditScript<String> diff(List<String> before, List<String> after, BiPredicate<String, String> equator) {
-		if (before == null) {
-			throw new IllegalArgumentException("before must not be null");
-		}
-		if (after == null) {
-			throw new IllegalArgumentException("after must not be null");
-		}
-		if (equator == null) {
-			throw new IllegalArgumentException("equator must not be null");
-		}
 
 		int n = before.size();
 		int m = after.size();
@@ -421,7 +314,7 @@ public class DiffTool {
 				}
 			}
 		}
-		throw new IllegalStateException("unreachable");
+		return new EditScript<>(List.of());  // unreachable: Myers always terminates
 	}
 
 	private EditScript<String> backtrack(List<String> before, List<String> after, List<int[]> trace, int n, int m, int max) {
@@ -471,31 +364,14 @@ public class DiffTool {
 		return new EditScript<>(ops);
 	}
 
-	/**
-	 * The tokenized result.
-	 *
-	 * @param lines the lines, without any terminator
-	 * @param endsWithNewline whether the original input ended with a line terminator
-	 * @param dominantTerminator the terminator observed most often in the input
-	 *        ({@code "\n"} or {@code "\r\n"}); {@code "\n"} wins on ties, and
-	 *        {@code "\n"} is also the default when the input contained no terminators
-	 */
-	record Tokenized(List<String> lines, boolean endsWithNewline, String dominantTerminator) {
+	private record Tokenized(List<String> lines, boolean endsWithNewline, String dominantTerminator) {
 
 		public Tokenized {
-			Objects.requireNonNull(lines, "lines must not be null");
-			Objects.requireNonNull(dominantTerminator, "dominantTerminator must not be null");
 			lines = List.copyOf(lines);
 		}
 	}
 
-	/**
-	 * Tokenizes the input into lines.
-	 * @param input the raw text, must not be null
-	 * @return the tokenized result
-	 */
-	Tokenized tokenize(String input) {
-		Objects.requireNonNull(input, "input must not be null");
+	private Tokenized tokenize(String input) {
 		if (input.isEmpty()) {
 			return new Tokenized(List.of(), false, "\n");
 		}
@@ -533,18 +409,12 @@ public class DiffTool {
 
 	public enum WhitespaceMode {
 
-		/** Compare lines byte-for-byte. */
 		STRICT,
 
-		/** Ignore trailing whitespace (see {@link String#stripTrailing()}). */
 		IGNORE_TRAILING,
 
-		/** Collapse all whitespace runs to a single space, then trim. */
 		IGNORE_ALL;
 
-		/**
-		 * Normalizes a line for comparison according to this mode.
-		 */
 		private static String normalize(String line, WhitespaceMode mode) {
 			if (line == null) {
 				return null;
@@ -556,14 +426,11 @@ public class DiffTool {
 			};
 		}
 
-		/**
-		 * Returns an equator that compares two lines under this whitespace mode.
-		 */
 		private BiPredicate<String, String> equator() {
 			return (a, b) -> {
 				String na = normalize(a, this);
 				String nb = normalize(b, this);
-				return na == null ? nb == null : na.equals(nb);
+				return Objects.equals(na, nb);
 			};
 		}
 
@@ -582,22 +449,29 @@ public class DiffTool {
 			@JsonPropertyDescription("Number of contiguous change regions (hunks)") int hunks) {
 	}
 
-	@Tool(name = "DiffTool",
-			description = """
-					Produces a unified diff between two text blocks. Output follows the
-					standard unified-diff format (--- / +++ / @@ headers) and is compatible
-					with the `patch` utility and `git apply`.
+	// @formatter:off
+	@Tool(name = "DiffTool", description = """
+		Produces a unified diff between two text blocks using Eugene W. Myers' O(ND) difference algorithm. The output follows the standard unified-diff format (--- / +++ / @@ headers) and is compatible with the `patch` utility and `git apply`.
 
-					Use this to show what changed after editing a file, summarize edits in
-					PR-style output, or audit agent modifications.
-					""")
+		Use this to show what changed after editing a file, summarize edits in PR-style output, or audit agent modifications.
+
+		Usage:
+		- The `before` and `after` parameters are required and should be the raw text of the original and modified content.
+		- Optionally provide `beforeLabel` and `afterLabel` to control the header lines (e.g. `a/config.yml` and `b/config.yml` for git-style labels). Defaults: "before" / "after".
+		- `contextLines` controls the number of unchanged lines shown around each change region. Default: 3, maximum: 10. Values above the maximum are clamped; negatives are clamped to 0.
+		- `whitespaceMode` controls line-equality: STRICT (default, byte-for-byte), IGNORE_TRAILING (ignores trailing whitespace), or IGNORE_ALL (collapses all whitespace runs to a single space, then trims).
+		- Returns an empty string when the two sides are equivalent under the selected whitespace mode.
+		- The output uses the line terminator dominant in `before` (or in `after` when `before` has no lines).
+		- When either side is missing a trailing newline, a `\\ No newline at end of file` marker is emitted so patch tools can round-trip correctly.
+		- For a lightweight count-only variant that skips rendering, use the `DiffSummarize` tool instead.
+		""")
 	public String diff(
 			@ToolParam(description = "Original text (the 'before' side)") String before,
 			@ToolParam(description = "Modified text (the 'after' side)") String after,
 			@ToolParam(description = "Label for the before side. Example: 'a/config.yml'", required = false) String beforeLabel,
 			@ToolParam(description = "Label for the after side. Example: 'b/config.yml'", required = false) String afterLabel,
 			@ToolParam(description = "Unchanged context lines around each change. Default 3, max 10.", required = false) Integer contextLines,
-			@ToolParam(description = "Whitespace handling. Default STRICT.", required = false) WhitespaceMode whitespaceMode) {
+			@ToolParam(description = "Whitespace handling. Default STRICT.", required = false) WhitespaceMode whitespaceMode) { // @formatter:on
 
 		int ctx = (contextLines == null) ? DEFAULT_CONTEXT
 				: Math.min(MAX_CONTEXT, Math.max(0, contextLines));
@@ -609,21 +483,33 @@ public class DiffTool {
 		return renderDiff(before, after, bLabel, aLabel, ctx, ws);
 	}
 
-	@Tool(name = "DiffFiles",
-			description = """
-					Produces a unified diff between the current contents of two files on
-					disk. Paths are resolved against the JVM working directory when not
-					absolute. Returns the same unified-diff format as the `diff` tool.
-					""")
+	// @formatter:off
+	@Tool(name = "DiffFiles", description = """
+		Produces a unified diff between the current contents of two files on disk. Returns the same unified-diff format as the `DiffTool` tool and is compatible with the `patch` utility and `git apply`.
+
+		Use this when the before/after content already lives in files and you want to avoid reading them into memory yourself.
+
+		Usage:
+		- The `beforePath` and `afterPath` parameters are required. Relative paths are resolved against the JVM working directory.
+		- Header lines are automatically emitted as `a/<beforePath>` and `b/<afterPath>` so `git apply -p1` strips the prefix correctly.
+		- `contextLines` controls the number of unchanged lines shown around each change region. Default: 3, maximum: 10.
+		- `whitespaceMode` controls line-equality: STRICT (default), IGNORE_TRAILING, or IGNORE_ALL.
+		- Returns an empty string when the two files are equivalent under the selected whitespace mode.
+		- Returns `Error: ...` if either path is blank, or `Error reading files: ...` if either file cannot be read.
+		- Files are read with the platform default charset.
+		""")
 	public String diffFiles(
 			@ToolParam(description = "Path to the original file") String beforePath,
 			@ToolParam(description = "Path to the modified file") String afterPath,
 			@ToolParam(description = "Unchanged context lines around each change. Default 3, max 10.", required = false) Integer contextLines,
-			@ToolParam(description = "Whitespace handling. Default STRICT.", required = false) WhitespaceMode whitespaceMode) {
-
-		Assert.hasText(beforePath, "beforePath must not be blank");
-		Assert.hasText(afterPath, "afterPath must not be blank");
+			@ToolParam(description = "Whitespace handling. Default STRICT.", required = false) WhitespaceMode whitespaceMode) { // @formatter:on
 		try {
+			if (beforePath == null || beforePath.isBlank()) {
+				return "Error: beforePath must not be blank";
+			}
+			if (afterPath == null || afterPath.isBlank()) {
+				return "Error: afterPath must not be blank";
+			}
 			Path bp = Paths.get(beforePath);
 			Path ap = Paths.get(afterPath);
 			String before = Files.readString(bp);
@@ -641,19 +527,24 @@ public class DiffTool {
 		}
 	}
 
-	@Tool(name = "DiffSummarize",
-			description = """
-					Returns aggregate counts (insertions, deletions, hunks) for the diff
-					between two text blocks, without emitting the full unified-diff body.
-					""")
+	// @formatter:off
+	@Tool(name = "DiffSummarize", description = """
+		Returns aggregate counts (insertions, deletions, hunks) for the diff between two text blocks, without emitting the full unified-diff body.
+
+		Use this to cheaply gate further work — for example, checking whether any changes exist, reporting the size of an edit, or deciding whether to render a full diff afterwards.
+
+		Usage:
+		- The `before` and `after` parameters are required and should be the raw text of the original and modified content.
+		- `contextLines` only affects how changes are grouped into hunks (it does not affect insertion/deletion counts). Default: 3, maximum: 10.
+		- `whitespaceMode` controls line-equality: STRICT (default), IGNORE_TRAILING, or IGNORE_ALL.
+		- Returns a `DiffSummary` with `insertions`, `deletions`, and `hunks` fields. All three are zero when the two sides are equivalent under the selected whitespace mode.
+		- Counts match exactly what the `DiffTool` tool would emit for the same inputs.
+		""")
 	public DiffSummary summarize(
 			@ToolParam(description = "Original text (the 'before' side)") String before,
 			@ToolParam(description = "Modified text (the 'after' side)") String after,
 			@ToolParam(description = "Unchanged context lines around each change. Default 3, max 10.", required = false) Integer contextLines,
-			@ToolParam(description = "Whitespace handling. Default STRICT.", required = false) WhitespaceMode whitespaceMode) {
-
-		Assert.notNull(before, "before must not be null");
-		Assert.notNull(after, "after must not be null");
+			@ToolParam(description = "Whitespace handling. Default STRICT.", required = false) WhitespaceMode whitespaceMode) { // @formatter:on
 
 		int ctx = (contextLines == null) ? DEFAULT_CONTEXT
 				: Math.min(MAX_CONTEXT, Math.max(0, contextLines));
@@ -667,7 +558,7 @@ public class DiffTool {
 		return new DiffSummary(script.insertions(), script.deletions(), hunks.size());
 	}
 
-	public static DiffTool.Builder builder() {
+	public static Builder builder() {
 		return new Builder();
 	}
 
