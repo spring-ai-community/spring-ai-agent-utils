@@ -1,18 +1,18 @@
 /*
- * Copyright 2025 - 2025 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2025 - 2025 the original author or authors.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* https://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package org.springaicommunity.agent.tools;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -338,8 +338,20 @@ class DiffToolTest {
 		if (diff.isEmpty()) {
 			return before;
 		}
-		DiffTool.Tokenized bt = tool.tokenize(before);
-		List<String> src = new ArrayList<>(bt.lines());
+		List<String> src = new ArrayList<>();
+		if (!before.isEmpty()) {
+			int s = 0;
+			for (int i = 0; i < before.length(); i++) {
+				if (before.charAt(i) == '\n') {
+					int end = (i > 0 && before.charAt(i - 1) == '\r') ? i - 1 : i;
+					src.add(before.substring(s, end));
+					s = i + 1;
+				}
+			}
+			if (s < before.length()) {
+				src.add(before.substring(s));
+			}
+		}
 		List<String> out = new ArrayList<>();
 
 		String term = diff.contains("\r\n") ? "\r\n" : "\n";
@@ -352,7 +364,6 @@ class DiffToolTest {
 
 		int srcIdx = 0;
 		boolean afterEndsWithNewline = true;
-		boolean beforeEndsWithNewline = bt.endsWithNewline();
 
 		while (di < diffLines.length) {
 			String line = diffLines[di];
@@ -381,20 +392,17 @@ class DiffToolTest {
 				out.add(content);
 			}
 			else if (prefix == '\\' && diffLines[di].contains("No newline")) {
-				// \ No newline at end of file applies to the previously emitted line
-					// Determine which side: look at previous non-backslash line prefix
-					int prev = di - 1;
-					while (prev >= 0 && diffLines[prev].isEmpty()) {
-						prev--;
-					}
-					if (prev >= 0) {
-						char prevPrefix = diffLines[prev].charAt(0);
-					if (prevPrefix == '+' || prevPrefix == ' ') {
+				int prev = di - 1;
+				while (prev >= 0 && diffLines[prev].isEmpty()) {
+					prev--;
+				}
+				if (prev >= 0) {
+					char prevPrefix = diffLines[prev].charAt(0);
+					if (prevPrefix == '+') {
 						afterEndsWithNewline = false;
 					}
-					if (prevPrefix == ' ' && !beforeEndsWithNewline) {
-						// Marker covers before too (already set via input).
-
+					else if (prevPrefix == ' ') {
+						afterEndsWithNewline = false;
 					}
 				}
 			}
