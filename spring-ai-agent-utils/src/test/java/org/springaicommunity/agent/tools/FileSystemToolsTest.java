@@ -729,6 +729,40 @@ class FileSystemToolsTest {
 			assertThat(result).contains("Error: Access denied");
 		}
 
+		@Test
+		@DisplayName("Should deny symlink + '..' traversal bypass")
+		@DisabledOnOs(OS.WINDOWS)
+		void shouldDenySymlinkFollowedByDotDotTraversal() throws IOException {
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(sandboxDir).build();
+			Path secretFile = outsideDir.resolve("secret.txt");
+			Files.writeString(secretFile, "secret content", StandardCharsets.UTF_8);
+
+			// Create a symlink inside the sandbox pointing to a subdirectory outside
+			Path symlinkDir = sandboxDir.resolve("link");
+			Files.createSymbolicLink(symlinkDir, outsideDir);
+
+			// Attempt: /sandbox/link/../secret.txt - normalizes to /sandbox/secret.txt
+			// but the OS would resolve 'link' as a symlink first, landing in outsideDir
+			String traversalPath = sandboxDir + "/link/../secret.txt";
+			String result = sandboxedTools.read(traversalPath, null, null);
+
+			assertThat(result).contains("Error: Access denied");
+		}
+
+		@Test
+		@DisplayName("Should allow write to file inside non-existent sandbox directory")
+		void shouldAllowWriteInsideNonExistentSandboxDirectory() throws IOException {
+			// Sandbox dir that doesn't exist yet
+			Path nonExistentSandbox = sandboxDir.resolve("not-yet-created");
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(nonExistentSandbox).build();
+			Path file = nonExistentSandbox.resolve("file.txt");
+
+			String result = sandboxedTools.write(file.toString(), "content");
+
+			assertThat(result).contains("Successfully created file");
+			assertThat(file).exists();
+		}
+
 	}
 
 	@Nested

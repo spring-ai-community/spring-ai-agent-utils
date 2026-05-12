@@ -46,9 +46,11 @@ public class FileSystemTools {
 	/**
 	 * Validates that the given file path is within the configured sandbox directory.
 	 * When no sandbox is configured, all paths are allowed.
-	 * Uses two checks: (1) normalized path to block {@code ..} traversal, and (2) real-path
-	 * resolution walking up existing path components to catch symlink escapes including
-	 * dangling symlinks that point outside the sandbox.
+	 * Uses three checks:
+	 * (1) rejects raw {@code ..} path components to prevent symlink+{@code ..} escapes,
+	 * (2) normalized path containment check to block remaining {@code ..} traversal,
+	 * (3) real-path resolution walking up existing path components to catch symlink escapes
+	 * including dangling symlinks (skipped when the sandbox directory does not yet exist).
 	 * @param filePath the path to validate
 	 * @return an error string if access is denied, or {@code null} if access is allowed
 	 */
@@ -58,35 +60,53 @@ public class FileSystemTools {
 		}
 		try {
 			Path sandbox = this.sandboxDirectory.toAbsolutePath().normalize();
-			Path target = Paths.get(filePath).toAbsolutePath().normalize();
+			Path targetAbs = Paths.get(filePath).toAbsolutePath();
 
-			// Check 1: normalized path must be within sandbox (blocks .. traversal)
+			// Check 1: reject '..' components in the raw absolute path.
+			// Normalizing before this check would hide symlink+'..' bypass attempts
+			// (e.g. /sandbox/link/../outside normalizes to /sandbox/outside but the OS
+			// resolves 'link' as a symlink first, landing outside the sandbox).
+			for (Path component : targetAbs) {
+				if ("..".equals(component.toString())) {
+					return "Error: Access denied. Path is outside the allowed sandbox directory: " + filePath;
+				}
+			}
+
+			Path target = targetAbs.normalize();
+
+			// Check 2: normalized path must start with sandbox (blocks remaining traversal)
 			if (!target.startsWith(sandbox)) {
 				return "Error: Access denied. Path is outside the allowed sandbox directory: " + filePath;
 			}
 
-			// Check 2: resolve symlinks in all existing path components.
-			// Walk up from target using NOFOLLOW_LINKS so dangling symlinks are detected.
-			Path realSandbox = Files.exists(sandbox) ? sandbox.toRealPath() : sandbox;
-			Path existing = target;
-			while (existing != null && !Files.exists(existing, LinkOption.NOFOLLOW_LINKS)) {
-				existing = existing.getParent();
-			}
-			if (existing != null) {
-				try {
-					Path realExisting = existing.toRealPath();
-					if (!realExisting.startsWith(realSandbox)) {
-						return "Error: Access denied. Path is outside the allowed sandbox directory: " + filePath;
-					}
+			// Check 3: resolve symlinks in all existing path components to catch symlink escapes,
+			// including dangling symlinks. Skipped when sandbox does not yet exist to allow writes
+			// into a sandbox directory that hasn't been created yet (checks 1+2 are sufficient then).
+			if (Files.exists(sandbox)) {
+				Path realSandbox = sandbox.toRealPath();
+				Path existing = target;
+				while (existing != null && !Files.exists(existing, LinkOption.NOFOLLOW_LINKS)) {
+					existing = existing.getParent();
 				}
-				catch (IOException e) {
-					// toRealPath() throws on a dangling symlink (symlink exists but target does not).
-					// We cannot verify where it points, so deny access.
-					return "Error: Access denied. Cannot resolve path (possible dangling symlink): " + filePath;
+				if (existing != null) {
+					try {
+						Path realExisting = existing.toRealPath();
+						if (!realExisting.startsWith(realSandbox)) {
+							return "Error: Access denied. Path is outside the allowed sandbox directory: " + filePath;
+						}
+					}
+					catch (IOException e) {
+						// toRealPath() throws on a dangling symlink (symlink exists but target does not).
+						// We cannot verify where it points, so deny access.
+						return "Error: Access denied. Cannot resolve path (possible dangling symlink): " + filePath;
+					}
 				}
 			}
 
 			return null;
+		}
+		catch (RuntimeException e) {
+			return "Error: Invalid path: " + e.getMessage();
 		}
 		catch (IOException e) {
 			return "Error validating path: " + e.getMessage();
