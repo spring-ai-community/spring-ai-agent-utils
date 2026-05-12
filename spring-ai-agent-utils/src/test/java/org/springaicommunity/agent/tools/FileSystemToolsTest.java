@@ -24,6 +24,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -491,6 +493,240 @@ class FileSystemToolsTest {
 			String content = Files.readString(file, StandardCharsets.UTF_8);
 			assertThat(content).contains("REPLACED");
 			assertThat(content).doesNotContain(".*+?[]{}()");
+		}
+
+	}
+
+	@Nested
+	@DisplayName("Sandbox Directory Tests")
+	class SandboxDirectoryTests {
+
+		private Path sandboxDir;
+
+		private Path outsideDir;
+
+		@BeforeEach
+		void setUpSandbox(@TempDir Path sandbox, @TempDir Path outside) throws IOException {
+			this.sandboxDir = sandbox;
+			this.outsideDir = outside;
+		}
+
+		@Test
+		@DisplayName("Should allow read of file inside sandbox")
+		void shouldAllowReadInsideSandbox() throws IOException {
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(sandboxDir).build();
+			Path file = sandboxDir.resolve("safe.txt");
+			Files.writeString(file, "safe content", StandardCharsets.UTF_8);
+
+			String result = sandboxedTools.read(file.toString(), null, null);
+
+			assertThat(result).contains("safe content");
+		}
+
+		@Test
+		@DisplayName("Should deny read of file outside sandbox")
+		void shouldDenyReadOutsideSandbox() throws IOException {
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(sandboxDir).build();
+			Path outside = outsideDir.resolve("secret.txt");
+			Files.writeString(outside, "secret", StandardCharsets.UTF_8);
+
+			String result = sandboxedTools.read(outside.toString(), null, null);
+
+			assertThat(result).contains("Error: Access denied");
+			assertThat(result).contains("outside the allowed sandbox directory");
+		}
+
+		@Test
+		@DisplayName("Should allow write of file inside sandbox")
+		void shouldAllowWriteInsideSandbox() {
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(sandboxDir).build();
+			Path file = sandboxDir.resolve("new.txt");
+
+			String result = sandboxedTools.write(file.toString(), "content");
+
+			assertThat(result).contains("Successfully created file");
+			assertThat(file).exists();
+		}
+
+		@Test
+		@DisplayName("Should deny write of file outside sandbox")
+		void shouldDenyWriteOutsideSandbox() {
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(sandboxDir).build();
+			Path outside = outsideDir.resolve("injected.txt");
+
+			String result = sandboxedTools.write(outside.toString(), "malicious content");
+
+			assertThat(result).contains("Error: Access denied");
+			assertThat(outside).doesNotExist();
+		}
+
+		@Test
+		@DisplayName("Should allow edit of file inside sandbox")
+		void shouldAllowEditInsideSandbox() throws IOException {
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(sandboxDir).build();
+			Path file = sandboxDir.resolve("edit.txt");
+			Files.writeString(file, "original", StandardCharsets.UTF_8);
+
+			String result = sandboxedTools.edit(file.toString(), "original", "modified", null);
+
+			assertThat(result).contains("has been updated");
+			assertThat(file).content(StandardCharsets.UTF_8).isEqualTo("modified");
+		}
+
+		@Test
+		@DisplayName("Should deny edit of file outside sandbox")
+		void shouldDenyEditOutsideSandbox() throws IOException {
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(sandboxDir).build();
+			Path outside = outsideDir.resolve("system.txt");
+			Files.writeString(outside, "original", StandardCharsets.UTF_8);
+
+			String result = sandboxedTools.edit(outside.toString(), "original", "modified", null);
+
+			assertThat(result).contains("Error: Access denied");
+			assertThat(outside).content(StandardCharsets.UTF_8).isEqualTo("original");
+		}
+
+		@Test
+		@DisplayName("Should deny path traversal via .. in read")
+		void shouldDenyPathTraversalInRead() throws IOException {
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(sandboxDir).build();
+			Path outside = outsideDir.resolve("secret.txt");
+			Files.writeString(outside, "secret", StandardCharsets.UTF_8);
+
+			// Attempt path traversal: /sandbox/../outside/secret.txt
+			String traversalPath = sandboxDir + "/../" + outsideDir.getFileName() + "/secret.txt";
+			String result = sandboxedTools.read(traversalPath, null, null);
+
+			assertThat(result).contains("Error: Access denied");
+		}
+
+		@Test
+		@DisplayName("Should deny path traversal via .. in write")
+		void shouldDenyPathTraversalInWrite() {
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(sandboxDir).build();
+
+			// Attempt path traversal: /sandbox/../outside/injected.txt
+			String traversalPath = sandboxDir + "/../" + outsideDir.getFileName() + "/injected.txt";
+			String result = sandboxedTools.write(traversalPath, "injected");
+
+			assertThat(result).contains("Error: Access denied");
+		}
+
+		@Test
+		@DisplayName("Should deny path traversal via .. in edit")
+		void shouldDenyPathTraversalInEdit() throws IOException {
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(sandboxDir).build();
+			Path outside = outsideDir.resolve("system.txt");
+			Files.writeString(outside, "original", StandardCharsets.UTF_8);
+
+			String traversalPath = sandboxDir + "/../" + outsideDir.getFileName() + "/system.txt";
+			String result = sandboxedTools.edit(traversalPath, "original", "modified", null);
+
+			assertThat(result).contains("Error: Access denied");
+			assertThat(outside).content(StandardCharsets.UTF_8).isEqualTo("original");
+		}
+
+		@Test
+		@DisplayName("Should allow access to nested subdirectory inside sandbox")
+		void shouldAllowAccessToNestedSubdirectory() throws IOException {
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(sandboxDir).build();
+			Path nested = sandboxDir.resolve("sub/dir/file.txt");
+			Files.createDirectories(nested.getParent());
+			Files.writeString(nested, "nested content", StandardCharsets.UTF_8);
+
+			String result = sandboxedTools.read(nested.toString(), null, null);
+
+			assertThat(result).contains("nested content");
+		}
+
+		@Test
+		@DisplayName("Should have no restriction when sandbox is not configured")
+		void shouldHaveNoRestrictionWithoutSandbox() throws IOException {
+			FileSystemTools unrestrictedTools = FileSystemTools.builder().build();
+			Path outside = outsideDir.resolve("file.txt");
+			Files.writeString(outside, "content", StandardCharsets.UTF_8);
+
+			String result = unrestrictedTools.read(outside.toString(), null, null);
+
+			assertThat(result).contains("content");
+			assertThat(result).doesNotContain("Access denied");
+		}
+
+		@Test
+		@DisplayName("Should accept sandboxDirectory as String in builder")
+		void shouldAcceptSandboxDirectoryAsString() throws IOException {
+			FileSystemTools sandboxedTools = FileSystemTools.builder()
+				.sandboxDirectory(sandboxDir.toString())
+				.build();
+			Path file = sandboxDir.resolve("file.txt");
+			Files.writeString(file, "content", StandardCharsets.UTF_8);
+
+			String result = sandboxedTools.read(file.toString(), null, null);
+
+			assertThat(result).contains("content");
+		}
+
+		@Test
+		@DisplayName("Should treat null String sandboxDirectory as no restriction")
+		void shouldTreatNullStringAsNoRestriction() throws IOException {
+			FileSystemTools tools = FileSystemTools.builder().sandboxDirectory((String) null).build();
+			Path outside = outsideDir.resolve("file.txt");
+			Files.writeString(outside, "content", StandardCharsets.UTF_8);
+
+			String result = tools.read(outside.toString(), null, null);
+
+			assertThat(result).contains("content");
+		}
+
+		@Test
+		@DisplayName("Should deny symlink pointing outside sandbox")
+		@DisabledOnOs(OS.WINDOWS)
+		void shouldDenySymlinkPointingOutsideSandbox() throws IOException {
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(sandboxDir).build();
+			Path secretFile = outsideDir.resolve("secret.txt");
+			Files.writeString(secretFile, "secret content", StandardCharsets.UTF_8);
+
+			// Create a symlink inside the sandbox pointing to a file outside
+			Path symlink = sandboxDir.resolve("escape.txt");
+			Files.createSymbolicLink(symlink, secretFile);
+
+			String result = sandboxedTools.read(symlink.toString(), null, null);
+
+			assertThat(result).contains("Error: Access denied");
+		}
+
+		@Test
+		@DisplayName("Should deny dangling symlink pointing outside sandbox on write")
+		@DisabledOnOs(OS.WINDOWS)
+		void shouldDenyDanglingSymlinkOutsideSandboxOnWrite() throws IOException {
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(sandboxDir).build();
+
+			// Dangling symlink: target file does not exist yet
+			Path danglingTarget = outsideDir.resolve("nonexistent.txt");
+			Path symlink = sandboxDir.resolve("dangling.txt");
+			Files.createSymbolicLink(symlink, danglingTarget);
+
+			String result = sandboxedTools.write(symlink.toString(), "injected");
+
+			assertThat(result).contains("Error: Access denied");
+			assertThat(danglingTarget).doesNotExist();
+		}
+
+		@Test
+		@DisplayName("Should deny symlink directory pointing outside sandbox")
+		@DisabledOnOs(OS.WINDOWS)
+		void shouldDenySymlinkDirectoryPointingOutsideSandbox() throws IOException {
+			FileSystemTools sandboxedTools = FileSystemTools.builder().sandboxDirectory(sandboxDir).build();
+			Path secretFile = outsideDir.resolve("secret.txt");
+			Files.writeString(secretFile, "secret content", StandardCharsets.UTF_8);
+
+			// Create a symlink directory inside the sandbox pointing to the outside dir
+			Path symlinkDir = sandboxDir.resolve("escapedir");
+			Files.createSymbolicLink(symlinkDir, outsideDir);
+
+			String result = sandboxedTools.read(symlinkDir.resolve("secret.txt").toString(), null, null);
+
+			assertThat(result).contains("Error: Access denied");
 		}
 
 	}

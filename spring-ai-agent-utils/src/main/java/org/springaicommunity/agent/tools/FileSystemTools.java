@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -35,6 +36,62 @@ import org.springframework.ai.tool.annotation.ToolParam;
  * @author Christian Tzolov
  */
 public class FileSystemTools {
+
+	private final Path sandboxDirectory;
+
+	protected FileSystemTools(Path sandboxDirectory) {
+		this.sandboxDirectory = sandboxDirectory;
+	}
+
+	/**
+	 * Validates that the given file path is within the configured sandbox directory.
+	 * When no sandbox is configured, all paths are allowed.
+	 * Uses two checks: (1) normalized path to block {@code ..} traversal, and (2) real-path
+	 * resolution walking up existing path components to catch symlink escapes including
+	 * dangling symlinks that point outside the sandbox.
+	 * @param filePath the path to validate
+	 * @return an error string if access is denied, or {@code null} if access is allowed
+	 */
+	private String validateSandboxAccess(String filePath) {
+		if (this.sandboxDirectory == null) {
+			return null;
+		}
+		try {
+			Path sandbox = this.sandboxDirectory.toAbsolutePath().normalize();
+			Path target = Paths.get(filePath).toAbsolutePath().normalize();
+
+			// Check 1: normalized path must be within sandbox (blocks .. traversal)
+			if (!target.startsWith(sandbox)) {
+				return "Error: Access denied. Path is outside the allowed sandbox directory: " + filePath;
+			}
+
+			// Check 2: resolve symlinks in all existing path components.
+			// Walk up from target using NOFOLLOW_LINKS so dangling symlinks are detected.
+			Path realSandbox = Files.exists(sandbox) ? sandbox.toRealPath() : sandbox;
+			Path existing = target;
+			while (existing != null && !Files.exists(existing, LinkOption.NOFOLLOW_LINKS)) {
+				existing = existing.getParent();
+			}
+			if (existing != null) {
+				try {
+					Path realExisting = existing.toRealPath();
+					if (!realExisting.startsWith(realSandbox)) {
+						return "Error: Access denied. Path is outside the allowed sandbox directory: " + filePath;
+					}
+				}
+				catch (IOException e) {
+					// toRealPath() throws on a dangling symlink (symlink exists but target does not).
+					// We cannot verify where it points, so deny access.
+					return "Error: Access denied. Cannot resolve path (possible dangling symlink): " + filePath;
+				}
+			}
+
+			return null;
+		}
+		catch (IOException e) {
+			return "Error validating path: " + e.getMessage();
+		}
+	}
 
 	// @formatter:off
 	@Tool(name = "Read", description = """
@@ -59,6 +116,11 @@ public class FileSystemTools {
 		@ToolParam(description = "The absolute path to the file to read") String filePath,
 		@ToolParam(description = "The line number to start reading from. Only provide if the file is too large to read at once", required = false) Integer offset,
 		@ToolParam(description = "The number of lines to read. Only provide if the file is too large to read at once.", required = false) Integer limit) { // @formatter:on
+
+		String accessError = validateSandboxAccess(filePath);
+		if (accessError != null) {
+			return accessError;
+		}
 
 		try {
 			File file = new File(filePath);
@@ -150,6 +212,11 @@ public class FileSystemTools {
 		@ToolParam(description = "The absolute path to the file to write (must be absolute, not relative)") String filePath,
 		@ToolParam(description = "The content to write to the file") String content) { // @formatter:on
 
+		String accessError = validateSandboxAccess(filePath);
+		if (accessError != null) {
+			return accessError;
+		}
+
 		try {
 			content = content != null ? content : "";
 
@@ -205,6 +272,11 @@ public class FileSystemTools {
 		@ToolParam(description = "The text to replace") String old_string,
 		@ToolParam(description = "The text to replace it with (must be different from old_string)") String new_string,
 		@ToolParam(description = "Replace all occurences of old_string (default false)", required = false) Boolean replace_all) { // @formatter:on
+
+		String accessError = validateSandboxAccess(filePath);
+		if (accessError != null) {
+			return accessError;
+		}
 
 		try {
 			File file = new File(filePath);
@@ -380,8 +452,35 @@ public class FileSystemTools {
 
 	public static class Builder {
 
+		private Path sandboxDirectory = null;
+
+		private Builder() {
+		}
+
+		/**
+		 * Restricts all file operations to paths within the given directory.
+		 * Any attempt to access a path outside the sandbox returns an error.
+		 * Symlinks are resolved to their real path before the check.
+		 * @param sandboxDirectory the directory to restrict operations to
+		 * @return this builder
+		 */
+		public Builder sandboxDirectory(Path sandboxDirectory) {
+			this.sandboxDirectory = sandboxDirectory;
+			return this;
+		}
+
+		/**
+		 * Restricts all file operations to paths within the given directory.
+		 * @param sandboxDirectory the directory path as a string
+		 * @return this builder
+		 */
+		public Builder sandboxDirectory(String sandboxDirectory) {
+			this.sandboxDirectory = sandboxDirectory != null ? Paths.get(sandboxDirectory) : null;
+			return this;
+		}
+
 		public FileSystemTools build() {
-			return new FileSystemTools();
+			return new FileSystemTools(sandboxDirectory);
 		}
 
 	}
