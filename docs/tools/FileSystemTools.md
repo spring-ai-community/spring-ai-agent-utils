@@ -11,6 +11,55 @@ A comprehensive file manipulation toolkit providing read, write, and edit operat
 - Automatic parent directory creation
 - UTF-8 encoding support
 - Replace all or single occurrence editing
+- Optional `allowedDirectory` to restrict all file operations to one or more configured paths
+
+## Builder Configuration
+
+### allowedDirectory / allowedDirectories — Restrict File Operations to a Directory
+
+By default `FileSystemTools` can access any path on the filesystem. Configure one or more allowed directories to restrict all `read`, `write`, and `edit` operations to paths within them. Access to any path outside all allowed directories returns an error.
+
+**Usage:**
+
+```java
+// Single directory (Path or String)
+FileSystemTools tools = FileSystemTools.builder()
+    .allowedDirectory(Path.of("/workspace/project"))
+    .build();
+
+// Multiple directories — chained
+FileSystemTools tools = FileSystemTools.builder()
+    .allowedDirectory("/workspace/project")
+    .allowedDirectory("/tmp/uploads")
+    .build();
+
+// Multiple directories — varargs
+FileSystemTools tools = FileSystemTools.builder()
+    .allowedDirectories(Path.of("/workspace/project"), Path.of("/tmp/uploads"))
+    .build();
+
+// No restriction (default — backward compatible)
+FileSystemTools tools = FileSystemTools.builder().build();
+```
+
+**Security guarantees:**
+
+Three layers block bypass attempts for each candidate directory:
+
+1. **Path traversal** — raw `..` components are rejected before normalization, blocking `/allowed/../etc/passwd`-style attacks.
+2. **Normalized containment** — the resolved path must start with the allowed directory (component-aware, so `/allowed-evil` does not match `/allowed`).
+3. **Symlink resolution** — real paths of existing path components are verified, blocking symlinks that point outside the allowed directory. Dangling symlinks are always denied.
+
+**Error returned on denied access:**
+
+```
+Error: Access denied. Path is outside the allowed directories: /etc/passwd
+```
+
+**Notes:**
+- When no directory is configured, all paths are allowed (backward compatible).
+- `allowedDirectory(null)` is a no-op — it does not add an entry.
+- Non-existent allowed directories are supported; writes into them are permitted (symlink check is skipped until the directory exists).
 
 ## Available Tools
 

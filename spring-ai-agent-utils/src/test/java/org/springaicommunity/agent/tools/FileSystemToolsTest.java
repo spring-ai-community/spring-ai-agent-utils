@@ -24,6 +24,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -491,6 +493,250 @@ class FileSystemToolsTest {
 			String content = Files.readString(file, StandardCharsets.UTF_8);
 			assertThat(content).contains("REPLACED");
 			assertThat(content).doesNotContain(".*+?[]{}()");
+		}
+
+	}
+
+	@Nested
+	@DisplayName("Allowed Directory Tests")
+	class AllowedDirectoryTests {
+
+		private Path allowedDir;
+
+		private Path outsideDir;
+
+		@BeforeEach
+		void setUpAllowedDirectory(@TempDir Path allowed, @TempDir Path outside) throws IOException {
+			this.allowedDir = allowed;
+			this.outsideDir = outside;
+		}
+
+		@Test
+		@DisplayName("Should allow read of file inside allowed directory")
+		void shouldAllowReadInsideAllowedDir() throws IOException {
+			FileSystemTools restrictedTools = FileSystemTools.builder().allowedDirectory(allowedDir).build();
+			Path file = allowedDir.resolve("safe.txt");
+			Files.writeString(file, "safe content", StandardCharsets.UTF_8);
+
+			String result = restrictedTools.read(file.toString(), null, null);
+
+			assertThat(result).contains("safe content");
+		}
+
+		@Test
+		@DisplayName("Should deny read of file outside allowed directory")
+		void shouldDenyReadOutsideAllowedDir() throws IOException {
+			FileSystemTools restrictedTools = FileSystemTools.builder().allowedDirectory(allowedDir).build();
+			Path outside = outsideDir.resolve("secret.txt");
+			Files.writeString(outside, "secret", StandardCharsets.UTF_8);
+
+			String result = restrictedTools.read(outside.toString(), null, null);
+
+			assertThat(result).contains("Error: Access denied");
+			assertThat(result).contains("outside the allowed directories");
+		}
+
+		@Test
+		@DisplayName("Should allow write of file inside allowed directory")
+		void shouldAllowWriteInsideAllowedDir() {
+			FileSystemTools restrictedTools = FileSystemTools.builder().allowedDirectory(allowedDir).build();
+			Path file = allowedDir.resolve("new.txt");
+
+			String result = restrictedTools.write(file.toString(), "content");
+
+			assertThat(result).contains("Successfully created file");
+			assertThat(file).exists();
+		}
+
+		@Test
+		@DisplayName("Should deny write of file outside allowed directory")
+		void shouldDenyWriteOutsideAllowedDir() {
+			FileSystemTools restrictedTools = FileSystemTools.builder().allowedDirectory(allowedDir).build();
+			Path outside = outsideDir.resolve("injected.txt");
+
+			String result = restrictedTools.write(outside.toString(), "malicious content");
+
+			assertThat(result).contains("Error: Access denied");
+			assertThat(outside).doesNotExist();
+		}
+
+		@Test
+		@DisplayName("Should deny path traversal via .. in read")
+		void shouldDenyPathTraversalInRead() throws IOException {
+			FileSystemTools restrictedTools = FileSystemTools.builder().allowedDirectory(allowedDir).build();
+			Path outside = outsideDir.resolve("secret.txt");
+			Files.writeString(outside, "secret", StandardCharsets.UTF_8);
+
+			// Attempt path traversal: /allowed/../outside/secret.txt
+			String traversalPath = allowedDir + "/../" + outsideDir.getFileName() + "/secret.txt";
+			String result = restrictedTools.read(traversalPath, null, null);
+
+			assertThat(result).contains("Error: Access denied");
+		}
+
+		@Test
+		@DisplayName("Should allow access to nested subdirectory inside allowed directory")
+		void shouldAllowAccessToNestedSubdirectory() throws IOException {
+			FileSystemTools restrictedTools = FileSystemTools.builder().allowedDirectory(allowedDir).build();
+			Path nested = allowedDir.resolve("sub/dir/file.txt");
+			Files.createDirectories(nested.getParent());
+			Files.writeString(nested, "nested content", StandardCharsets.UTF_8);
+
+			String result = restrictedTools.read(nested.toString(), null, null);
+
+			assertThat(result).contains("nested content");
+		}
+
+		@Test
+		@DisplayName("Should have no restriction when allowed directory is not configured")
+		void shouldHaveNoRestrictionWithoutAllowedDir() throws IOException {
+			FileSystemTools unrestrictedTools = FileSystemTools.builder().build();
+			Path outside = outsideDir.resolve("file.txt");
+			Files.writeString(outside, "content", StandardCharsets.UTF_8);
+
+			String result = unrestrictedTools.read(outside.toString(), null, null);
+
+			assertThat(result).contains("content");
+			assertThat(result).doesNotContain("Access denied");
+		}
+
+		@Test
+		@DisplayName("Should accept allowedDirectory as String in builder")
+		void shouldAcceptAllowedDirectoryAsString() throws IOException {
+			FileSystemTools restrictedTools = FileSystemTools.builder()
+				.allowedDirectory(allowedDir.toString())
+				.build();
+			Path file = allowedDir.resolve("file.txt");
+			Files.writeString(file, "content", StandardCharsets.UTF_8);
+
+			String result = restrictedTools.read(file.toString(), null, null);
+
+			assertThat(result).contains("content");
+		}
+
+		@Test
+		@DisplayName("Should treat null String allowedDirectory as no restriction")
+		void shouldTreatNullStringAsNoRestriction() throws IOException {
+			FileSystemTools tools = FileSystemTools.builder().allowedDirectory((String) null).build();
+			Path outside = outsideDir.resolve("file.txt");
+			Files.writeString(outside, "content", StandardCharsets.UTF_8);
+
+			String result = tools.read(outside.toString(), null, null);
+
+			assertThat(result).contains("content");
+		}
+
+		@Test
+		@DisplayName("Should deny symlink pointing outside allowed directory")
+		@DisabledOnOs(OS.WINDOWS)
+		void shouldDenySymlinkPointingOutsideAllowedDir() throws IOException {
+			FileSystemTools restrictedTools = FileSystemTools.builder().allowedDirectory(allowedDir).build();
+			Path secretFile = outsideDir.resolve("secret.txt");
+			Files.writeString(secretFile, "secret content", StandardCharsets.UTF_8);
+
+			// Create a symlink inside the allowed directory pointing to a file outside
+			Path symlink = allowedDir.resolve("escape.txt");
+			Files.createSymbolicLink(symlink, secretFile);
+
+			String result = restrictedTools.read(symlink.toString(), null, null);
+
+			assertThat(result).contains("Error: Access denied");
+		}
+
+		@Test
+		@DisplayName("Should deny dangling symlink pointing outside allowed directory on write")
+		@DisabledOnOs(OS.WINDOWS)
+		void shouldDenyDanglingSymlinkOutsideAllowedDirOnWrite() throws IOException {
+			FileSystemTools restrictedTools = FileSystemTools.builder().allowedDirectory(allowedDir).build();
+
+			// Dangling symlink: target file does not exist yet
+			Path danglingTarget = outsideDir.resolve("nonexistent.txt");
+			Path symlink = allowedDir.resolve("dangling.txt");
+			Files.createSymbolicLink(symlink, danglingTarget);
+
+			String result = restrictedTools.write(symlink.toString(), "injected");
+
+			assertThat(result).contains("Error: Access denied");
+			assertThat(danglingTarget).doesNotExist();
+		}
+
+		@Test
+		@DisplayName("Should deny symlink directory pointing outside allowed directory")
+		@DisabledOnOs(OS.WINDOWS)
+		void shouldDenySymlinkDirectoryPointingOutsideAllowedDir() throws IOException {
+			FileSystemTools restrictedTools = FileSystemTools.builder().allowedDirectory(allowedDir).build();
+			Path secretFile = outsideDir.resolve("secret.txt");
+			Files.writeString(secretFile, "secret content", StandardCharsets.UTF_8);
+
+			// Create a symlink directory inside the allowed directory pointing to the outside dir
+			Path symlinkDir = allowedDir.resolve("escapedir");
+			Files.createSymbolicLink(symlinkDir, outsideDir);
+
+			String result = restrictedTools.read(symlinkDir.resolve("secret.txt").toString(), null, null);
+
+			assertThat(result).contains("Error: Access denied");
+		}
+
+		@Test
+		@DisplayName("Should deny symlink + '..' traversal bypass")
+		@DisabledOnOs(OS.WINDOWS)
+		void shouldDenySymlinkFollowedByDotDotTraversal() throws IOException {
+			FileSystemTools restrictedTools = FileSystemTools.builder().allowedDirectory(allowedDir).build();
+			Path secretFile = outsideDir.resolve("secret.txt");
+			Files.writeString(secretFile, "secret content", StandardCharsets.UTF_8);
+
+			// Create a symlink inside the allowed directory pointing to a subdirectory outside
+			Path symlinkDir = allowedDir.resolve("link");
+			Files.createSymbolicLink(symlinkDir, outsideDir);
+
+			// Attempt: /allowed/link/../secret.txt - normalizes to /allowed/secret.txt
+			// but the OS would resolve 'link' as a symlink first, landing in outsideDir
+			String traversalPath = allowedDir + "/link/../secret.txt";
+			String result = restrictedTools.read(traversalPath, null, null);
+
+			assertThat(result).contains("Error: Access denied");
+		}
+
+		@Test
+		@DisplayName("Should allow write to file inside non-existent allowed directory")
+		void shouldAllowWriteInsideNonExistentAllowedDirectory() throws IOException {
+			// Allowed dir that doesn't exist yet
+			Path nonExistentAllowedDir = allowedDir.resolve("not-yet-created");
+			FileSystemTools restrictedTools = FileSystemTools.builder().allowedDirectory(nonExistentAllowedDir).build();
+			Path file = nonExistentAllowedDir.resolve("file.txt");
+
+			String result = restrictedTools.write(file.toString(), "content");
+
+			assertThat(result).contains("Successfully created file");
+			assertThat(file).exists();
+		}
+
+		@Test
+		@DisplayName("Should allow access to any of multiple allowed directories")
+		void shouldAllowAccessToAnyOfMultipleAllowedDirectories() throws IOException {
+			FileSystemTools restrictedTools = FileSystemTools.builder()
+				.allowedDirectory(allowedDir)
+				.allowedDirectory(outsideDir)
+				.build();
+			Path fileInFirst = allowedDir.resolve("first.txt");
+			Path fileInSecond = outsideDir.resolve("second.txt");
+			Files.writeString(fileInFirst, "content1", StandardCharsets.UTF_8);
+			Files.writeString(fileInSecond, "content2", StandardCharsets.UTF_8);
+
+			assertThat(restrictedTools.read(fileInFirst.toString(), null, null)).contains("content1");
+			assertThat(restrictedTools.read(fileInSecond.toString(), null, null)).contains("content2");
+		}
+
+		@Test
+		@DisplayName("Should use varargs allowedDirectories builder method")
+		void shouldSupportVarargsAllowedDirectories() throws IOException {
+			FileSystemTools restrictedTools = FileSystemTools.builder()
+				.allowedDirectories(allowedDir, outsideDir)
+				.build();
+			Path file = outsideDir.resolve("file.txt");
+			Files.writeString(file, "content", StandardCharsets.UTF_8);
+
+			assertThat(restrictedTools.read(file.toString(), null, null)).contains("content");
 		}
 
 	}

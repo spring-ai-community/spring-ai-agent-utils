@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -35,6 +36,88 @@ import org.springframework.ai.tool.annotation.ToolParam;
  * @author Christian Tzolov
  */
 public class FileSystemTools {
+
+	private final List<Path> allowedDirectories;
+
+	protected FileSystemTools(List<Path> allowedDirectories) {
+		this.allowedDirectories = List.copyOf(allowedDirectories);
+	}
+
+	/**
+	 * Validates that the given file path is within at least one configured allowed directory.
+	 * When no allowed directories are configured, all paths are allowed.
+	 * Uses three checks per directory candidate:
+	 * (1) rejects raw {@code ..} path components to prevent symlink+{@code ..} escapes,
+	 * (2) normalized path containment check to block remaining {@code ..} traversal,
+	 * (3) real-path resolution walking up existing path components to catch symlink escapes
+	 * including dangling symlinks (skipped when the candidate directory does not yet exist).
+	 * @param filePath the path to validate
+	 * @return an error string if access is denied, or {@code null} if access is allowed
+	 */
+	private String validateAllowedAccess(String filePath) {
+		if (this.allowedDirectories.isEmpty()) {
+			return null;
+		}
+		try {
+			Path targetAbs = Paths.get(filePath).toAbsolutePath();
+
+			// Check 1: reject '..' components in the raw absolute path.
+			// Normalizing before this check would hide symlink+'..' bypass attempts
+			// (e.g. /allowed/link/../outside normalizes to /allowed/outside but the OS
+			// resolves 'link' as a symlink first, landing outside the allowed directory).
+			for (Path component : targetAbs) {
+				if ("..".equals(component.toString())) {
+					return "Error: Access denied. Path is outside the allowed directories: " + filePath;
+				}
+			}
+
+			Path target = targetAbs.normalize();
+
+			for (Path allowedDir : this.allowedDirectories) {
+				Path allowed = allowedDir.toAbsolutePath().normalize();
+
+				// Check 2: normalized path must start with this candidate (blocks remaining traversal)
+				if (!target.startsWith(allowed)) {
+					continue;
+				}
+
+				// Check 3: resolve symlinks in all existing path components to catch symlink escapes.
+				// Skipped when the candidate directory does not yet exist (checks 1+2 are sufficient then).
+				if (Files.exists(allowed)) {
+					Path realAllowed = allowed.toRealPath();
+					Path existing = target;
+					while (existing != null && !Files.exists(existing, LinkOption.NOFOLLOW_LINKS)) {
+						existing = existing.getParent();
+					}
+					if (existing != null) {
+						Path realExisting;
+						try {
+							realExisting = existing.toRealPath();
+						}
+						catch (IOException e) {
+							// toRealPath() throws on a dangling symlink (symlink exists but target does not).
+							// We cannot verify where it points, so deny access unconditionally.
+							return "Error: Access denied. Cannot resolve path (possible dangling symlink): "
+									+ filePath;
+						}
+						if (!realExisting.startsWith(realAllowed)) {
+							continue;
+						}
+					}
+				}
+
+				return null; // path is within this allowed directory
+			}
+
+			return "Error: Access denied. Path is outside the allowed directories: " + filePath;
+		}
+		catch (RuntimeException e) {
+			return "Error: Invalid path: " + e.getMessage();
+		}
+		catch (IOException e) {
+			return "Error validating path: " + e.getMessage();
+		}
+	}
 
 	// @formatter:off
 	@Tool(name = "Read", description = """
@@ -59,6 +142,11 @@ public class FileSystemTools {
 		@ToolParam(description = "The absolute path to the file to read") String filePath,
 		@ToolParam(description = "The line number to start reading from. Only provide if the file is too large to read at once", required = false) Integer offset,
 		@ToolParam(description = "The number of lines to read. Only provide if the file is too large to read at once.", required = false) Integer limit) { // @formatter:on
+
+		String accessError = validateAllowedAccess(filePath);
+		if (accessError != null) {
+			return accessError;
+		}
 
 		try {
 			File file = new File(filePath);
@@ -150,6 +238,11 @@ public class FileSystemTools {
 		@ToolParam(description = "The absolute path to the file to write (must be absolute, not relative)") String filePath,
 		@ToolParam(description = "The content to write to the file") String content) { // @formatter:on
 
+		String accessError = validateAllowedAccess(filePath);
+		if (accessError != null) {
+			return accessError;
+		}
+
 		try {
 			content = content != null ? content : "";
 
@@ -205,6 +298,11 @@ public class FileSystemTools {
 		@ToolParam(description = "The text to replace") String old_string,
 		@ToolParam(description = "The text to replace it with (must be different from old_string)") String new_string,
 		@ToolParam(description = "Replace all occurences of old_string (default false)", required = false) Boolean replace_all) { // @formatter:on
+
+		String accessError = validateAllowedAccess(filePath);
+		if (accessError != null) {
+			return accessError;
+		}
 
 		try {
 			File file = new File(filePath);
@@ -380,8 +478,53 @@ public class FileSystemTools {
 
 	public static class Builder {
 
+		private final List<Path> allowedDirectories = new ArrayList<>();
+
+		private Builder() {
+		}
+
+		/**
+		 * Adds a directory to the list of allowed paths. All file operations are restricted
+		 * to the union of configured allowed directories. Symlinks are resolved to their
+		 * real path before the check.
+		 * @param allowedDirectory the directory to allow operations within
+		 * @return this builder
+		 */
+		public Builder allowedDirectory(Path allowedDirectory) {
+			if (allowedDirectory != null) {
+				this.allowedDirectories.add(allowedDirectory);
+			}
+			return this;
+		}
+
+		/**
+		 * Adds a directory to the list of allowed paths.
+		 * @param allowedDirectory the directory path as a string; ignored if {@code null}
+		 * @return this builder
+		 */
+		public Builder allowedDirectory(String allowedDirectory) {
+			if (allowedDirectory != null) {
+				this.allowedDirectories.add(Paths.get(allowedDirectory));
+			}
+			return this;
+		}
+
+		/**
+		 * Adds multiple directories to the list of allowed paths.
+		 * @param allowedDirectories the directories to allow operations within
+		 * @return this builder
+		 */
+		public Builder allowedDirectories(Path... allowedDirectories) {
+			for (Path dir : allowedDirectories) {
+				if (dir != null) {
+					this.allowedDirectories.add(dir);
+				}
+			}
+			return this;
+		}
+
 		public FileSystemTools build() {
-			return new FileSystemTools();
+			return new FileSystemTools(this.allowedDirectories);
 		}
 
 	}
