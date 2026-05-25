@@ -35,6 +35,7 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.DefaultToolCallingChatOptions;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.core.io.ByteArrayResource;
 
@@ -93,8 +94,7 @@ class AutoMemoryToolsAdvisorTest {
 		@Test
 		@DisplayName("Empty memoriesRootDirectory throws")
 		void emptyDirectoryThrows() {
-			assertThatIllegalArgumentException()
-				.isThrownBy(() -> AutoMemoryToolsAdvisor.builder().build());
+			assertThatIllegalArgumentException().isThrownBy(() -> AutoMemoryToolsAdvisor.builder().build());
 		}
 
 		@Test
@@ -156,9 +156,8 @@ class AutoMemoryToolsAdvisorTest {
 		@Test
 		@DisplayName("Preserves existing system message text")
 		void preservesExistingSystemText() {
-			Prompt prompt = new Prompt(
-				List.of(new SystemMessage("ORIGINAL"), new UserMessage("hi")),
-				new DefaultToolCallingChatOptions());
+			Prompt prompt = new Prompt(List.of(new SystemMessage("ORIGINAL"), new UserMessage("hi")),
+					new DefaultToolCallingChatOptions());
 			ChatClientRequest request = request(prompt);
 
 			ChatClientRequest result = advisor("APPENDED").before(request, advisorChain);
@@ -185,8 +184,7 @@ class AutoMemoryToolsAdvisorTest {
 
 			ChatClientRequest result = advisor("MEMORY_PROMPT").before(request, advisorChain);
 
-			assertThat(result.prompt().getSystemMessage().getText())
-				.doesNotContain("system-reminder")
+			assertThat(result.prompt().getSystemMessage().getText()).doesNotContain("system-reminder")
 				.doesNotContain("Consolidate");
 		}
 
@@ -202,8 +200,7 @@ class AutoMemoryToolsAdvisorTest {
 			Prompt prompt = new Prompt(new UserMessage("hi"), new DefaultToolCallingChatOptions());
 			ChatClientRequest result = a.before(request(prompt), advisorChain);
 
-			assertThat(result.prompt().getSystemMessage().getText())
-				.contains("Consolidate")
+			assertThat(result.prompt().getSystemMessage().getText()).contains("Consolidate")
 				.contains("system-reminder");
 		}
 
@@ -262,13 +259,10 @@ class AutoMemoryToolsAdvisorTest {
 			ChatClientRequest result = advisor("prompt").before(request, advisorChain);
 
 			DefaultToolCallingChatOptions opts = (DefaultToolCallingChatOptions) result.prompt().getOptions();
-			List<String> names = opts.getToolCallbacks().stream()
-				.map(tc -> tc.getToolDefinition().name())
-				.toList();
+			List<String> names = opts.getToolCallbacks().stream().map(tc -> tc.getToolDefinition().name()).toList();
 
-			assertThat(names).containsExactlyInAnyOrder(
-				"MemoryView", "MemoryCreate", "MemoryStrReplace",
-				"MemoryInsert", "MemoryDelete", "MemoryRename");
+			assertThat(names).containsExactlyInAnyOrder("MemoryView", "MemoryCreate", "MemoryStrReplace",
+					"MemoryInsert", "MemoryDelete", "MemoryRename");
 		}
 
 		@Test
@@ -293,13 +287,15 @@ class AutoMemoryToolsAdvisorTest {
 				.getOptions()).getToolCallbacks();
 
 			// Second pass: pre-populate options with those same callbacks
-			DefaultToolCallingChatOptions opts = new DefaultToolCallingChatOptions();
-			opts.setToolCallbacks(memoryCallbacks);
+			ToolCallingChatOptions opts = DefaultToolCallingChatOptions.builder()
+				.toolCallbacks(memoryCallbacks)
+				.build();
+
 			ChatClientRequest requestWithDups = request(new Prompt(new UserMessage("hi"), opts));
 
 			ChatClientRequest result = a.before(requestWithDups, advisorChain);
 
-			DefaultToolCallingChatOptions resultOpts = (DefaultToolCallingChatOptions) result.prompt().getOptions();
+			ToolCallingChatOptions resultOpts = (ToolCallingChatOptions) result.prompt().getOptions();
 			List<String> names = resultOpts.getToolCallbacks()
 				.stream()
 				.map(tc -> tc.getToolDefinition().name())

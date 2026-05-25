@@ -183,7 +183,7 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 					if (MODEL_NAME_MAPPER.containsKey(modelName)) {
 						modelName = MODEL_NAME_MAPPER.get(modelName);
 					}
-					builder = builder.clone().defaultOptions(ChatOptions.builder().model(modelName).build());
+					builder = builder.clone().defaultOptions(ChatOptions.builder().model(modelName));
 				}
 				return builder;
 			}

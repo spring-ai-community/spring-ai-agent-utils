@@ -89,7 +89,9 @@ public class AutoMemoryToolsAdvisor implements BaseChatMemoryAdvisor {
 				.filter(tc -> !existingNames.contains(tc.getToolDefinition().name()))
 				.forEach(toolCallbacks::add);
 
-			toolOptionsCopy.setToolCallbacks(new ArrayList<>(toolCallbacks));
+			toolOptionsCopy = ((ToolCallingChatOptions.Builder<?>) toolOptionsCopy.mutate())
+				.toolCallbacks(new ArrayList<>(toolCallbacks))
+				.build();
 
 			return chatClientRequest.mutate().prompt(augPrompt.mutate().chatOptions(toolOptionsCopy).build()).build();
 
