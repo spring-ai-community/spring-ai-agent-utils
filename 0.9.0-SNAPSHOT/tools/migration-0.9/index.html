@@ -1483,6 +1483,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#conversation-id-required-on-prompt-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conversation ID Required on Prompt Calls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consolidate-multiple-defaulttools-calls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Consolidate Multiple defaultTools() Calls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#toolcallingadvisor-requires-at-least-one-registered-tool-spring-ai-6325" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ToolCallingAdvisor Requires at Least One Registered Tool (spring-ai #6325)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1630,6 +1663,52 @@
 <div class="highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">MessageChatMemoryAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">memory</span><span class="p">).</span><span class="na">build</span><span class="p">()</span>
 </span></code></pre></div>
 <p>The auto-configured <code>ToolCallingAdvisor</code> sits at <code>HIGHEST_PRECEDENCE + 300</code>. Memory at the default <code>HIGHEST_PRECEDENCE + 200</code> is numerically lower and therefore outermost, wrapping all tool calls in a single memory read/write cycle.</p>
+<h2 id="conversation-id-required-on-prompt-calls">Conversation ID Required on Prompt Calls<a class="headerlink" href="#conversation-id-required-on-prompt-calls" title="Permanent link">&para;</a></h2>
+<p>Spring AI 2.0.0-RC1 no longer infers a default conversation ID. You must supply <code>ChatMemory.CONVERSATION_ID</code> explicitly on each <code>.prompt()</code> call, otherwise <code>MessageChatMemoryAdvisor</code> silently uses a <code>null</code> key and memory is not persisted correctly.</p>
+<p><strong>Before (memory silently broken):</strong></p>
+<div class="highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">chatClient</span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="n">userInput</span><span class="p">).</span><span class="na">call</span><span class="p">().</span><span class="na">content</span><span class="p">();</span>
+</span></code></pre></div>
+<p><strong>After:</strong></p>
+<div class="highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">chatClient</span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="n">userInput</span><span class="p">)</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="p">.</span><span class="na">advisors</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="n">ChatMemory</span><span class="p">.</span><span class="na">CONVERSATION_ID</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;session-1&quot;</span><span class="p">))</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="p">.</span><span class="na">call</span><span class="p">()</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="p">.</span><span class="na">content</span><span class="p">();</span>
+</span></code></pre></div>
+<p>Use a stable, meaningful ID. For single-session CLI agents <code>"session-1"</code> is fine. For multi-user or multi-session applications, use a per-session identifier (e.g. a UUID generated at startup or stored in session state).</p>
+<h2 id="consolidate-multiple-defaulttools-calls">Consolidate Multiple <code>defaultTools()</code> Calls<a class="headerlink" href="#consolidate-multiple-defaulttools-calls" title="Permanent link">&para;</a></h2>
+<p>Previously, multiple <code>.defaultTools()</code> chains were processed independently and could lead to subtle ordering issues. Prefer a single <code>defaultTools(...)</code> varargs call that registers all tools together:</p>
+<p><strong>Before:</strong></p>
+<div class="highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">chatClientBuilder</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span><span class="n">taskTools</span><span class="p">)</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span><span class="n">SkillsTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">())</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">        </span><span class="n">ShellTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">        </span><span class="n">FileSystemTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">());</span>
+</span></code></pre></div>
+<p><strong>After:</strong></p>
+<div class="highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">chatClientBuilder</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">        </span><span class="n">taskTools</span><span class="p">,</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">        </span><span class="n">SkillsTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">        </span><span class="n">ShellTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">        </span><span class="n">FileSystemTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">());</span>
+</span></code></pre></div>
+<h2 id="toolcallingadvisor-requires-at-least-one-registered-tool-spring-ai-6325"><code>ToolCallingAdvisor</code> Requires at Least One Registered Tool (spring-ai #6325)<a class="headerlink" href="#toolcallingadvisor-requires-at-least-one-registered-tool-spring-ai-6325" title="Permanent link">&para;</a></h2>
+<p>When using <code>AutoAutoMemoryToolsAdvisor</code> without any other tools pre-registered on the <code>ChatClient</code>, the auto-configured <code>ToolCallingAdvisor</code> may not activate because there are no tools in the default configuration to trigger it. The advisor injects memory tools at request time, but the framework checks for tools at build time.</p>
+<p><strong>Workaround</strong> — register a dummy tool on the <code>ChatClient</code> until the upstream issue is resolved:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">DummyTools</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="nd">@Tool</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;No-op placeholder tool&quot;</span><span class="p">)</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">noop</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">input</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="p">}</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="n">chatClientBuilder</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">DummyTools</span><span class="p">())</span><span class="w">  </span><span class="c1">// workaround for spring-ai#6325</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span><span class="n">AutoAutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">        </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">&quot;/path/to/memories&quot;</span><span class="p">)</span>
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">        </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
+</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span></code></pre></div>
+<p>Track the upstream fix at <a href="https://github.com/spring-projects/spring-ai/issues/6325">spring-projects/spring-ai#6325</a>.</p>
 
 
 
