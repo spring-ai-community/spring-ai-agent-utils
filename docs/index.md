@@ -102,40 +102,38 @@ public class Application {
                     .param(AgentEnvironment.AGENT_MODEL_KEY, "claude-sonnet-4-5-20250929")
                     .param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, "2025-01-01"))
 
-                // Sub-Agents
-                .defaultToolCallbacks(taskTool)
-
-                // Skills
-                .defaultToolCallbacks(SkillsTool.builder()
-                    .addSkillsResources(skillPaths)
-                    .build())
-
-                // Core Tools
                 .defaultTools(
+                    // Sub-Agents
+                    taskTool,
+
+                    // Skills
+                    SkillsTool.builder().addSkillsResources(skillPaths).build(),
+
+                    // Core Tools
                     ShellTools.builder().build(),
                     FileSystemTools.builder().build(),
                     GrepTool.builder().build(),
                     GlobTool.builder().build(),
                     SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build(),
-                    BraveWebSearchTool.builder(braveApiKey).build())
+                    BraveWebSearchTool.builder(braveApiKey).build(),
 
-                // Task orchestration
-                .defaultTools(TodoWriteTool.builder().build())
+                    // Task orchestration
+                    TodoWriteTool.builder().build(),
 
-                // User feedback tool (use CommandLineQuestionHandler for CLI apps)
-                .defaultTools(AskUserQuestionTool.builder()
-                    .questionHandler(new CommandLineQuestionHandler())
-                    .build())
+                    // User feedback tool (use CommandLineQuestionHandler for CLI apps)
+                    AskUserQuestionTool.builder()
+                        .questionHandler(new CommandLineQuestionHandler())
+                        .build())
 
                 // Advisors
                 .defaultAdvisors(
-                    ToolCallAdvisor.builder().conversationHistoryEnabled(false).build(),
                     MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build()).build())
 
                 .build();
 
             String response = chatClient
                 .prompt("Search for Spring AI documentation and summarize it")
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "session-1"))
                 .call()
                 .content();
         };

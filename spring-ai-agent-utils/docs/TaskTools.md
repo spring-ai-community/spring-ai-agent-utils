@@ -405,7 +405,7 @@ Provide clear, actionable feedback with file references and line numbers.
 
 ### Creating a Custom Subagent Type
 
-To add support for a new subagent protocol, implement three interfaces from `spring-ai-agent-utils-common` and register them as a `SubagentType`. See the [Subagent Framework](Subagent.md) documentation for the full SPI reference, or the [spring-ai-agent-utils-a2a](../../spring-ai-agent-utils-a2a/README.md) module for a complete A2A protocol implementation.
+To add support for a new subagent protocol, implement three interfaces from `spring-ai-agent-utils-common` and register them as a `SubagentType`. See the [Subagent Framework](Subagent.md) documentation for the full SPI reference, or the [spring-ai-agent-utils-a2a](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/spring-ai-agent-utils-a2a) module for a complete A2A protocol implementation.
 
 ```java
 // 1. Implement SubagentDefinition, SubagentResolver, SubagentExecutor
@@ -749,8 +749,8 @@ public class ClaudeSubagentReferences {
 ## Related Documentation
 
 - [**Subagent Framework**](Subagent.md) - Protocol-agnostic subagent SPI for integrating A2A, MCP, and custom agent protocols
-- [**spring-ai-agent-utils-common**](../../spring-ai-agent-utils-common/README.md) - Shared subagent SPI module
-- [**spring-ai-agent-utils-a2a**](../../spring-ai-agent-utils-a2a/README.md) - A2A protocol subagent implementation
+- [**spring-ai-agent-utils-common**](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/spring-ai-agent-utils-common) - Shared subagent SPI module
+- [**spring-ai-agent-utils-a2a**](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/spring-ai-agent-utils-a2a) - A2A protocol subagent implementation
 - [**FileSystemTools**](FileSystemTools.md) - File operations for sub-agents
 - [**GrepTool**](GrepTool.md) - Code search capabilities
 - [**GlobTool**](GlobTool.md) - File pattern matching
@@ -762,5 +762,5 @@ public class ClaudeSubagentReferences {
 - [Claude Code Sub-Agents Documentation](https://code.claude.com/docs/en/sub-agents)
 - [Claude Agent SDK Sub-Agents](https://platform.claude.com/docs/en/agent-sdk/subagents)
 - [Spring AI Documentation](https://docs.spring.io/spring-ai/reference/)
-- [Example: subagent-demo](../../examples/subagent-demo)
-- [Example: subagent-a2a-demo](../../examples/subagent-a2a-demo)
+- [Example: subagent-demo](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/subagent-demo)
+- [Example: subagent-a2a-demo](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/subagent-a2a-demo)

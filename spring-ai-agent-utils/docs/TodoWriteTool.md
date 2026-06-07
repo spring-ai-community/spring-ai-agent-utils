@@ -2,6 +2,8 @@
 
 A structured task list management tool for AI agents. Helps track progress, organize complex tasks, and provide visibility into task execution.
 
+![TodoWriteTools](../images/todo-write-flow.png)
+
 Reference: [Claude Code Todo Tracking](https://platform.claude.com/docs/en/agent-sdk/todo-tracking)
 
 ## Quick Start

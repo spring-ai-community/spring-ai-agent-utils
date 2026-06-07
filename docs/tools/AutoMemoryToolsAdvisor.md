@@ -41,10 +41,7 @@ ChatClient chatClient = ChatClient.builder(chatModel)
         // Short-term memory — full conversation history for this session
         MessageChatMemoryAdvisor.builder(
             MessageWindowChatMemory.builder().maxMessages(100).build())
-            .build(),
-
-        // Tool calling
-        ToolCallAdvisor.builder().build())
+            .build())
     .build();
 ```
 
@@ -168,7 +165,6 @@ String memoryPrompt = new PromptTemplate(memorySystemPromptResource)
 ChatClient chatClient = ChatClient.builder(chatModel)
     .defaultSystem(baseSystemPrompt + "\n\n" + memoryPrompt)
     .defaultTools(memoryTools)
-    .defaultAdvisors(ToolCallAdvisor.builder().build())
     .build();
 
 // Advisor setup — equivalent, less boilerplate
@@ -176,8 +172,7 @@ ChatClient chatClient = ChatClient.builder(chatModel)
     .defaultAdvisors(
         AutoAutoMemoryToolsAdvisor.builder()
             .memoriesRootDirectory("/path/to/memories")
-            .build(),
-        ToolCallAdvisor.builder().build())
+            .build())
     .build();
 ```
 
@@ -207,7 +202,7 @@ AutoAutoMemoryToolsAdvisor.builder()
 
 ## Demo Application
 
-See [`memory-tools-advisor-demo`](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-advisor-demo) for a complete runnable example showing `AutoAutoMemoryToolsAdvisor` combined with `ToolCallAdvisor`, `MessageChatMemoryAdvisor`, and a custom logging advisor.
+See [`memory-tools-advisor-demo`](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-advisor-demo) for a complete runnable example showing `AutoAutoMemoryToolsAdvisor` combined with `MessageChatMemoryAdvisor` and a custom logging advisor.
 
 ## See Also
 

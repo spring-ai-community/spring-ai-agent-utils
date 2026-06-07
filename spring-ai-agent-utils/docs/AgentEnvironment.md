@@ -2,7 +2,7 @@
 
 Provide AI agents with runtime environment information and git repository context through dynamic system prompt parameters. The `AgentEnvironment` utility class automatically gathers environment metadata and git status to make agents more context-aware.
 
-It is used in a combination with the agent system prompt: [MAIN_AGENT_SYSTEM_PROMPT_V2.md](../src/main/resources/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md).
+It is used in a combination with the agent system prompt: [MAIN_AGENT_SYSTEM_PROMPT_V2.md](https://github.com/spring-ai-community/spring-ai-agent-utils/blob/main/spring-ai-agent-utils/src/main/resources/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md).
 
 ## System Prompt Template Placeholders
 

@@ -2,6 +2,8 @@
 
 A persistent, file-based **long-term memory** toolkit for AI agents. Complements the built-in session/conversation history by giving agents a durable store that survives across conversations — user preferences, project context, behavioral feedback, and external references — organized in a dedicated memories directory.
 
+![AutoAutoMemoryTools](../images/spring-ai-auto-memory-flow.png)
+
 ## Long-term memory vs. conversation history
 
 | | Conversation history | AutoMemoryTools (long-term memory) |
@@ -323,7 +325,7 @@ chatClientBuilder.defaultSystem(p -> p
 
 ## Demo Application
 
-See [memory-tools-demo](../../../examples/memory/memory-tools-demo) for a complete working example. It demonstrates:
+See [memory-tools-demo](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-demo) for a complete working example. It demonstrates:
 
 - Combining `MAIN_AGENT_SYSTEM_PROMPT_V2.md` and `AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md`
 - Configuring `AutoMemoryTools` with a path from `application.properties`

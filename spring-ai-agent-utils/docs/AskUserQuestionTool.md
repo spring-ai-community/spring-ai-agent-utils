@@ -198,7 +198,7 @@ public class WebQuestionHandler {
 
 ## Demo Application
 
-See the [ask-user-question-demo](../../../examples/ask-user-question-demo) for a complete working example of a console-based AI chat application using the AskUserQuestionTool with `CommandLineQuestionHandler`. The demo shows how to:
+See the [ask-user-question-demo](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/ask-user-question-demo) for a complete working example of a console-based AI chat application using the AskUserQuestionTool with `CommandLineQuestionHandler`. The demo shows how to:
 - Use the provided `CommandLineQuestionHandler` for console interaction
 - Handle both single-select and multi-select questions
 - Configure the tool with answer validation options

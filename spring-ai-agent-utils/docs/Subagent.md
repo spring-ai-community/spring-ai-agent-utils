@@ -4,7 +4,7 @@
 
 The Subagent framework provides a protocol-agnostic abstraction for integrating various agent communication protocols with the [TaskTool](TaskTools.md). It enables orchestrating heterogeneous agents across different backends - local LLM-based agents, remote A2A protocol agents, or custom implementations - through a unified interface.
 
-The SPI interfaces live in the [`spring-ai-agent-utils-common`](../../spring-ai-agent-utils-common/README.md) module so that different subagent implementations can be developed in separate modules without depending on each other.
+The SPI interfaces live in the [`spring-ai-agent-utils-common`](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/spring-ai-agent-utils-common) module so that different subagent implementations can be developed in separate modules without depending on each other.
 
 ## Design Philosophy
 
@@ -203,7 +203,7 @@ TaskTool.builder()
 
 ## A2A Protocol Subagent
 
-The [A2A (Agent-to-Agent)](https://google.github.io/A2A/) protocol implementation lives in the separate `spring-ai-agent-utils-a2a` module. See the [A2A module README](../../spring-ai-agent-utils-a2a/README.md) for full details.
+The [A2A (Agent-to-Agent)](https://google.github.io/A2A/) protocol implementation lives in the separate `spring-ai-agent-utils-a2a` module. See the [A2A module README](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/spring-ai-agent-utils-a2a) for full details.
 
 ### A2A Components
 
@@ -479,11 +479,11 @@ logger.info("Agent '{}' response received", subagent.getName());
 ## Related Documentation
 
 - [TaskTools](TaskTools.md) - Complete TaskTool documentation and usage
-- [spring-ai-agent-utils-common](../../spring-ai-agent-utils-common/README.md) - SPI module with all core abstractions
-- [spring-ai-agent-utils-a2a](../../spring-ai-agent-utils-a2a/README.md) - A2A protocol implementation
+- [spring-ai-agent-utils-common](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/spring-ai-agent-utils-common) - SPI module with all core abstractions
+- [spring-ai-agent-utils-a2a](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/spring-ai-agent-utils-a2a) - A2A protocol implementation
 - [SkillsTool](SkillsTool.md) - Reusable knowledge modules for subagents
-- [Example: subagent-demo](../../examples/subagent-demo) - Local Claude subagent demo
-- [Example: subagent-a2a-demo](../../examples/subagent-a2a-demo) - A2A integration demo
+- [Example: subagent-demo](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/subagent-demo) - Local Claude subagent demo
+- [Example: subagent-a2a-demo](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/subagent-a2a-demo) - A2A integration demo
 
 ## References
 
