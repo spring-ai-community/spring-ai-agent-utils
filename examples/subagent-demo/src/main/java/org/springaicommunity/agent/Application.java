@@ -17,7 +17,6 @@ import org.springaicommunity.agent.utils.AgentEnvironment;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -65,18 +64,18 @@ public class Application {
 					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, agentModelKnowledgeCutoff))
 
 				// sub-agent task tool callbacks
-				.defaultToolCallbacks(taskTools)
+				.defaultTools(taskTools)
 
 				// skills tool
-				// .defaultToolCallbacks(SkillsTool.builder().addSkillsResources(skillPaths).build())
+				.defaultTools(SkillsTool.builder().addSkillsResources(skillPaths).build())
 				
 				.defaultTools(
 					// task orchestration tools
-					// TodoWriteTool.builder().build(),
+					TodoWriteTool.builder().build(),
 
 					// common agentic tools
-					// GlobTool.builder().build(),
-					// GrepTool.builder().build(),
+					GlobTool.builder().build(),
+					GrepTool.builder().build(),
 					ShellTools.builder().build(),
 					FileSystemTools.builder().build(),
 
@@ -85,10 +84,6 @@ public class Application {
 
 				// Advisors
 				.defaultAdvisors(
-					ToolCallAdvisor.builder()
-						.conversationHistoryEnabled(false)
-						.build(), // tool calling advisor
-
 					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build())
 						.order(Ordered.HIGHEST_PRECEDENCE + 1000)
 						.build(),

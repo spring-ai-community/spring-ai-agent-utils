@@ -13,8 +13,8 @@ import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.model.Generation;
-import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
+import org.springframework.ai.util.JsonHelper;
 
 public class MyLoggingAdvisor implements BaseAdvisor {
 
@@ -41,7 +41,8 @@ public class MyLoggingAdvisor implements BaseAdvisor {
 	@Override
 	public ChatClientRequest before(ChatClientRequest chatClientRequest, AdvisorChain advisorChain) {
 		Object tools = "No Tools";
-		if (chatClientRequest.prompt().getOptions() instanceof ToolCallingChatOptions toolOptions) {
+		if (chatClientRequest.prompt().getOptions() instanceof ToolCallingChatOptions toolOptions
+				&& toolOptions.getToolCallbacks() != null) {
 			tools = toolOptions.getToolCallbacks().stream().map(tc -> tc.getToolDefinition().name()).toList();
 		}
 		printUser("USER", chatClientRequest.prompt().getInstructions(), tools);
@@ -50,6 +51,9 @@ public class MyLoggingAdvisor implements BaseAdvisor {
 
 	@Override
 	public ChatClientResponse after(ChatClientResponse chatClientResponse, AdvisorChain advisorChain) {
+		if (chatClientResponse.chatResponse() == null || chatClientResponse.chatResponse().getResults() == null) {
+			return chatClientResponse;
+		}
 		printAssistant("ASSISTANT", chatClientResponse.chatResponse().getResults());
 		return chatClientResponse;
 	}
@@ -57,14 +61,15 @@ public class MyLoggingAdvisor implements BaseAdvisor {
 	private void printUser(String label, List<Message> messages, Object tools) {
 		String mt = messages.stream()
 			.map(message -> message.getMessageType() == MessageType.SYSTEM ? " - SYSTEM "
-					: " - " + ModelOptionsUtils.toJsonString(message))
+					: " - " + new JsonHelper().toJson(message))
 			.collect(Collectors.joining("\n"));
-		logger.info("\n" + labelPrefix + " " + label + ":\n" + mt + "\n   TOOLS: " + ModelOptionsUtils.toJsonString(tools) + "\n");
+		logger.info(
+				"\n" + labelPrefix + " " + label + ":\n" + mt + "\n   TOOLS: " + new JsonHelper().toJson(tools) + "\n");
 	}
 
 	private void printAssistant(String label, List<Generation> generations) {
 		String gt = generations.stream()
-			.map(g -> " - " + ModelOptionsUtils.toJsonString(g.getOutput()))
+			.map(g -> " - " + new JsonHelper().toJson(g.getOutput()))
 			.collect(Collectors.joining("\n"));
 		logger.info("\n" + labelPrefix + " " + label + ":\n" + gt + "\n");
 	}

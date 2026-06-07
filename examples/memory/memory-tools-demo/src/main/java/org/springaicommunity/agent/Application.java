@@ -9,7 +9,6 @@ import org.springaicommunity.agent.tools.TodoWriteTool;
 import org.springaicommunity.agent.utils.AgentEnvironment;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -61,8 +60,6 @@ public class Application {
 				)
 				
 				.defaultAdvisors(
-					// Tool Calling advisor
-					ToolCallAdvisor.builder().build(),
 					// Custom logging advisor
 					MyLoggingAdvisor.builder()
 						.showAvailableTools(false)

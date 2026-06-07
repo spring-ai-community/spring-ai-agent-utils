@@ -7,8 +7,8 @@ import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
-import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
+import org.springframework.ai.util.JsonHelper;
 import org.springframework.util.StringUtils;
 
 public class MyLoggingAdvisor implements BaseAdvisor {
@@ -18,13 +18,13 @@ public class MyLoggingAdvisor implements BaseAdvisor {
 	public final boolean showSystemMessage;
 
 	public final boolean showAvailableTools;
-	
+
 	public final boolean showUserText;
-	
+
 	public final boolean showAssistantText;
 
-
-	private MyLoggingAdvisor(int order, boolean showSystemMessage, boolean showAvailableTools, boolean showUserText, boolean showAssistantText) {
+	private MyLoggingAdvisor(int order, boolean showSystemMessage, boolean showAvailableTools, boolean showUserText,
+			boolean showAssistantText) {
 		this.order = order;
 		this.showSystemMessage = showSystemMessage;
 		this.showAvailableTools = showAvailableTools;
@@ -49,11 +49,12 @@ public class MyLoggingAdvisor implements BaseAdvisor {
 		if (this.showAvailableTools) {
 			Object tools = "No Tools";
 
-			if (chatClientRequest.prompt().getOptions() instanceof ToolCallingChatOptions toolOptions) {
+			if (chatClientRequest.prompt().getOptions() instanceof ToolCallingChatOptions toolOptions
+					&& toolOptions.getToolCallbacks() != null) {
 				tools = toolOptions.getToolCallbacks().stream().map(tc -> tc.getToolDefinition().name()).toList();
 			}
 
-			sb.append("\n - TOOLS: " + ModelOptionsUtils.toJsonString(tools));
+			sb.append("\n - TOOLS: " + new JsonHelper().toJson(tools));
 		}
 
 		Message lastMessage = chatClientRequest.prompt().getLastUserOrToolResponseMessage();
@@ -128,7 +129,7 @@ public class MyLoggingAdvisor implements BaseAdvisor {
 		private boolean showSystemMessage = true;
 
 		private boolean showAvailableTools = true;
-		
+
 		private boolean showAssistantText = true;
 
 		private boolean showUserText = true;
@@ -147,6 +148,7 @@ public class MyLoggingAdvisor implements BaseAdvisor {
 			this.showAvailableTools = showAvailableTools;
 			return this;
 		}
+
 		public Builder showAssistantText(boolean showAssistantText) {
 			this.showAssistantText = showAssistantText;
 			return this;
@@ -155,11 +157,11 @@ public class MyLoggingAdvisor implements BaseAdvisor {
 		public Builder showUserText(boolean showUserText) {
 			this.showUserText = showUserText;
 			return this;
-		}	
+		}
 
 		public MyLoggingAdvisor build() {
-			MyLoggingAdvisor advisor = new MyLoggingAdvisor(this.order, this.showSystemMessage,
-					this.showAvailableTools, this.showUserText, this.showAssistantText);
+			MyLoggingAdvisor advisor = new MyLoggingAdvisor(this.order, this.showSystemMessage, this.showAvailableTools,
+					this.showUserText, this.showAssistantText);
 			return advisor;
 		}
 

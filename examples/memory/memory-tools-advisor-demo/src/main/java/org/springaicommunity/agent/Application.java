@@ -9,13 +9,13 @@ import org.springaicommunity.agent.utils.AgentEnvironment;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
 import org.springframework.core.io.Resource;
 
 @SpringBootApplication
@@ -34,7 +34,7 @@ public class Application {
 			@Value("classpath:/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md") Resource systemPrompt,
 			@Value("${agent.memory.dir}") String memoryDir) throws IOException {
 
-		return args -> {		
+		return args -> {
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off
 				// system prompt
@@ -62,10 +62,8 @@ public class Application {
 						})
 						.build(),
 
-					// Tool Calling advisor
-					ToolCallAdvisor.builder().disableInternalConversationHistory().build(),
-
-					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(100).build()).build(),
+					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(100).build())
+						.order(Ordered.HIGHEST_PRECEDENCE + 1000).build(),
 
 					// Custom logging advisor
 					MyLoggingAdvisor.builder()

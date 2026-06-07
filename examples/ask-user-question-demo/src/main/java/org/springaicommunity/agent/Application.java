@@ -7,16 +7,16 @@ import org.springaicommunity.agent.utils.CommandLineQuestionHandler;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
 
 @SpringBootApplication
 public class Application {
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
@@ -35,8 +35,8 @@ public class Application {
 					.build())
 
 				.defaultAdvisors(
-					ToolCallAdvisor.builder().disableInternalConversationHistory().build(),
-					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build()).build())
+					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build())
+					.order(Ordered.HIGHEST_PRECEDENCE + 1000).build())
 
 				.build();
 				// @formatter:on
@@ -52,4 +52,5 @@ public class Application {
 			}
 		};
 	}
+
 }

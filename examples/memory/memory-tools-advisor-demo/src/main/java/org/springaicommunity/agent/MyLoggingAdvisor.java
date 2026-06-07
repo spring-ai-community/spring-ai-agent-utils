@@ -1,8 +1,5 @@
 package org.springaicommunity.agent;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
@@ -10,9 +7,8 @@ import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
-import org.springframework.ai.chat.model.Generation;
-import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
+import org.springframework.ai.util.JsonHelper;
 import org.springframework.util.StringUtils;
 
 public class MyLoggingAdvisor implements BaseAdvisor {
@@ -50,11 +46,12 @@ public class MyLoggingAdvisor implements BaseAdvisor {
 		if (this.showAvailableTools) {
 			Object tools = "No Tools";
 
-			if (chatClientRequest.prompt().getOptions() instanceof ToolCallingChatOptions toolOptions) {
+			if (chatClientRequest.prompt().getOptions() instanceof ToolCallingChatOptions toolOptions
+					&& toolOptions.getToolCallbacks() != null) {
 				tools = toolOptions.getToolCallbacks().stream().map(tc -> tc.getToolDefinition().name()).toList();
 			}
 
-			sb.append("\n - TOOLS: " + ModelOptionsUtils.toJsonString(tools));
+			sb.append("\n - TOOLS: " + new JsonHelper().toJson(tools));
 		}
 
 		Message lastMessage = chatClientRequest.prompt().getLastUserOrToolResponseMessage();

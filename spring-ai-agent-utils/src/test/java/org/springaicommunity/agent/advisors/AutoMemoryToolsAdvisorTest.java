@@ -145,7 +145,7 @@ class AutoMemoryToolsAdvisorTest {
 		@Test
 		@DisplayName("Injects memory prompt when ToolCallingChatOptions present")
 		void injectsWithToolCallingOptions() {
-			Prompt prompt = new Prompt(List.of(new UserMessage("hi")), new DefaultToolCallingChatOptions());
+			Prompt prompt = new Prompt(List.of(new UserMessage("hi")), DefaultToolCallingChatOptions.builder().build());
 			ChatClientRequest request = request(prompt);
 
 			ChatClientRequest result = advisor("MEMORY_INSTRUCTIONS").before(request, advisorChain);
@@ -157,7 +157,7 @@ class AutoMemoryToolsAdvisorTest {
 		@DisplayName("Preserves existing system message text")
 		void preservesExistingSystemText() {
 			Prompt prompt = new Prompt(List.of(new SystemMessage("ORIGINAL"), new UserMessage("hi")),
-					new DefaultToolCallingChatOptions());
+					DefaultToolCallingChatOptions.builder().build());
 			ChatClientRequest request = request(prompt);
 
 			ChatClientRequest result = advisor("APPENDED").before(request, advisorChain);
@@ -179,7 +179,7 @@ class AutoMemoryToolsAdvisorTest {
 		@Test
 		@DisplayName("No consolidation reminder when trigger returns false (default)")
 		void noReminderByDefault() {
-			Prompt prompt = new Prompt(new UserMessage("hi"), new DefaultToolCallingChatOptions());
+			Prompt prompt = new Prompt(new UserMessage("hi"), DefaultToolCallingChatOptions.builder().build());
 			ChatClientRequest request = request(prompt);
 
 			ChatClientRequest result = advisor("MEMORY_PROMPT").before(request, advisorChain);
@@ -197,7 +197,7 @@ class AutoMemoryToolsAdvisorTest {
 				.memoryConsolidationTrigger((req, instant) -> true)
 				.build();
 
-			Prompt prompt = new Prompt(new UserMessage("hi"), new DefaultToolCallingChatOptions());
+			Prompt prompt = new Prompt(new UserMessage("hi"), DefaultToolCallingChatOptions.builder().build());
 			ChatClientRequest result = a.before(request(prompt), advisorChain);
 
 			assertThat(result.prompt().getSystemMessage().getText()).contains("Consolidate")
@@ -220,7 +220,7 @@ class AutoMemoryToolsAdvisorTest {
 				})
 				.build();
 
-			Prompt prompt = new Prompt(new UserMessage("hi"), new DefaultToolCallingChatOptions());
+			Prompt prompt = new Prompt(new UserMessage("hi"), DefaultToolCallingChatOptions.builder().build());
 			ChatClientRequest originalRequest = request(prompt);
 			a.before(originalRequest, advisorChain);
 
@@ -241,7 +241,7 @@ class AutoMemoryToolsAdvisorTest {
 		@Test
 		@DisplayName("Registers memory tools when ToolCallingChatOptions present")
 		void registersMemoryTools() {
-			Prompt prompt = new Prompt(new UserMessage("hi"), new DefaultToolCallingChatOptions());
+			Prompt prompt = new Prompt(new UserMessage("hi"), DefaultToolCallingChatOptions.builder().build());
 			ChatClientRequest request = request(prompt);
 
 			ChatClientRequest result = advisor("prompt").before(request, advisorChain);
@@ -253,7 +253,7 @@ class AutoMemoryToolsAdvisorTest {
 		@Test
 		@DisplayName("Registers all six MemoryTools by name")
 		void registersAllSixMemoryTools() {
-			Prompt prompt = new Prompt(new UserMessage("hi"), new DefaultToolCallingChatOptions());
+			Prompt prompt = new Prompt(new UserMessage("hi"), DefaultToolCallingChatOptions.builder().build());
 			ChatClientRequest request = request(prompt);
 
 			ChatClientRequest result = advisor("prompt").before(request, advisorChain);
@@ -281,7 +281,7 @@ class AutoMemoryToolsAdvisorTest {
 			AutoMemoryToolsAdvisor a = advisor("prompt");
 
 			// First pass: collect the memory callbacks the advisor registers
-			Prompt first = new Prompt(new UserMessage("hi"), new DefaultToolCallingChatOptions());
+			Prompt first = new Prompt(new UserMessage("hi"), DefaultToolCallingChatOptions.builder().build());
 			List<ToolCallback> memoryCallbacks = ((DefaultToolCallingChatOptions) a.before(request(first), advisorChain)
 				.prompt()
 				.getOptions()).getToolCallbacks();

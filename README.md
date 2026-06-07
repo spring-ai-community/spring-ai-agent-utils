@@ -94,7 +94,7 @@ Use the BOM to manage versions consistently across all modules:
         <dependency>
             <groupId>org.springaicommunity</groupId>
             <artifactId>spring-ai-agent-utils-bom</artifactId>
-            <version>0.7.0</version>
+            <version>0.9.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -115,7 +115,7 @@ Or add the core library directly:
 <dependency>
     <groupId>org.springaicommunity</groupId>
     <artifactId>spring-ai-agent-utils</artifactId>
-    <version>0.7.0</version>
+    <version>0.9.0</version>
 </dependency>
 ```
 
@@ -208,7 +208,7 @@ This project reimplements key Claude Code features based on:
 
 - Java 17+
 - Spring Boot 3.x / 4.x
-- Spring AI 2.0.0-M4 or later
+- Spring AI 2.0.0-RC1 or later
 - Maven 3.6+
 
 ## Building

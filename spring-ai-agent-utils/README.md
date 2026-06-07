@@ -45,7 +45,7 @@ While these tools can be used standalone, truly agentic behavior emerges when th
         <dependency>
             <groupId>org.springaicommunity</groupId>
             <artifactId>spring-ai-agent-utils-bom</artifactId>
-            <version>0.7.0</version>
+            <version>0.9.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -65,13 +65,13 @@ While these tools can be used standalone, truly agentic behavior emerges when th
 <dependency>
     <groupId>org.springaicommunity</groupId>
     <artifactId>spring-ai-agent-utils</artifactId>
-    <version>0.7.0</version>
+    <version>0.9.0</version>
 </dependency>
 ```
 
 _Check the latest version:_ [![](https://img.shields.io/maven-central/v/org.springaicommunity/spring-ai-agent-utils.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/org.springaicommunity/spring-ai-agent-utils)
 
-> **Note:** You need Spring AI version `2.0.0-M4` or later.
+> **Note:** You need Spring AI version `2.0.0-RC1` or later.
 
 
 ## Quick Start

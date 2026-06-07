@@ -2,7 +2,6 @@ package org.springaicommunity.skills;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.Scanner;
 
 import org.springaicommunity.agent.tools.FileSystemTools;
@@ -10,7 +9,6 @@ import org.springaicommunity.agent.tools.ShellTools;
 import org.springaicommunity.agent.utils.AgentEnvironment;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -63,8 +61,6 @@ public class Application {
 					FileSystemTools.builder().build())
 				
 				.defaultAdvisors(
-					// Tool Calling advisor
-					ToolCallAdvisor.builder().build(),
 					// Custom logging advisor
 					MyLoggingAdvisor.builder()
 						.showAvailableTools(false)

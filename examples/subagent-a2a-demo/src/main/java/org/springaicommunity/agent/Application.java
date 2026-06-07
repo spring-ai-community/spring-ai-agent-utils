@@ -23,7 +23,6 @@ import org.springaicommunity.agent.utils.AgentEnvironment;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -78,10 +77,10 @@ public class Application {
 					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, agentModelKnowledgeCutoff))
 
 				// Sub-agent task tool callbacks
-				.defaultToolCallbacks(taskTools)
+				.defaultTools(taskTools)
 
 				// Agent Skills tool
-				.defaultToolCallbacks(SkillsTool.builder().addSkillsResources(skillPaths).build())
+				.defaultTools(SkillsTool.builder().addSkillsResources(skillPaths).build())
 				
 				.defaultTools(
 					// Task orchestration tools
@@ -97,7 +96,6 @@ public class Application {
 
 				// Advisors
 				.defaultAdvisors(
-					ToolCallAdvisor.builder().disableInternalConversationHistory().build(),
 
 					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build())
 						.order(Ordered.HIGHEST_PRECEDENCE + 1000)

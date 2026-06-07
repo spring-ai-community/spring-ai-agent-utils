@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
@@ -77,9 +78,9 @@ public class AutoMemoryToolsAdvisor implements BaseChatMemoryAdvisor {
 								? "<system-reminder>Consolidate the long-term memory by summarizing and removing redundant information.</system-reminder>"
 								: ""));
 
-			ToolCallingChatOptions toolOptionsCopy = toolOptions.copy();
+			ToolCallingChatOptions toolOptionsCopy = toolOptions.mutate().build();
 
-			List<ToolCallback> toolCallbacks = new ArrayList<>(toolOptionsCopy.getToolCallbacks());
+			List<ToolCallback> toolCallbacks = new ArrayList<>(Objects.requireNonNullElse(toolOptionsCopy.getToolCallbacks(), List.of()));
 
 			Set<String> existingNames = toolCallbacks.stream()
 				.map(tc -> tc.getToolDefinition().name())
