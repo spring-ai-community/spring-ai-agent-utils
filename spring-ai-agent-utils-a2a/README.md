@@ -84,7 +84,7 @@ The resolver expects each A2A-compatible agent to expose an [Agent Card](https:/
 <dependency>
     <groupId>org.springaicommunity</groupId>
     <artifactId>spring-ai-agent-utils-a2a</artifactId>
-    <version>0.9.0</version>
+    <version>0.10.0</version>
 </dependency>
 ```
 
@@ -97,7 +97,7 @@ See the [subagent-a2a-demo](../examples/subagent-a2a-demo) for a complete exampl
 ## Requirements
 
 - Java 17+
-- Spring AI 2.0.0-SNAPSHOT (> M1)
+- Spring AI 2.0.0
 - A running A2A-compatible agent server
 
 ## License

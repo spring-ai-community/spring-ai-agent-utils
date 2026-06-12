@@ -42,7 +42,7 @@ Use the BOM to manage versions consistently across all modules:
         <dependency>
             <groupId>org.springaicommunity</groupId>
             <artifactId>spring-ai-agent-utils-bom</artifactId>
-            <version>0.9.0</version>
+            <version>0.10.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -63,14 +63,14 @@ Or add the core library directly:
 <dependency>
     <groupId>org.springaicommunity</groupId>
     <artifactId>spring-ai-agent-utils</artifactId>
-    <version>0.9.0</version>
+    <version>0.10.0</version>
 </dependency>
 ```
 
 _Check the latest version:_ [![](https://img.shields.io/maven-central/v/org.springaicommunity/spring-ai-agent-utils.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/org.springaicommunity/spring-ai-agent-utils)
 
 !!! note
-    You need Spring AI version `2.0.0-RC1` or later.
+    You need Spring AI version `2.0.0` or later.
 
 **2. Configure your agent:**
 
@@ -145,7 +145,7 @@ public class Application {
 
 - Java 17+
 - Spring Boot 3.x / 4.x
-- Spring AI 2.0.0-RC1 or later
+- Spring AI 2.0.0 or later
 - Maven 3.6+
 
 ## Building

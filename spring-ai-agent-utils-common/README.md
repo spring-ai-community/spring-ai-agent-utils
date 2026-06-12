@@ -79,7 +79,7 @@ TaskTool.builder()
 <dependency>
     <groupId>org.springaicommunity</groupId>
     <artifactId>spring-ai-agent-utils-common</artifactId>
-    <version>0.9.0</version>
+    <version>0.10.0</version>
 </dependency>
 ```
 
@@ -88,7 +88,7 @@ TaskTool.builder()
 ## Requirements
 
 - Java 17+
-- Spring AI 2.0.0-SNAPSHOT (> M1)
+- Spring AI 2.0.0
 
 ## License
 
