@@ -17,6 +17,7 @@ package org.springaicommunity.agent.tools;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,8 @@ import org.springaicommunity.agent.tools.TodoWriteTool.Todos;
 import org.springaicommunity.agent.tools.TodoWriteTool.Todos.Status;
 import org.springaicommunity.agent.tools.TodoWriteTool.Todos.TodoItem;
 
+import org.springframework.ai.chat.model.ToolContext;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -34,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * Tests for {@link TodoWriteTool}.
  *
  * @author Christian Tzolov
+ * @author zz_zhi
  */
 @DisplayName("TodoWriteTool Tests")
 class TodoWriteToolTest {
@@ -385,6 +389,83 @@ class TodoWriteToolTest {
 			String result = TodoWriteToolTest.this.tool.todoWrite(todos4);
 
 			assertThat(result).contains("Todos have been modified successfully");
+		}
+
+	}
+
+	@Nested
+	@DisplayName("ToolContext Tests")
+	class ToolContextTests {
+
+		@Test
+		@DisplayName("Should pass ToolContext to TodoEventHandler")
+		void shouldPassToolContextToTodoEventHandler() {
+			AtomicReference<ToolContext> capturedContext = new AtomicReference<>();
+			TodoWriteTool.TodoEventHandler handler = new TodoWriteTool.TodoEventHandler() {
+				@Override
+				public void handle(Todos todos) {
+					// no-op
+				}
+
+				@Override
+				public void handle(Todos todos, ToolContext toolContext) {
+					capturedContext.set(toolContext);
+				}
+			};
+			TodoWriteTool contextTool = TodoWriteTool.builder().todoEventHandler(handler).build();
+
+			List<TodoItem> items = List.of(new TodoItem("Task 1", Status.pending, "Doing task 1"));
+			Todos todos = new Todos(items);
+			ToolContext toolContext = new ToolContext(Map.of("channelId", "test-channel"));
+
+			contextTool.todoWrite(todos, toolContext);
+
+			assertThat(capturedContext.get()).isSameAs(toolContext);
+			assertThat(capturedContext.get().getContext()).containsEntry("channelId", "test-channel");
+		}
+
+		@Test
+		@DisplayName("Should pass null ToolContext when using overloaded method")
+		void shouldPassNullToolContextWhenUsingOverloadedMethod() {
+			AtomicReference<ToolContext> capturedContext = new AtomicReference<>();
+			TodoWriteTool.TodoEventHandler handler = new TodoWriteTool.TodoEventHandler() {
+				@Override
+				public void handle(Todos todos) {
+					// no-op
+				}
+
+				@Override
+				public void handle(Todos todos, ToolContext toolContext) {
+					capturedContext.set(toolContext);
+				}
+			};
+			TodoWriteTool contextTool = TodoWriteTool.builder().todoEventHandler(handler).build();
+
+			List<TodoItem> items = List.of(new TodoItem("Task 1", Status.pending, "Doing task 1"));
+			Todos todos = new Todos(items);
+
+			contextTool.todoWrite(todos);
+
+			assertThat(capturedContext.get()).isNull();
+		}
+
+		@Test
+		@DisplayName("Should work with old-style TodoEventHandler lambda (backward compatibility)")
+		void shouldWorkWithOldStyleTodoEventHandlerLambda() {
+			// Old-style lambda: todos -> ... (single argument)
+			AtomicReference<Todos> capturedTodos = new AtomicReference<>();
+			TodoWriteTool oldStyleTool = TodoWriteTool.builder()
+				.todoEventHandler(capturedTodos::set)
+				.build();
+
+			List<TodoItem> items = List.of(new TodoItem("Task 1", Status.pending, "Doing task 1"));
+			Todos todos = new Todos(items);
+			ToolContext toolContext = new ToolContext(Map.of("key", "value"));
+
+			String result = oldStyleTool.todoWrite(todos, toolContext);
+
+			assertThat(result).contains("Todos have been modified successfully");
+			assertThat(capturedTodos.get()).isEqualTo(todos);
 		}
 
 	}

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.ai.util.json.JsonParser;
@@ -53,6 +54,7 @@ import org.springframework.util.Assert;
  * has to be set for this behavior.
  *
  * @author Christian Tzolov
+ * @author zz_zhi
  * @see <a href=
  * "https://platform.claude.com/docs/en/agent-sdk/user-input#question-format"> Claude
  * Agent SDK - Question Format</a>
@@ -75,7 +77,13 @@ public class AskUserQuestionTool {
 	 */
 	@FunctionalInterface
 	public interface QuestionHandler {
+
 		Map<String, String> handle(List<Question> questions);
+
+		default Map<String, String> handle(List<Question> questions, ToolContext toolContext) {
+			return handle(questions);
+		}
+
 	}
 
 	private final QuestionHandler questionHandler;
@@ -191,7 +199,8 @@ public class AskUserQuestionTool {
 	public String askUserQuestion(
 			@ToolParam(description = "Questions to ask the user (1-4 questions)") List<Question> questions,
 			@ToolParam(description = "User answers collected by the permission component",
-					required = false) Map<String, String> answers) {
+					required = false) Map<String, String> answers,
+			ToolContext toolContext) {
 
 		// Validate the questions list
 		this.validateQuestions(questions);
@@ -201,7 +210,7 @@ public class AskUserQuestionTool {
 			questions.forEach(q -> logger.trace("Question: {}", q.question()));
 		}
 
-		Map<String, String> result = this.questionHandler.handle(questions);
+		Map<String, String> result = this.questionHandler.handle(questions, toolContext);
 
 		// Validate the answer map
 		if (this.answersValidation) {
@@ -213,6 +222,14 @@ public class AskUserQuestionTool {
 		}
 
 		return "User has answered your questions: " + JsonParser.toJson(result);
+	}
+
+	/**
+	 * Backward-compatible overload without {@link ToolContext}. Delegates to
+	 * {@link #askUserQuestion(List, Map, ToolContext)} with a {@code null} context.
+	 */
+	public String askUserQuestion(List<Question> questions, Map<String, String> answers) {
+		return askUserQuestion(questions, answers, null);
 	}
 
 	/**
