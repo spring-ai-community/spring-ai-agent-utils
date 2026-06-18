@@ -119,7 +119,12 @@ public class ClaudeSubagentType {
 
 		private List<ToolCallback> defaultClaudeSubagentTools() {
 
-			ChatClient.Builder webFetchChatClientBuilder = this.chatClientBuilderMap.get("default"); // ?
+			// Use a dedicated "webfetch" builder for the WebFetch tool's internal
+			// summarization calls when provided, so they can be configured (e.g. model,
+			// logging advisor label) independently of the subagent's default builder.
+			// Falls back to the "default" builder when no "webfetch" builder is registered.
+			ChatClient.Builder webFetchChatClientBuilder = this.chatClientBuilderMap.getOrDefault("webfetch",
+					this.chatClientBuilderMap.get("default"));
 
 			List<ToolCallback> defaultCallbacks = new ArrayList<>();
 

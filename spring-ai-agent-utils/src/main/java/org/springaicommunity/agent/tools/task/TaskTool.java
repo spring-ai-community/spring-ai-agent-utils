@@ -153,7 +153,7 @@ public class TaskTool {
 			if (Boolean.TRUE.equals(taskCall.run_in_background())) {
 				// Create background task using CompletableFuture
 				var bgTask = this.taskRepository.putTask("task_" + UUID.randomUUID(),
-						() -> subagentExecutor.execute(taskCall, subagent));
+						() -> execute(subagentExecutor, taskCall, subagent));
 
 				return String.format(
 						"task_id: %s\n\nBackground task started with ID: %s\nUse TaskOutput tool with task_id='%s' to retrieve results.",
@@ -161,7 +161,22 @@ public class TaskTool {
 			}
 
 			// Synchronous execution (existing behavior)
-			return subagentExecutor.execute(taskCall, subagent);
+			return execute(subagentExecutor, taskCall, subagent);
+		}
+
+		/**
+		 * Executes the subagent and logs the full stack trace on failure. The tool-calling
+		 * framework otherwise only surfaces a generic "Request failed" message to the
+		 * model, hiding the real cause.
+		 */
+		private String execute(SubagentExecutor subagentExecutor, TaskCall taskCall, SubagentDefinition subagent) {
+			try {
+				return subagentExecutor.execute(taskCall, subagent);
+			}
+			catch (Exception ex) {
+				logger.error("Subagent '{}' (kind '{}') execution failed", subagent.getName(), subagent.getKind(), ex);
+				throw ex;
+			}
 		}
 
 	}
