@@ -33,6 +33,8 @@ import org.junit.jupiter.api.Test;
 import org.springaicommunity.agent.tools.AskUserQuestionTool.Question;
 import org.springaicommunity.agent.tools.AskUserQuestionTool.Question.Option;
 
+import org.springframework.ai.chat.model.ToolContext;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -40,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * Tests for {@link AskUserQuestionTool}.
  *
  * @author Christian Tzolov
+ * @author zz_zhi
  */
 @DisplayName("AskUserQuestionTool Tests")
 class AskUserQuestionToolTest {
@@ -600,6 +603,103 @@ class AskUserQuestionToolTest {
 			executor.shutdown();
 
 			assertThat(callCount.get()).isEqualTo(threadCount);
+		}
+
+	}
+
+	@Nested
+	@DisplayName("ToolContext Tests")
+	class ToolContextTests {
+
+		@Test
+		@DisplayName("Should pass ToolContext to QuestionHandler")
+		void shouldPassToolContextToQuestionHandler() {
+			AtomicReference<ToolContext> capturedContext = new AtomicReference<>();
+			AskUserQuestionTool.QuestionHandler handler = new AskUserQuestionTool.QuestionHandler() {
+				@Override
+				public Map<String, String> handle(List<Question> questions) {
+					Map<String, String> answers = new HashMap<>();
+					for (Question q : questions) {
+						answers.put(q.question(), q.options().get(0).label());
+					}
+					return answers;
+				}
+
+				@Override
+				public Map<String, String> handle(List<Question> questions, ToolContext toolContext) {
+					capturedContext.set(toolContext);
+					return handle(questions);
+				}
+			};
+			AskUserQuestionTool contextTool = AskUserQuestionTool.builder().questionHandler(handler).build();
+
+			List<Option> options = List.of(new Option("A", "First"), new Option("B", "Second"));
+			List<Question> questions = List.of(new Question("Question?", "Header", options, false));
+			ToolContext toolContext = new ToolContext(Map.of("key", "value"));
+
+			String result = contextTool.askUserQuestion(questions, null, toolContext);
+
+			assertThat(result).isNotNull();
+			assertThat(capturedContext.get()).isSameAs(toolContext);
+			assertThat(capturedContext.get().getContext()).containsEntry("key", "value");
+		}
+
+		@Test
+		@DisplayName("Should pass null ToolContext when using overloaded method")
+		void shouldPassNullToolContextWhenUsingOverloadedMethod() {
+			AtomicReference<ToolContext> capturedContext = new AtomicReference<>();
+			AskUserQuestionTool.QuestionHandler handler = new AskUserQuestionTool.QuestionHandler() {
+				@Override
+				public Map<String, String> handle(List<Question> questions) {
+					Map<String, String> answers = new HashMap<>();
+					for (Question q : questions) {
+						answers.put(q.question(), q.options().get(0).label());
+					}
+					return answers;
+				}
+
+				@Override
+				public Map<String, String> handle(List<Question> questions, ToolContext toolContext) {
+					capturedContext.set(toolContext);
+					return handle(questions);
+				}
+			};
+			AskUserQuestionTool contextTool = AskUserQuestionTool.builder().questionHandler(handler).build();
+
+			List<Option> options = List.of(new Option("A", "First"), new Option("B", "Second"));
+			List<Question> questions = List.of(new Question("Question?", "Header", options, false));
+
+			String result = contextTool.askUserQuestion(questions, null);
+
+			assertThat(result).isNotNull();
+			assertThat(capturedContext.get()).isNull();
+		}
+
+		@Test
+		@DisplayName("Should work with old-style QuestionHandler lambda (backward compatibility)")
+		void shouldWorkWithOldStyleQuestionHandlerLambda() {
+			// Old-style lambda: questions -> ... (single argument)
+			AtomicReference<List<Question>> capturedQuestions = new AtomicReference<>();
+			AskUserQuestionTool oldStyleTool = AskUserQuestionTool.builder()
+				.questionHandler(questions -> {
+					capturedQuestions.set(questions);
+					Map<String, String> answers = new HashMap<>();
+					for (Question q : questions) {
+						answers.put(q.question(), q.options().get(0).label());
+					}
+					return answers;
+				})
+				.build();
+
+			List<Option> options = List.of(new Option("A", "First"), new Option("B", "Second"));
+			List<Question> questions = List.of(new Question("Question?", "Header", options, false));
+			ToolContext toolContext = new ToolContext(Map.of("key", "value"));
+
+			String result = oldStyleTool.askUserQuestion(questions, null, toolContext);
+
+			assertThat(result).isNotNull();
+			assertThat(result).contains("User has answered your questions");
+			assertThat(capturedQuestions.get()).hasSize(1);
 		}
 
 	}
