@@ -28,8 +28,9 @@ import org.springaicommunity.agent.common.task.subagent.TaskCall;
 import org.springaicommunity.agent.utils.Skills;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
+import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -51,8 +52,16 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 
 	private final List<String> skillsDirectories;
 
+	private final ToolCallingManager toolCallingManager;
+
 	public ClaudeSubagentExecutor(Map<String, ChatClient.Builder> chatClientBuilderMap, List<ToolCallback> tools,
 			List<String> skillsDirectories) {
+
+		this(chatClientBuilderMap, tools, skillsDirectories, null);
+	}
+
+	public ClaudeSubagentExecutor(Map<String, ChatClient.Builder> chatClientBuilderMap, List<ToolCallback> tools,
+			List<String> skillsDirectories, ToolCallingManager toolCallingManager) {
 
 		Assert.notEmpty(chatClientBuilderMap, "chatClientBuilderMap must not be empty");
 		Assert.isTrue(chatClientBuilderMap.containsKey("default"),
@@ -63,6 +72,7 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 		this.chatClientBuilderMap = chatClientBuilderMap;
 		this.tools = tools;
 		this.skillsDirectories = skillsDirectories;
+		this.toolCallingManager = toolCallingManager;
 	}
 
 	@Override
@@ -130,7 +140,11 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 
 		// TODO Add ToolCallAdvisors only if not already present in the
 		// ChatClient.Builder.
-		return builder.defaultAdvisors(ToolCallAdvisor.builder().build()).build();
+		var toolCallingAdvisorBuilder = ToolCallingAdvisor.builder();
+		if (this.toolCallingManager != null) {
+			toolCallingAdvisorBuilder.toolCallingManager(this.toolCallingManager);
+		}
+		return builder.defaultAdvisors(toolCallingAdvisorBuilder.build()).build();
 	}
 
 	private static final Map<String, String> MODEL_NAME_MAPPER = Map.of("opus", "claude-opus-4-64k", "haiku",

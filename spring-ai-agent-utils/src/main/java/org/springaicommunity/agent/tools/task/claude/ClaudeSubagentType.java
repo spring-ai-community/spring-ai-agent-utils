@@ -31,6 +31,7 @@ import org.springaicommunity.agent.tools.SmartWebFetchTool;
 import org.springaicommunity.agent.tools.TodoWriteTool;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.core.io.Resource;
@@ -55,6 +56,8 @@ public class ClaudeSubagentType {
 
 		private List<String> skillsDirectories = new ArrayList<>();
 
+		private ToolCallingManager toolCallingManager;
+
 		public Builder braveApiKey(String braveApiKey) {
 			Assert.notNull(braveApiKey, "braveApiKey must not be null");
 			this.braveApiKey = braveApiKey;
@@ -71,6 +74,12 @@ public class ClaudeSubagentType {
 		public Builder chatClientBuilders(Map<String, ChatClient.Builder> chatClientBuilderMap) {
 			Assert.notNull(chatClientBuilderMap, "chatClientBuilderMap must not be null");
 			this.chatClientBuilderMap.putAll(chatClientBuilderMap);
+			return this;
+		}
+
+		public Builder toolCallingManager(ToolCallingManager toolCallingManager) {
+			Assert.notNull(toolCallingManager, "toolCallingManager must not be null");
+			this.toolCallingManager = toolCallingManager;
 			return this;
 		}
 
@@ -112,7 +121,7 @@ public class ClaudeSubagentType {
 					"chatClientBuilderMap must contain a 'default' builder for the SmartWebFetchTool");
 
 			ClaudeSubagentExecutor executor = new ClaudeSubagentExecutor(this.chatClientBuilderMap,
-					this.defaultClaudeSubagentTools(), this.skillsDirectories);
+					this.defaultClaudeSubagentTools(), this.skillsDirectories, this.toolCallingManager);
 
 			return new SubagentType(new ClaudeSubagentResolver(), executor);
 		}
