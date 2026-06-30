@@ -23,6 +23,7 @@ import java.util.function.BiConsumer;
 import io.a2a.client.Client;
 import io.a2a.client.ClientEvent;
 import io.a2a.client.TaskEvent;
+import io.a2a.client.TaskUpdateEvent;
 import io.a2a.client.config.ClientConfig;
 import io.a2a.client.transport.jsonrpc.JSONRPCTransport;
 import io.a2a.client.transport.jsonrpc.JSONRPCTransportConfig;
@@ -32,6 +33,7 @@ import io.a2a.spec.Message;
 import io.a2a.spec.Part;
 import io.a2a.spec.Task;
 import io.a2a.spec.TextPart;
+import io.a2a.spec.TaskState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springaicommunity.agent.common.task.subagent.SubagentDefinition;
@@ -70,24 +72,35 @@ public class A2ASubagentExecutor implements SubagentExecutor {
 			AtomicReference<String> responseText = new AtomicReference<>("");
 
 			BiConsumer<ClientEvent, AgentCard> consumer = (event, card) -> {
-				if (event instanceof TaskEvent taskEvent) {
-					Task completedTask = taskEvent.getTask();
-					logger.info("Received task response: status={}", completedTask.getStatus().state());
+				Task task;
 
-					// Extract text from artifacts
-					if (completedTask.getArtifacts() != null) {
-						StringBuilder sb = new StringBuilder();
-						for (Artifact artifact : completedTask.getArtifacts()) {
-							if (artifact.parts() != null) {
-								for (Part<?> part : artifact.parts()) {
-									if (part instanceof TextPart textPart) {
-										sb.append(textPart.getText());
-									}
+				if (event instanceof TaskEvent taskEvent) {
+					task = taskEvent.getTask();
+				} else if (event instanceof TaskUpdateEvent taskUpdateEvent) {
+					task = taskUpdateEvent.getTask();
+				} else {
+					return;
+				}
+
+				TaskState taskState = task.getStatus().state();
+				logger.info("Received task response: status={}", taskState);
+
+				// Extract text from artifacts
+				if (task.getArtifacts() != null) {
+					StringBuilder sb = new StringBuilder();
+					for (Artifact artifact : task.getArtifacts()) {
+						if (artifact.parts() != null) {
+							for (Part<?> part : artifact.parts()) {
+								if (part instanceof TextPart textPart) {
+									sb.append(textPart.getText());
 								}
 							}
 						}
-						responseText.set(sb.toString());
 					}
+					responseText.set(sb.toString());
+				}
+
+				if(taskState.isFinal()) {
 					responseFuture.complete(responseText.get());
 				}
 			};
