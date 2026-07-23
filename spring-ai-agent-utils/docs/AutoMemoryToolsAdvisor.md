@@ -207,6 +207,7 @@ See [`memory-tools-advisor-demo`](https://github.com/spring-ai-community/spring-
 ## See Also
 
 - [AutoMemoryTools](AutoMemoryTools.md) — the underlying tool implementations, file conventions, and security model
+- [AutoDreamAdvisor](AutoDreamAdvisor.md) — schedules out-of-band background consolidation, complementing `memoryConsolidationTrigger`
 - [FileSystemTools](FileSystemTools.md) — general-purpose file read/write/edit (not sandboxed)
 - [Claude Code — Memory](https://code.claude.com/docs/en/memory) — the file-based memory design this library is modelled after
 - [Claude API SDK — Memory Tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool) — the official tool specification

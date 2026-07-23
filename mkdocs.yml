@@ -57,6 +57,8 @@ nav:
   - Memory:
     - AutoMemoryTools: tools/AutoMemoryTools.md
     - AutoMemoryToolsAdvisor: tools/AutoMemoryToolsAdvisor.md
+    - AutoDreamService: tools/AutoDreamService.md
+    - AutoDreamAdvisor: tools/AutoDreamAdvisor.md
   - Multi-Agent:
     - Task Tools: tools/TaskTools.md
     - Subagent Framework: tools/Subagent.md

@@ -53,6 +53,7 @@
 	<properties>
 		<maven.compiler.target>17</maven.compiler.target>
 		<maven.compiler.source>17</maven.compiler.source>
+		<spring-ai-session.version>0.7.0</spring-ai-session.version>
 	</properties>
 
 	<dependencies>
@@ -74,6 +75,17 @@
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-client-chat</artifactId>
 			<scope>provided</scope>
+		</dependency>
+
+		<!-- Optional: Auto-Dream Phase 2 cross-session recall (AutoDreamService.sessionService(...)).
+			Provided + optional — consumers who don't wire session-integrated dreaming
+			never pull this in transitively. -->
+		<dependency>
+			<groupId>org.springaicommunity</groupId>
+			<artifactId>spring-ai-session</artifactId>
+			<version>${spring-ai-session.version}</version>
+			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
 
 		<dependency>
