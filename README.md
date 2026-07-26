@@ -34,7 +34,7 @@ spring-ai-agent-utils/
     └── memory/
         ├── memory-tools-demo/           # Long-term memory with AutoMemoryTools (manual setup)
         ├── memory-filesystem-tools-demo/# Long-term memory with general FileSystemTools
-        └── memory-tools-advisor-demo/   # Long-term memory via AutoAutoMemoryToolsAdvisor
+        └── memory-tools-advisor-demo/   # Long-term memory via AutoMemoryToolsAdvisor
 ```
 
 ## Agentic Utils
@@ -62,7 +62,7 @@ These are the agent tools needed to implement any agentic behavior
 #### Long-term memory
 
 - **[AutoMemoryTools](spring-ai-agent-utils/docs/AutoMemoryTools.md)** - Persistent, file-based long-term memory that survives across conversations. Agents store typed memory files (`user`, `feedback`, `project`, `reference`) in a sandboxed directory and navigate them via a `MEMORY.md` index. Requires the companion `classpath:/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md` system prompt (bundled in the jar) to instruct the agent on when and how to use the tools. Inspired by [Claude Code memory](https://code.claude.com/docs/en/memory) and the [Claude API SDK memory tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool).
-- **[AutoAutoMemoryToolsAdvisor](spring-ai-agent-utils/docs/AutoAutoMemoryToolsAdvisor.md)** - A `ChatClient` advisor that wires `AutoMemoryTools` and its companion system prompt into the request pipeline automatically. Eliminates manual tool and prompt registration, deduplicates callbacks, and supports an optional `memoryConsolidationTrigger` to prompt the model to summarise and clean up memories on a schedule.
+- **[AutoMemoryToolsAdvisor](spring-ai-agent-utils/docs/AutoMemoryToolsAdvisor.md)** - A `ChatClient` advisor that wires `AutoMemoryTools` and its companion system prompt into the request pipeline automatically. Eliminates manual tool and prompt registration, deduplicates callbacks, and supports an optional `memoryConsolidationTrigger` to prompt the model to summarise and clean up memories on a schedule.
 
 #### Task orchestration & multi-agent
 
@@ -234,7 +234,7 @@ mvn spring-boot:run
 | [ask-user-question-demo](examples/ask-user-question-demo) | Interactive agent-user communication with `AskUserQuestionTool` |
 | [memory/memory-tools-demo](examples/memory/memory-tools-demo) | Long-term memory across conversations using dedicated, sandboxed `AutoMemoryTools` (manual setup) |
 | [memory/memory-filesystem-tools-demo](examples/memory/memory-filesystem-tools-demo) | Long-term memory using general-purpose `FileSystemTools` — no dedicated memory tooling required |
-| [memory/memory-tools-advisor-demo](examples/memory/memory-tools-advisor-demo) | Long-term memory via `AutoAutoMemoryToolsAdvisor` — advisor-based setup with consolidation trigger |
+| [memory/memory-tools-advisor-demo](examples/memory/memory-tools-advisor-demo) | Long-term memory via `AutoMemoryToolsAdvisor` — advisor-based setup with consolidation trigger |
 
 See [examples/README.md](examples/README.md) for setup and usage details.
 

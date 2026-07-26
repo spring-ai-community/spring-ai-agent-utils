@@ -1,8 +1,8 @@
-# AutoAutoMemoryToolsAdvisor
+# AutoMemoryToolsAdvisor
 
 A Spring AI `ChatClient` advisor that gives any agent **automatic long-term memory** by wiring [`AutoMemoryTools`](AutoMemoryTools.md) and its companion system prompt into the request pipeline as a single, self-contained unit.
 
-![AutoAutoMemoryToolsAdvisor](../images/spring-ai-auto-memory-tools-advisor.png)
+![AutoMemoryToolsAdvisor](../images/spring-ai-auto-memory-tools-advisor.png)
 
 ## What it does
 
@@ -18,9 +18,9 @@ If the prompt carries no `ToolCallingChatOptions` the request is returned unchan
 
 ## Long-term memory vs. session memory
 
-`AutoAutoMemoryToolsAdvisor` is a **long-term memory** mechanism. It is designed to complement, not replace, Spring AI's built-in short-term conversation memory (e.g. `MessageChatMemoryAdvisor` + `MessageWindowChatMemory`). The two layers serve fundamentally different purposes and should normally be used together:
+`AutoMemoryToolsAdvisor` is a **long-term memory** mechanism. It is designed to complement, not replace, Spring AI's built-in short-term conversation memory (e.g. `MessageChatMemoryAdvisor` + `MessageWindowChatMemory`). The two layers serve fundamentally different purposes and should normally be used together:
 
-| | Session memory (`MessageChatMemoryAdvisor`) | Long-term memory (`AutoAutoMemoryToolsAdvisor`) |
+| | Session memory (`MessageChatMemoryAdvisor`) | Long-term memory (`AutoMemoryToolsAdvisor`) |
 |---|---|---|
 | **Scope** | Current conversation only | Persists across conversations |
 | **Storage** | In-process (`ChatMemory`) | Files on disk via `AutoMemoryTools` |
@@ -34,7 +34,7 @@ A typical agent setup combines both:
 ChatClient chatClient = ChatClient.builder(chatModel)
     .defaultAdvisors(
         // Long-term memory — facts that survive across sessions
-        AutoAutoMemoryToolsAdvisor.builder()
+        AutoMemoryToolsAdvisor.builder()
             .memoriesRootDirectory("/home/user/.agent/memories")
             .build(),
 
@@ -54,7 +54,7 @@ In this setup the model has the best of both worlds: the full context of the cur
 ## Quick Start
 
 ```java
-AutoAutoMemoryToolsAdvisor memoryAdvisor = AutoAutoMemoryToolsAdvisor.builder()
+AutoMemoryToolsAdvisor memoryAdvisor = AutoMemoryToolsAdvisor.builder()
     .memoriesRootDirectory("/home/user/.agent/memories")
     .build();
 
@@ -68,7 +68,7 @@ That's all. On the first turn the model reads `MEMORY.md` via `MemoryView`, load
 ## Builder Configuration
 
 ```java
-AutoAutoMemoryToolsAdvisor advisor = AutoAutoMemoryToolsAdvisor.builder()
+AutoMemoryToolsAdvisor advisor = AutoMemoryToolsAdvisor.builder()
     .memoriesRootDirectory("/path/to/memories")          // required
     .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200)         // optional
     .memorySystemPrompt(customPromptResource)            // optional
@@ -95,7 +95,7 @@ Over time the memory store can accumulate redundant or outdated entries. The `me
 
 ```java
 // Trigger consolidation roughly every 20 requests (stateless approximation)
-AutoAutoMemoryToolsAdvisor advisor = AutoAutoMemoryToolsAdvisor.builder()
+AutoMemoryToolsAdvisor advisor = AutoMemoryToolsAdvisor.builder()
     .memoriesRootDirectory("/path/to/memories")
     .memoryConsolidationTrigger((req, instant) ->
         Math.random() < 0.05)   // ~5 % of requests
@@ -170,7 +170,7 @@ ChatClient chatClient = ChatClient.builder(chatModel)
 // Advisor setup — equivalent, less boilerplate
 ChatClient chatClient = ChatClient.builder(chatModel)
     .defaultAdvisors(
-        AutoAutoMemoryToolsAdvisor.builder()
+        AutoMemoryToolsAdvisor.builder()
             .memoriesRootDirectory("/path/to/memories")
             .build())
     .build();
@@ -194,7 +194,7 @@ To use a custom prompt, provide any `Resource` that contains the same placeholde
 @Value("classpath:/my-custom-memory-prompt.md")
 Resource customPrompt;
 
-AutoAutoMemoryToolsAdvisor.builder()
+AutoMemoryToolsAdvisor.builder()
     .memoriesRootDirectory("/path/to/memories")
     .memorySystemPrompt(customPrompt)
     .build();
@@ -202,7 +202,7 @@ AutoAutoMemoryToolsAdvisor.builder()
 
 ## Demo Application
 
-See [`memory-tools-advisor-demo`](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-advisor-demo) for a complete runnable example showing `AutoAutoMemoryToolsAdvisor` combined with `MessageChatMemoryAdvisor` and a custom logging advisor.
+See [`memory-tools-advisor-demo`](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-advisor-demo) for a complete runnable example showing `AutoMemoryToolsAdvisor` combined with `MessageChatMemoryAdvisor` and a custom logging advisor.
 
 ## See Also
 

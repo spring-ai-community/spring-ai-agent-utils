@@ -202,7 +202,7 @@ chatClientBuilder
 
 ## `ToolCallingAdvisor` Requires at Least One Registered Tool (spring-ai #6325)
 
-When using `AutoAutoMemoryToolsAdvisor` without any other tools pre-registered on the `ChatClient`, the auto-configured `ToolCallingAdvisor` may not activate because there are no tools in the default configuration to trigger it. The advisor injects memory tools at request time, but the framework checks for tools at build time.
+When using `AutoMemoryToolsAdvisor` without any other tools pre-registered on the `ChatClient`, the auto-configured `ToolCallingAdvisor` may not activate because there are no tools in the default configuration to trigger it. The advisor injects memory tools at request time, but the framework checks for tools at build time.
 
 **Workaround** — register a dummy tool on the `ChatClient` until the upstream issue is resolved:
 
@@ -214,7 +214,7 @@ public static class DummyTools {
 
 chatClientBuilder
     .defaultTools(new DummyTools())  // workaround for spring-ai#6325
-    .defaultAdvisors(AutoAutoMemoryToolsAdvisor.builder()
+    .defaultAdvisors(AutoMemoryToolsAdvisor.builder()
         .memoriesRootDirectory("/path/to/memories")
         .build())
     .build();
