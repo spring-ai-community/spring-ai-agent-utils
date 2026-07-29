@@ -28,7 +28,6 @@ import org.springaicommunity.agent.common.task.subagent.TaskCall;
 import org.springaicommunity.agent.utils.Skills;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.util.Assert;
@@ -120,7 +119,7 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 					.toList();
 			}
 
-			builder.defaultToolCallbacks(subagentTools);
+			builder.defaultTools(subagentTools);
 		}
 
 		if (!claudeSubagent.permissionMode().equals("default")) {
@@ -128,9 +127,7 @@ public class ClaudeSubagentExecutor implements SubagentExecutor {
 					+ claudeSubagent.permissionMode());
 		}
 
-		// TODO Add ToolCallAdvisors only if not already present in the
-		// ChatClient.Builder.
-		return builder.defaultAdvisors(ToolCallAdvisor.builder().build()).build();
+		return builder.build();
 	}
 
 	private static final Map<String, String> MODEL_NAME_MAPPER = Map.of("opus", "claude-opus-4-64k", "haiku",
