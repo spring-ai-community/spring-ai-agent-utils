@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../images/logo2.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#autoautomemorytoolsadvisor" class="md-skip">
+        <a href="#automemorytoolsadvisor" class="md-skip">
           Skip to content
         </a>
       
@@ -1781,9 +1781,9 @@
   
 
 
-<h1 id="autoautomemorytoolsadvisor">AutoAutoMemoryToolsAdvisor<a class="headerlink" href="#autoautomemorytoolsadvisor" title="Permanent link">&para;</a></h1>
+<h1 id="automemorytoolsadvisor">AutoMemoryToolsAdvisor<a class="headerlink" href="#automemorytoolsadvisor" title="Permanent link">&para;</a></h1>
 <p>A Spring AI <code>ChatClient</code> advisor that gives any agent <strong>automatic long-term memory</strong> by wiring <a href="../AutoMemoryTools/"><code>AutoMemoryTools</code></a> and its companion system prompt into the request pipeline as a single, self-contained unit.</p>
-<p><img alt="AutoAutoMemoryToolsAdvisor" src="../../images/spring-ai-auto-memory-tools-advisor.png" /></p>
+<p><img alt="AutoMemoryToolsAdvisor" src="../../images/spring-ai-auto-memory-tools-advisor.png" /></p>
 <h2 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h2>
 <p>On every <code>before()</code> call the advisor:</p>
 <ol>
@@ -1794,13 +1794,13 @@
 <p>If the prompt carries no <code>ToolCallingChatOptions</code> the request is returned unchanged — both the tool injection and the system prompt augmentation are skipped.</p>
 <p><code>after()</code> is a passthrough. Memory persistence is driven entirely by the model via tool calls during the conversation; no post-processing is needed.</p>
 <h2 id="long-term-memory-vs-session-memory">Long-term memory vs. session memory<a class="headerlink" href="#long-term-memory-vs-session-memory" title="Permanent link">&para;</a></h2>
-<p><code>AutoAutoMemoryToolsAdvisor</code> is a <strong>long-term memory</strong> mechanism. It is designed to complement, not replace, Spring AI's built-in short-term conversation memory (e.g. <code>MessageChatMemoryAdvisor</code> + <code>MessageWindowChatMemory</code>). The two layers serve fundamentally different purposes and should normally be used together:</p>
+<p><code>AutoMemoryToolsAdvisor</code> is a <strong>long-term memory</strong> mechanism. It is designed to complement, not replace, Spring AI's built-in short-term conversation memory (e.g. <code>MessageChatMemoryAdvisor</code> + <code>MessageWindowChatMemory</code>). The two layers serve fundamentally different purposes and should normally be used together:</p>
 <table>
 <thead>
 <tr>
 <th></th>
 <th>Session memory (<code>MessageChatMemoryAdvisor</code>)</th>
-<th>Long-term memory (<code>AutoAutoMemoryToolsAdvisor</code>)</th>
+<th>Long-term memory (<code>AutoMemoryToolsAdvisor</code>)</th>
 </tr>
 </thead>
 <tbody>
@@ -1835,7 +1835,7 @@
 <div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ChatClient</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatModel</span><span class="p">)</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="c1">// Long-term memory — facts that survive across sessions</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="n">AutoAutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">            </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">&quot;/home/user/.agent/memories&quot;</span><span class="p">)</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">            </span><span class="p">.</span><span class="na">build</span><span class="p">(),</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
@@ -1850,7 +1850,7 @@
 - Ephemeral details — what was said in this session, in-progress task state — belong in session memory.
 - Durable facts worth having next week — user preferences, project decisions, behavioural feedback — belong in long-term memory.</p>
 <h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">AutoAutoMemoryToolsAdvisor</span><span class="w"> </span><span class="n">memoryAdvisor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoAutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">AutoMemoryToolsAdvisor</span><span class="w"> </span><span class="n">memoryAdvisor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">&quot;/home/user/.agent/memories&quot;</span><span class="p">)</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
@@ -1860,7 +1860,7 @@
 </span></code></pre></div>
 <p>That's all. On the first turn the model reads <code>MEMORY.md</code> via <code>MemoryView</code>, loads relevant memory files, and writes new memories at the end of the session — all without any extra wiring.</p>
 <h2 id="builder-configuration">Builder Configuration<a class="headerlink" href="#builder-configuration" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">AutoAutoMemoryToolsAdvisor</span><span class="w"> </span><span class="n">advisor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoAutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">AutoMemoryToolsAdvisor</span><span class="w"> </span><span class="n">advisor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">&quot;/path/to/memories&quot;</span><span class="p">)</span><span class="w">          </span><span class="c1">// required</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="p">.</span><span class="na">order</span><span class="p">(</span><span class="n">BaseAdvisor</span><span class="p">.</span><span class="na">HIGHEST_PRECEDENCE</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w">         </span><span class="c1">// optional</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="p">.</span><span class="na">memorySystemPrompt</span><span class="p">(</span><span class="n">customPromptResource</span><span class="p">)</span><span class="w">            </span><span class="c1">// optional</span>
@@ -1912,7 +1912,7 @@
 <h2 id="memory-consolidation-trigger">Memory Consolidation Trigger<a class="headerlink" href="#memory-consolidation-trigger" title="Permanent link">&para;</a></h2>
 <p>Over time the memory store can accumulate redundant or outdated entries. The <code>memoryConsolidationTrigger</code> lets you inject a reminder at a chosen frequency to prompt the model to clean up:</p>
 <div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// Trigger consolidation roughly every 20 requests (stateless approximation)</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">AutoAutoMemoryToolsAdvisor</span><span class="w"> </span><span class="n">advisor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoAutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">AutoMemoryToolsAdvisor</span><span class="w"> </span><span class="n">advisor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">&quot;/path/to/memories&quot;</span><span class="p">)</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="p">.</span><span class="na">memoryConsolidationTrigger</span><span class="p">((</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">instant</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">        </span><span class="n">Math</span><span class="p">.</span><span class="na">random</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.05</span><span class="p">)</span><span class="w">   </span><span class="c1">// ~5 % of requests</span>
@@ -1988,7 +1988,7 @@
 </span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="c1">// Advisor setup — equivalent, less boilerplate</span>
 </span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ChatClient</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatModel</span><span class="p">)</span>
 </span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span>
-</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">        </span><span class="n">AutoAutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">        </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">            </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">&quot;/path/to/memories&quot;</span><span class="p">)</span>
 </span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">            </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
 </span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
@@ -2007,13 +2007,13 @@
 <div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">&quot;classpath:/my-custom-memory-prompt.md&quot;</span><span class="p">)</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">Resource</span><span class="w"> </span><span class="n">customPrompt</span><span class="p">;</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">AutoAutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">&quot;/path/to/memories&quot;</span><span class="p">)</span>
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="p">.</span><span class="na">memorySystemPrompt</span><span class="p">(</span><span class="n">customPrompt</span><span class="p">)</span>
 </span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
 <h2 id="demo-application">Demo Application<a class="headerlink" href="#demo-application" title="Permanent link">&para;</a></h2>
-<p>See <a href="https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-advisor-demo"><code>memory-tools-advisor-demo</code></a> for a complete runnable example showing <code>AutoAutoMemoryToolsAdvisor</code> combined with <code>MessageChatMemoryAdvisor</code> and a custom logging advisor.</p>
+<p>See <a href="https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-advisor-demo"><code>memory-tools-advisor-demo</code></a> for a complete runnable example showing <code>AutoMemoryToolsAdvisor</code> combined with <code>MessageChatMemoryAdvisor</code> and a custom logging advisor.</p>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../AutoMemoryTools/">AutoMemoryTools</a> — the underlying tool implementations, file conventions, and security model</li>
@@ -2094,7 +2094,7 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.path", "navigation.indexes", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": ["latest-snapshot", "latest"], "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
