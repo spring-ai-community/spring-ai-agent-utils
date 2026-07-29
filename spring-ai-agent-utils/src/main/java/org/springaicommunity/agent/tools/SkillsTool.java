@@ -36,31 +36,22 @@ import org.springframework.util.Assert;
 public class SkillsTool {
 
 	private static final String TOOL_DESCRIPTION_TEMPLATE = """
-			Execute a skill within the main conversation
+			Retrieve specialized instructions for a task by invoking a skill.
 
-			<skills_instructions>
-			When users ask you to perform tasks, check if any of the available skills below can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.
+			This tool returns detailed reference guides with code examples. \
+			It does NOT perform any action directly. After calling this tool, \
+			follow the returned instructions step-by-step using your other \
+			available tools (Bash, Write, Read, etc.).
 
-			How to use skills:
-			- Invoke skills using this tool with the skill name only (no arguments)
-			- When you invoke a skill, you will see <command-message>The "{name}" skill is loading</command-message>
-			- The skill's prompt will expand and provide detailed instructions on how to complete the task
+			IMPORTANT: These are NOT tool names. You must call this "Skill" tool \
+			with the "command" parameter set to one of the values below. \
+			For example: Skill({"command": "pdf"})
 
-			NOTE: Response always starts start with the base directory of the skill execution environment. You can use this to retrieve additional files of call shell commands.
-			Skill description follows after the base directory line.
-
-			Important:
-			- Only use skills listed in <available_skills> below
-			- Do not invoke a skill that is already running
-			</skills_instructions>
-
-			<available_skills>
-			%s
-			</available_skills>
-			""";
+			Available commands:
+			%s""";
 
 	public static record SkillsInput(
-			@ToolParam(description = "The skill name (no arguments). E.g., \"pdf\" or \"xlsx\"") String command) {
+			@ToolParam(description = "The skill command to invoke. Must be one of the available commands listed in this tool's description.") String command) {
 	}
 
 	public static class SkillsFunction implements Function<SkillsInput, String> {
@@ -128,10 +119,12 @@ public class SkillsTool {
 		public ToolCallback build() {
 			Assert.notEmpty(this.skills, "At least one skill must be configured");
 
-			String skillsXml = this.skills.stream().map(s -> s.toXml()).collect(Collectors.joining("\n"));
+			String commandList = this.skills.stream()
+				.map(s -> "- \"%s\": %s".formatted(s.name(), s.description()))
+				.collect(Collectors.joining("\n"));
 
 			return FunctionToolCallback.builder("Skill", new SkillsFunction(toSkillsMap(this.skills)))
-				.description(this.toolDescriptionTemplate.formatted(skillsXml))
+				.description(this.toolDescriptionTemplate.formatted(commandList))
 				.inputType(SkillsInput.class)
 				.build();
 		}
@@ -145,6 +138,11 @@ public class SkillsTool {
 
 		public String name() {
 			return this.frontMatter().get("name").toString();
+		}
+
+		public String description() {
+			Object desc = this.frontMatter().get("description");
+			return desc != null ? desc.toString() : this.name();
 		}
 
 		public String toXml() {
