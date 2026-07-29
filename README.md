@@ -48,6 +48,7 @@ These are the agent tools needed to implement any agentic behavior
 - **[ShellTools](spring-ai-agent-utils/docs/ShellTools.md)** - Execute shell commands with timeout control, background process management, and regex output filtering
 - **[GrepTool](spring-ai-agent-utils/docs/GrepTool.md)** - Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes
 - **[GlobTool](spring-ai-agent-utils/docs/GlobTool.md)** - Fast file pattern matching tool for finding files by name patterns with glob syntax
+- **[DiffTool](spring-ai-agent-utils/docs/DiffTool.md)** - Pure Java unified-diff tool for comparing strings or files using Myers' O(ND) algorithm; output is compatible with `patch` and `git apply`
 - **[SmartWebFetchTool](spring-ai-agent-utils/docs/SmartWebFetchTool.md)** - AI-powered web content summarization with caching
 - **[BraveWebSearchTool](spring-ai-agent-utils/docs/BraveWebSearchTool.md)** - Web search with domain filtering
 
