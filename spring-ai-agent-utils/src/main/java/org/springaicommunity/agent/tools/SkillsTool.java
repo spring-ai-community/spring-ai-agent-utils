@@ -16,12 +16,14 @@
 package org.springaicommunity.agent.tools;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springaicommunity.agent.common.skill.SkillDescriptor;
+import org.springaicommunity.agent.common.skill.SkillProvider;
+import org.springaicommunity.agent.tools.skill.FileSystemSkillProvider;
 import org.springaicommunity.agent.utils.Skills;
 
 import org.springframework.ai.tool.ToolCallback;
@@ -65,18 +67,19 @@ public class SkillsTool {
 
 	public static class SkillsFunction implements Function<SkillsInput, String> {
 
-		private Map<String, Skill> skillsMap;
+		private final List<SkillProvider> providers;
 
-		public SkillsFunction(Map<String, Skill> skillsMap) {
-			this.skillsMap = skillsMap;
+		public SkillsFunction(List<SkillProvider> providers) {
+			this.providers = providers;
 		}
 
 		@Override
 		public String apply(SkillsInput input) {
-			Skill skill = this.skillsMap.get(input.command());
-
-			if (skill != null) {
-				return "Base directory for this skill: %s\n\n%s".formatted(skill.basePath(), skill.content());
+			for (SkillProvider provider : this.providers) {
+				String content = provider.getSkillContent(input.command());
+				if (content != null) {
+					return content;
+				}
 			}
 
 			return "Skill not found: " + input.command();
@@ -91,6 +94,8 @@ public class SkillsTool {
 	public static class Builder {
 
 		private List<Skill> skills = new ArrayList<>();
+
+		private List<SkillProvider> providers = new ArrayList<>();
 
 		private String toolDescriptionTemplate = TOOL_DESCRIPTION_TEMPLATE;
 
@@ -125,12 +130,33 @@ public class SkillsTool {
 			return this;
 		}
 
+		/**
+		 * Adds a custom {@link SkillProvider} for pluggable skill backends.
+		 * @param provider the skill provider to add
+		 * @return this builder
+		 */
+		public Builder addSkillProvider(SkillProvider provider) {
+			this.providers.add(provider);
+			return this;
+		}
+
 		public ToolCallback build() {
-			Assert.notEmpty(this.skills, "At least one skill must be configured");
+			// Wrap any statically-loaded filesystem skills into a provider
+			if (!this.skills.isEmpty()) {
+				this.providers.add(0, FileSystemSkillProvider.fromSkills(this.skills));
+			}
 
-			String skillsXml = this.skills.stream().map(s -> s.toXml()).collect(Collectors.joining("\n"));
+			Assert.notEmpty(this.providers, "At least one skill or skill provider must be configured");
 
-			return FunctionToolCallback.builder("Skill", new SkillsFunction(toSkillsMap(this.skills)))
+			List<SkillDescriptor> allDescriptors = this.providers.stream()
+				.flatMap(p -> p.getSkillDescriptors().stream())
+				.toList();
+
+			String skillsXml = allDescriptors.stream()
+				.map(SkillDescriptor::toXml)
+				.collect(Collectors.joining("\n"));
+
+			return FunctionToolCallback.builder("Skill", new SkillsFunction(this.providers))
 				.description(this.toolDescriptionTemplate.formatted(skillsXml))
 				.inputType(SkillsInput.class)
 				.build();
@@ -156,18 +182,5 @@ public class SkillsTool {
 
 			return "<skill>\n%s\n</skill>".formatted(frontMatterXml);
 		}
-
 	}
-
-	private static Map<String, Skill> toSkillsMap(List<Skill> skills) {
-
-		Map<String, Skill> skillsMap = new HashMap<>();
-
-		for (Skill skill : skills) {
-			skillsMap.put(skill.name(), skill);
-		}
-
-		return skillsMap;
-	}
-
 }

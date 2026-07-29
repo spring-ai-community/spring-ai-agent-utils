@@ -132,7 +132,7 @@ class SkillsToolTest {
 		void shouldThrowWhenNoSkillsConfigured(@TempDir Path tempDir) {
 			assertThatThrownBy(() -> SkillsTool.builder().addSkillsDirectory(tempDir.toString()).build())
 				.isInstanceOf(IllegalArgumentException.class)
-				.hasMessageContaining("At least one skill must be configured");
+				.hasMessageContaining("At least one skill or skill provider must be configured");
 		}
 
 	}
