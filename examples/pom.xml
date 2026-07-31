@@ -40,6 +40,7 @@
         <module>memory/memory-tools-demo</module>
         <module>memory/memory-tools-advisor-demo</module>
         <module>memory/memory-filesystem-tools-demo</module>
+        <module>memory/memory-tools-dream-demo</module>
     </modules>
 
     <repositories>

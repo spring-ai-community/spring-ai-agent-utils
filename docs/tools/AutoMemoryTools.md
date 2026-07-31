@@ -348,3 +348,4 @@ See [memory-tools-demo](https://github.com/spring-ai-community/spring-ai-agent-u
 - [Claude API SDK — Memory Tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool) — the official tool specification
 - [FileSystemTools](FileSystemTools.md) — general-purpose file read/write/edit (not scoped to a sandbox)
 - [TodoWriteTool](TodoWriteTool.md) — task tracking within a single conversation
+- [AutoDreamService](AutoDreamService.md) — out-of-band background consolidation for this memory store
