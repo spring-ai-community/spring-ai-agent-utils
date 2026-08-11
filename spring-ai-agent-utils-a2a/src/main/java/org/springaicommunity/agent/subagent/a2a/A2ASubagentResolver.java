@@ -15,8 +15,6 @@
 */
 package org.springaicommunity.agent.subagent.a2a;
 
-import java.net.URI;
-
 import io.a2a.A2A;
 import io.a2a.spec.AgentCard;
 import org.slf4j.Logger;
@@ -60,11 +58,11 @@ public class A2ASubagentResolver implements SubagentResolver {
 		if (subagentRef == null) {
 			throw new IllegalArgumentException("SubagentReference must not be null");
 		}
+
 		try {
-			String url = subagentRef.uri();
-			String path = new URI(url).getPath();
-			AgentCard card = A2A.getAgentCard(url, path + agentCardPath, null);
-			logger.debug("Discovered agent: {} at {}", card.name(), url);
+			String fullWellKnownUrl = buildWellKnownUrl(subagentRef.uri(), agentCardPath);
+			AgentCard card = A2A.getAgentCard(fullWellKnownUrl);
+			logger.debug("Discovered agent: {} at {}", card.name(), subagentRef.uri());
 			return new A2ASubagentDefinition(subagentRef, card);
 		}
 		catch (Exception e) {
@@ -72,4 +70,12 @@ public class A2ASubagentResolver implements SubagentResolver {
 		}
 	}
 
+	private String buildWellKnownUrl(String agentBaseUrl, String cardPath) {
+		// Ensure base URL ends with a single slash
+		String base = agentBaseUrl.endsWith("/") ? agentBaseUrl : agentBaseUrl + "/";
+		// Remove leading slash from card path to make it relative (avoids double slashes)
+		String relativeCardPath = cardPath.startsWith("/") ? cardPath.substring(1) : cardPath;
+
+		return base + relativeCardPath;
+	}
 }
