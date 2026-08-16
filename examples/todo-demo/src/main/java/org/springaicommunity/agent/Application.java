@@ -1,6 +1,8 @@
 package org.springaicommunity.agent;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.springaicommunity.agent.tools.BraveWebSearchTool;
@@ -24,6 +26,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @SpringBootApplication
 public class Application {
@@ -43,6 +46,17 @@ public class Application {
 			ApplicationEventPublisher applicationEventPublisher) {
 
 		return args -> {
+			List<Object> tools = new ArrayList<>();
+			tools.add(TodoWriteTool.builder()
+				// Publish todo update events
+				.todoEventHandler(
+						event -> applicationEventPublisher.publishEvent(new TodoUpdateEvent(this, event.todos())))
+				.build());
+
+			if (StringUtils.hasText(braveApiKey)) {
+				tools.add(BraveWebSearchTool.builder(braveApiKey).resultCount(15).build());
+			}
+
 			// @formatter:off
 			ChatClient chatClient = chatClientBuilder
 				.defaultSystem(p -> p.text(systemPrompt) // system prompt
@@ -51,16 +65,7 @@ public class Application {
 					.param(AgentEnvironment.AGENT_MODEL_KEY, "Unknown Model")
 					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, "Unknown Cutoff"))
 
-				// Todo management tool
-				.defaultTools(TodoWriteTool.builder()
-					// Publish todo update events
-					.todoEventHandler(event ->
-						applicationEventPublisher.publishEvent(new TodoUpdateEvent(this, event.todos())))
-					.build(),
-					
-					// Internet search tool
-					BraveWebSearchTool.builder(braveApiKey).resultCount(15).build()
-				)	
+				.defaultTools(tools.toArray())
 
 				// Advisors
 				.defaultAdvisors(
@@ -77,6 +82,8 @@ public class Application {
 					System.out.print("\n> USER: ");
 					System.out.println("\n> ASSISTANT: " + chatClient.prompt(scanner.nextLine())
 						.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "session-1"))
+						// TodoWriteTool's method requires a non-empty ToolContext
+						.toolContext(Map.of(ChatMemory.CONVERSATION_ID, "session-1"))
 						.call()
 						.content());
 				}
