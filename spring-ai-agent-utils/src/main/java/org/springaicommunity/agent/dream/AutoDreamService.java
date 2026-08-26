@@ -26,9 +26,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -37,11 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.springaicommunity.agent.tools.AutoMemoryTools;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.session.SessionService;
 import org.springframework.ai.session.tool.CrossSessionRecallTools;
-import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -53,14 +47,14 @@ import org.springframework.util.StringUtils;
  * reorganizes it, independently of any live conversation.
  *
  * <p>
- * Each call to {@link #runDreamCycle(String)} builds its own short-lived {@link ChatClient}
- * scoped to exactly the tools the Dreamer is allowed to use — never the caller's tools —
- * guarded by a {@link DreamLock} so two cycles never run concurrently against the same
- * memory store.
+ * Each call to {@link #runDreamCycle(String)} builds its own short-lived
+ * {@link ChatClient} scoped to exactly the tools the Dreamer is allowed to use — never
+ * the caller's tools — guarded by a {@link DreamLock} so two cycles never run
+ * concurrently against the same memory store.
  *
  * <p>
- * When {@link Builder#sessionService(SessionService)} is configured, {@link
- * #runDreamCycle(String, String)} additionally gives the Dreamer a read-only
+ * When {@link Builder#sessionService(SessionService)} is configured,
+ * {@link #runDreamCycle(String, String)} additionally gives the Dreamer a read-only
  * {@code cross_session_search} tool ({@link CrossSessionRecallTools}) scoped to the given
  * {@code userId}, so it can mine historical conversation signal in addition to
  * self-consolidating the memory store. Without a configured {@code sessionService} (or
@@ -102,8 +96,8 @@ public class AutoDreamService {
 
 	/**
 	 * Runs one memory-only dream cycle against {@code memoriesRootDirectory} — equivalent
-	 * to {@code runDreamCycle(memoriesRootDirectory, null)}. Safe to call synchronously or
-	 * from a background task — this method blocks until the Dreamer finishes.
+	 * to {@code runDreamCycle(memoriesRootDirectory, null)}. Safe to call synchronously
+	 * or from a background task — this method blocks until the Dreamer finishes.
 	 * @param memoriesRootDirectory the memories root directory to consolidate
 	 * @return the outcome of the cycle; {@link DreamResult#skipped(String)} if another
 	 * cycle already holds the lock for this directory
@@ -129,6 +123,7 @@ public class AutoDreamService {
 
 		Path liveMemoriesDir = Paths.get(memoriesRootDirectory);
 		try {
+			// Create directory if not exists, ignore otherwise.
 			Files.createDirectories(liveMemoriesDir);
 		}
 		catch (IOException e) {
@@ -152,22 +147,14 @@ public class AutoDreamService {
 
 		boolean crossSessionRecallAvailable = this.sessionService != null && StringUtils.hasText(userId);
 
-		List<ToolCallback> toolCallbacks = new ArrayList<>(Arrays.asList(MethodToolCallbackProvider.builder()
-			.toolObjects(AutoMemoryTools.builder().memoriesDir(dreamTargetDir).build())
-			.build()
-			.getToolCallbacks()));
+		var chatClientBuilder = this.chatClientBuilder.clone()
+			.defaultTools(AutoMemoryTools.builder().memoriesDir(dreamTargetDir).build());
 
 		if (crossSessionRecallAvailable) {
-			toolCallbacks.addAll(Arrays.asList(MethodToolCallbackProvider.builder()
-				.toolObjects(CrossSessionRecallTools.builder(this.sessionService, userId).build())
-				.build()
-				.getToolCallbacks()));
+			chatClientBuilder.defaultTools(CrossSessionRecallTools.builder(this.sessionService, userId).build());
 		}
 
-		ChatClient dreamerChatClient = this.chatClientBuilder.clone()
-			.defaultTools(toolCallbacks)
-			// .defaultAdvisors(ToolCallingAdvisor.builder().build()) // toolcalling advisor is auto-enabled by default.
-			.build();
+		ChatClient dreamerChatClient = chatClientBuilder.build();
 
 		String status;
 		String summary;
