@@ -35,3 +35,5 @@ build/
 .DS_Store
 
 .flattened-pom.xml
+
+/docs/design/**
