@@ -1029,6 +1029,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -1388,6 +1392,62 @@
     
   
     AutoMemoryToolsAdvisor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AutoDreamService/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AutoDreamService
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AutoDreamAdvisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AutoDreamAdvisor
   
 
     
@@ -1986,7 +2046,7 @@
 - Companion system prompt included as a classpath resource</p>
 <h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AutoMemoryTools</span><span class="w"> </span><span class="n">memoryTools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoMemoryTools</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesDir</span><span class="p">(</span><span class="s">&quot;/path/to/memory&quot;</span><span class="p">)</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesDir</span><span class="p">(</span><span class="s">"/path/to/memory"</span><span class="p">)</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClientBuilder</span>
@@ -1996,13 +2056,13 @@
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
 <p>Load the companion system prompt from the classpath (available inside the <code>spring-ai-agent-utils</code> jar):</p>
-<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">&quot;classpath:/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">"classpath:/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md"</span><span class="p">)</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">Resource</span><span class="w"> </span><span class="n">memorySystemPrompt</span><span class="p">;</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1">// Inject the memories root path into the prompt template</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">defaultSystem</span><span class="p">(</span><span class="n">p</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">p</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="p">.</span><span class="na">text</span><span class="p">(</span><span class="n">toString</span><span class="p">(</span><span class="n">memorySystemPrompt</span><span class="p">))</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="s">&quot;MEMORIES_ROOT_DIERCTORY&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">memoryDir</span><span class="p">));</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="s">"MEMORIES_ROOT_DIERCTORY"</span><span class="p">,</span><span class="w"> </span><span class="n">memoryDir</span><span class="p">));</span>
 </span></code></pre></div>
 <h2 id="memory-file-convention">Memory File Convention<a class="headerlink" href="#memory-file-convention" title="Permanent link">&para;</a></h2>
 <p>Each memory is a Markdown file with a YAML frontmatter header:</p>
@@ -2051,7 +2111,7 @@
 </table>
 <h3 id="memorymd-index">MEMORY.md Index<a class="headerlink" href="#memorymd-index" title="Permanent link">&para;</a></h3>
 <p><code>MEMORY.md</code> is the always-loaded index. Every memory file must have a corresponding one-line entry:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">-</span><span class="w"> </span>[<span class="nt">Title</span>](<span class="na">filename.md</span>) — one-line hook describing what&#39;s stored (≤150 chars)
+<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">-</span><span class="w"> </span>[<span class="nt">Title</span>](<span class="na">filename.md</span>) — one-line hook describing what's stored (≤150 chars)
 </span></code></pre></div>
 <p>The agent reads <code>MEMORY.md</code> at the start of a session to decide which memory files to load. Keep entries concise — lines after 200 are truncated.</p>
 <h3 id="two-step-save-workflow">Two-Step Save Workflow<a class="headerlink" href="#two-step-save-workflow" title="Permanent link">&para;</a></h3>
@@ -2067,16 +2127,16 @@
 - <code>path</code> (required) — relative path from the memories root; empty string or <code>"/"</code> for the root
 - <code>viewRange</code> (optional) — <code>"start,end"</code> to page through a large file (e.g. <code>"1,50"</code>)</p>
 <div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// View the index</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">String</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryView</span><span class="p">(</span><span class="s">&quot;MEMORY.md&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">String</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryView</span><span class="p">(</span><span class="s">"MEMORY.md"</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1">// View a specific memory file</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">String</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryView</span><span class="p">(</span><span class="s">&quot;user_profile.md&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">String</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryView</span><span class="p">(</span><span class="s">"user_profile.md"</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
 </span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1">// Page through a large file</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">String</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryView</span><span class="p">(</span><span class="s">&quot;feedback_testing.md&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1,30&quot;</span><span class="p">);</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">String</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryView</span><span class="p">(</span><span class="s">"feedback_testing.md"</span><span class="p">,</span><span class="w"> </span><span class="s">"1,30"</span><span class="p">);</span>
 </span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
 </span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="c1">// List the root directory (shows all memory files)</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="n">String</span><span class="w"> </span><span class="n">listing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryView</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="n">String</span><span class="w"> </span><span class="n">listing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryView</span><span class="p">(</span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
 </span></code></pre></div>
 <p><strong>Output — file:</strong>
 <div class="highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>File: user_profile.md
@@ -2106,7 +2166,7 @@
 <p><strong>Parameters:</strong>
 - <code>path</code> (required) — relative path for the new file (e.g. <code>"user_profile.md"</code>, <code>"project/sprint.md"</code>)
 - <code>fileText</code> (required) — full file content including the YAML frontmatter block</p>
-<div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryCreate</span><span class="p">(</span><span class="s">&quot;user_profile.md&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;&quot;</span>
+<div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryCreate</span><span class="p">(</span><span class="s">"user_profile.md"</span><span class="p">,</span><span class="w"> </span><span class="s">"""</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="s">    ---</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="s">    name: user profile</span>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="s">    description: Christian Tzolov — Spring AI lead at Broadcom</span>
@@ -2115,12 +2175,12 @@
 </span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
 </span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="s">    Leads the Spring AI project at Broadcom.</span>
 </span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="s">    Prefers concise, direct responses without trailing summaries.</span>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="s">    &quot;&quot;&quot;</span><span class="p">);</span>
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="c1">// Returns: &quot;Successfully created file: user_profile.md (201 bytes)&quot;</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="s">    """</span><span class="p">);</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="c1">// Returns: "Successfully created file: user_profile.md (201 bytes)"</span>
 </span></code></pre></div>
 <p>After creating the file, add a pointer to <code>MEMORY.md</code> using <code>MemoryInsert</code>:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryInsert</span><span class="p">(</span><span class="s">&quot;MEMORY.md&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">currentLineCount</span><span class="p">,</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="s">&quot;- [User Profile](user_profile.md) — Christian Tzolov, Spring AI lead at Broadcom&quot;</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryInsert</span><span class="p">(</span><span class="s">"MEMORY.md"</span><span class="p">,</span><span class="w"> </span><span class="n">currentLineCount</span><span class="p">,</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="s">"- [User Profile](user_profile.md) — Christian Tzolov, Spring AI lead at Broadcom"</span><span class="p">);</span>
 </span></code></pre></div>
 <p><strong>What NOT to save (belongs in conversation history, not long-term memory):</strong>
 - Ephemeral task details, in-progress steps, or current conversation context — these live in the session and disappear naturally
@@ -2135,22 +2195,22 @@
 - <code>oldStr</code> (required) — exact text to replace (must appear exactly once)
 - <code>newStr</code> (required) — replacement text; use <code>""</code> to delete the matched text</p>
 <div class="highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">// Update stale content in a memory file</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryStrReplace</span><span class="p">(</span><span class="s">&quot;user_profile.md&quot;</span><span class="p">,</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="s">&quot;Leads the Spring AI project at Broadcom.&quot;</span><span class="p">,</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="s">&quot;Leads the Spring AI project at Broadcom. Also working on agent tooling.&quot;</span><span class="p">);</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryStrReplace</span><span class="p">(</span><span class="s">"user_profile.md"</span><span class="p">,</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="s">"Leads the Spring AI project at Broadcom."</span><span class="p">,</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="s">"Leads the Spring AI project at Broadcom. Also working on agent tooling."</span><span class="p">);</span>
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
 </span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="c1">// Update a description in the frontmatter</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryStrReplace</span><span class="p">(</span><span class="s">&quot;user_profile.md&quot;</span><span class="p">,</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="s">&quot;description: Christian Tzolov — Spring AI lead at Broadcom&quot;</span><span class="p">,</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="s">&quot;description: Christian Tzolov — Spring AI lead, agent tooling focus&quot;</span><span class="p">);</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryStrReplace</span><span class="p">(</span><span class="s">"user_profile.md"</span><span class="p">,</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="s">"description: Christian Tzolov — Spring AI lead at Broadcom"</span><span class="p">,</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="s">"description: Christian Tzolov — Spring AI lead, agent tooling focus"</span><span class="p">);</span>
 </span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>
 </span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="c1">// Update the MEMORY.md pointer when a description changes</span>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryStrReplace</span><span class="p">(</span><span class="s">&quot;MEMORY.md&quot;</span><span class="p">,</span>
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="w">    </span><span class="s">&quot;- [User Profile](user_profile.md) — Christian Tzolov, Spring AI lead at Broadcom&quot;</span><span class="p">,</span>
-</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">    </span><span class="s">&quot;- [User Profile](user_profile.md) — Christian Tzolov, Spring AI lead, agent tooling focus&quot;</span><span class="p">);</span>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryStrReplace</span><span class="p">(</span><span class="s">"MEMORY.md"</span><span class="p">,</span>
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="w">    </span><span class="s">"- [User Profile](user_profile.md) — Christian Tzolov, Spring AI lead at Broadcom"</span><span class="p">,</span>
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">    </span><span class="s">"- [User Profile](user_profile.md) — Christian Tzolov, Spring AI lead, agent tooling focus"</span><span class="p">);</span>
 </span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>
 </span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="c1">// Delete a line (empty newStr)</span>
-</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryStrReplace</span><span class="p">(</span><span class="s">&quot;feedback.md&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;\nOutdated note to remove.&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">);</span>
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryStrReplace</span><span class="p">(</span><span class="s">"feedback.md"</span><span class="p">,</span><span class="w"> </span><span class="s">"\nOutdated note to remove."</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">);</span>
 </span></code></pre></div>
 <p>When <code>newStr</code> is empty (deletion), the tool confirms the removal without returning a snippet. Otherwise it returns a numbered snippet around the edited location.</p>
 <hr />
@@ -2162,12 +2222,12 @@
 - <code>insertText</code> (required) — text to insert</p>
 <div class="highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// Append a new entry to MEMORY.md (most common use)</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="c1">// First, find the current line count via MemoryView</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryInsert</span><span class="p">(</span><span class="s">&quot;MEMORY.md&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">currentLineCount</span><span class="p">,</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="s">&quot;- [Feedback Testing](feedback_testing.md) — always use real DB in integration tests&quot;</span><span class="p">);</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryInsert</span><span class="p">(</span><span class="s">"MEMORY.md"</span><span class="p">,</span><span class="w"> </span><span class="n">currentLineCount</span><span class="p">,</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="s">"- [Feedback Testing](feedback_testing.md) — always use real DB in integration tests"</span><span class="p">);</span>
 </span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
 </span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="c1">// Insert a new section into an existing memory file</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryInsert</span><span class="p">(</span><span class="s">&quot;project_auth.md&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">    </span><span class="s">&quot;\n**Update 2026-04-05:** legal approved the revised token storage approach.&quot;</span><span class="p">);</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryInsert</span><span class="p">(</span><span class="s">"project_auth.md"</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">    </span><span class="s">"\n**Update 2026-04-05:** legal approved the revised token storage approach."</span><span class="p">);</span>
 </span></code></pre></div>
 <p>The original trailing newline of the file is preserved after the insert.</p>
 <hr />
@@ -2176,12 +2236,12 @@
 <p><strong>Parameters:</strong>
 - <code>path</code> (required) — relative path to the file or directory to delete</p>
 <div class="highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">// Delete a stale memory file</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryDelete</span><span class="p">(</span><span class="s">&quot;project_old_sprint.md&quot;</span><span class="p">);</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="c1">// Returns: &quot;Successfully deleted file: project_old_sprint.md&quot;</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryDelete</span><span class="p">(</span><span class="s">"project_old_sprint.md"</span><span class="p">);</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="c1">// Returns: "Successfully deleted file: project_old_sprint.md"</span>
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
 </span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="c1">// Delete a subdirectory and all its contents</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryDelete</span><span class="p">(</span><span class="s">&quot;archived/&quot;</span><span class="p">);</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="c1">// Returns: &quot;Successfully deleted directory: archived/&quot;</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryDelete</span><span class="p">(</span><span class="s">"archived/"</span><span class="p">);</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="c1">// Returns: "Successfully deleted directory: archived/"</span>
 </span></code></pre></div>
 <blockquote>
 <p><strong>Important:</strong> After deleting a memory file, always remove its entry from <code>MEMORY.md</code> using <code>MemoryStrReplace</code> to keep the index accurate.</p>
@@ -2193,18 +2253,18 @@
 - <code>oldPath</code> (required) — current relative path
 - <code>newPath</code> (required) — new relative path (must not already exist)</p>
 <div class="highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1">// Rename a file</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryRename</span><span class="p">(</span><span class="s">&quot;feedback.md&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;feedback_testing.md&quot;</span><span class="p">);</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c1">// Returns: &quot;Successfully renamed &#39;feedback.md&#39; to &#39;feedback_testing.md&#39;&quot;</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryRename</span><span class="p">(</span><span class="s">"feedback.md"</span><span class="p">,</span><span class="w"> </span><span class="s">"feedback_testing.md"</span><span class="p">);</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c1">// Returns: "Successfully renamed 'feedback.md' to 'feedback_testing.md'"</span>
 </span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
 </span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1">// Move into a subdirectory</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryRename</span><span class="p">(</span><span class="s">&quot;old_project.md&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;archived/old_project.md&quot;</span><span class="p">);</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="n">memoryTools</span><span class="p">.</span><span class="na">memoryRename</span><span class="p">(</span><span class="s">"old_project.md"</span><span class="p">,</span><span class="w"> </span><span class="s">"archived/old_project.md"</span><span class="p">);</span>
 </span></code></pre></div>
 <blockquote>
 <p><strong>Important:</strong> After renaming, update the corresponding link in <code>MEMORY.md</code> using <code>MemoryStrReplace</code>.</p>
 </blockquote>
 <h2 id="builder-configuration">Builder Configuration<a class="headerlink" href="#builder-configuration" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">AutoMemoryTools</span><span class="w"> </span><span class="n">tools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoMemoryTools</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesDir</span><span class="p">(</span><span class="s">&quot;/path/to/memory&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// Path or String; default: /memories</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesDir</span><span class="p">(</span><span class="s">"/path/to/memory"</span><span class="p">)</span><span class="w">   </span><span class="c1">// Path or String; default: /memories</span>
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
 <table>
@@ -2251,8 +2311,8 @@
 </ul>
 <p>The prompt contains one template placeholder: <code>{MEMORIES_ROOT_DIERCTORY}</code> (note the intentional spelling), which should be filled with the configured memories directory path so the agent can reference it in responses.</p>
 <div class="highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">defaultSystem</span><span class="p">(</span><span class="n">p</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">p</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span><span class="p">.</span><span class="na">text</span><span class="p">(</span><span class="n">mainPrompt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;\n\n&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">memoryToolsPrompt</span><span class="p">)</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="s">&quot;MEMORIES_ROOT_DIERCTORY&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">memoryDir</span><span class="p">));</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span><span class="p">.</span><span class="na">text</span><span class="p">(</span><span class="n">mainPrompt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"\n\n"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">memoryToolsPrompt</span><span class="p">)</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="s">"MEMORIES_ROOT_DIERCTORY"</span><span class="p">,</span><span class="w"> </span><span class="n">memoryDir</span><span class="p">));</span>
 </span></code></pre></div>
 <h2 id="demo-application">Demo Application<a class="headerlink" href="#demo-application" title="Permanent link">&para;</a></h2>
 <p>See <a href="https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-demo">memory-tools-demo</a> for a complete working example. It demonstrates:</p>
@@ -2279,6 +2339,7 @@
 <li><a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool">Claude API SDK — Memory Tool</a> — the official tool specification</li>
 <li><a href="../FileSystemTools/">FileSystemTools</a> — general-purpose file read/write/edit (not scoped to a sandbox)</li>
 <li><a href="../TodoWriteTool/">TodoWriteTool</a> — task tracking within a single conversation</li>
+<li><a href="../AutoDreamService/">AutoDreamService</a> — out-of-band background consolidation for this memory store</li>
 </ul>
 
 

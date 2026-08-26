@@ -1025,6 +1025,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -1113,6 +1117,62 @@
     
   
     AutoMemoryToolsAdvisor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AutoDreamService/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AutoDreamService
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AutoDreamAdvisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AutoDreamAdvisor
   
 
     
@@ -1789,7 +1849,7 @@
 <p><strong>Before:</strong></p>
 <div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">var</span><span class="w"> </span><span class="n">taskTools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TaskToolCallbackProvider</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentReferences</span><span class="p">(</span><span class="n">ClaudeSubagentReferences</span><span class="p">.</span><span class="na">fromResources</span><span class="p">(</span><span class="n">agentPaths</span><span class="p">))</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">&quot;default&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">())</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"default"</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">())</span>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="p">.</span><span class="na">skillsResources</span><span class="p">(</span><span class="n">skillPaths</span><span class="p">)</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p">.</span><span class="na">braveApiKey</span><span class="p">(</span><span class="n">braveApiKey</span><span class="p">)</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
@@ -1800,7 +1860,7 @@
 <p><strong>After:</strong></p>
 <div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">var</span><span class="w"> </span><span class="n">taskTools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TaskTool</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentTypes</span><span class="p">(</span><span class="n">ClaudeSubagentType</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">        </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">&quot;default&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">())</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">        </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"default"</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">())</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">        </span><span class="p">.</span><span class="na">skillsResources</span><span class="p">(</span><span class="n">skillPaths</span><span class="p">)</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">        </span><span class="p">.</span><span class="na">braveApiKey</span><span class="p">(</span><span class="n">braveApiKey</span><span class="p">)</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
@@ -1837,10 +1897,10 @@
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="c1">// Claude (local)</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentReferences</span><span class="p">(</span><span class="n">ClaudeSubagentReferences</span><span class="p">.</span><span class="na">fromResources</span><span class="p">(</span><span class="n">agentPaths</span><span class="p">))</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentTypes</span><span class="p">(</span><span class="n">ClaudeSubagentType</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">        </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">&quot;default&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">())</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">        </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"default"</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">())</span>
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">        </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
 </span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="c1">// A2A (remote)</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentReferences</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SubagentReference</span><span class="p">(</span><span class="s">&quot;http://host:port/path&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A2ASubagentDefinition</span><span class="p">.</span><span class="na">KIND</span><span class="p">))</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentReferences</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SubagentReference</span><span class="p">(</span><span class="s">"http://host:port/path"</span><span class="p">,</span><span class="w"> </span><span class="n">A2ASubagentDefinition</span><span class="p">.</span><span class="na">KIND</span><span class="p">))</span>
 </span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentTypes</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SubagentType</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">A2ASubagentResolver</span><span class="p">(),</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">A2ASubagentExecutor</span><span class="p">()))</span>
 </span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>

@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://spring-ai-community.github.io/spring-ai-agent-utils/0.11.0-SNAPSHOT/tools/AutoMemoryToolsAdvisor/">
+        <link rel="canonical" href="https://spring-ai-community.github.io/spring-ai-agent-utils/0.11.0-SNAPSHOT/tools/AutoDreamService/">
       
       
-        <link rel="prev" href="../AutoMemoryTools/">
+        <link rel="prev" href="../AutoMemoryToolsAdvisor/">
       
       
-        <link rel="next" href="../AutoDreamService/">
+        <link rel="next" href="../AutoDreamAdvisor/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>AutoMemoryToolsAdvisor - Spring AI Agent Utils</title>
+        <title>AutoDreamService - Spring AI Agent Utils</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#automemorytoolsadvisor" class="md-skip">
+        <a href="#autodreamservice" class="md-skip">
           Skip to content
         </a>
       
@@ -117,7 +117,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              AutoMemoryToolsAdvisor
+              AutoDreamService
             
           </span>
         </div>
@@ -1113,6 +1113,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../AutoMemoryToolsAdvisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AutoMemoryToolsAdvisor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1132,7 +1160,7 @@
   <span class="md-ellipsis">
     
   
-    AutoMemoryToolsAdvisor
+    AutoDreamService
   
 
     
@@ -1150,7 +1178,7 @@
   <span class="md-ellipsis">
     
   
-    AutoMemoryToolsAdvisor
+    AutoDreamService
   
 
     
@@ -1176,21 +1204,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-it-does" class="md-nav__link">
+  <a href="#in-band-nudge-vs-out-of-band-dreaming" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What it does
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#long-term-memory-vs-session-memory" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Long-term memory vs. session memory
+        In-band nudge vs. out-of-band dreaming
       
     </span>
   </a>
@@ -1202,6 +1219,17 @@
     <span class="md-ellipsis">
       
         Quick Start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-dream-cycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Dream Cycle
       
     </span>
   </a>
@@ -1221,10 +1249,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#validation" class="md-nav__link">
+  <a href="#running-a-cycle" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Validation
+        Running a cycle
       
     </span>
   </a>
@@ -1237,10 +1265,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#memory-consolidation-trigger" class="md-nav__link">
+  <a href="#dream-triggers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Memory Consolidation Trigger
+        Dream Triggers
       
     </span>
   </a>
@@ -1248,10 +1276,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#advisor-ordering" class="md-nav__link">
+  <a href="#dream-modes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Advisor Ordering
+        Dream Modes
       
     </span>
   </a>
@@ -1259,30 +1287,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#relation-to-automemorytools" class="md-nav__link">
+  <a href="#cross-session-recall-optional" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Relation to AutoMemoryTools
+        Cross-Session Recall (optional)
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Relation to AutoMemoryTools">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#manual-setup-vs-advisor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Manual setup vs. advisor
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1323,34 +1334,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../AutoDreamService/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    AutoDreamService
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1630,21 +1613,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-it-does" class="md-nav__link">
+  <a href="#in-band-nudge-vs-out-of-band-dreaming" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What it does
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#long-term-memory-vs-session-memory" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Long-term memory vs. session memory
+        In-band nudge vs. out-of-band dreaming
       
     </span>
   </a>
@@ -1656,6 +1628,17 @@
     <span class="md-ellipsis">
       
         Quick Start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-dream-cycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Dream Cycle
       
     </span>
   </a>
@@ -1675,10 +1658,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#validation" class="md-nav__link">
+  <a href="#running-a-cycle" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Validation
+        Running a cycle
       
     </span>
   </a>
@@ -1691,10 +1674,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#memory-consolidation-trigger" class="md-nav__link">
+  <a href="#dream-triggers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Memory Consolidation Trigger
+        Dream Triggers
       
     </span>
   </a>
@@ -1702,10 +1685,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#advisor-ordering" class="md-nav__link">
+  <a href="#dream-modes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Advisor Ordering
+        Dream Modes
       
     </span>
   </a>
@@ -1713,30 +1696,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#relation-to-automemorytools" class="md-nav__link">
+  <a href="#cross-session-recall-optional" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Relation to AutoMemoryTools
+        Cross-Session Recall (optional)
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Relation to AutoMemoryTools">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#manual-setup-vs-advisor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Manual setup vs. advisor
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1841,90 +1807,90 @@
   
 
 
-<h1 id="automemorytoolsadvisor">AutoMemoryToolsAdvisor<a class="headerlink" href="#automemorytoolsadvisor" title="Permanent link">&para;</a></h1>
-<p>A Spring AI <code>ChatClient</code> advisor that gives any agent <strong>automatic long-term memory</strong> by wiring <a href="../AutoMemoryTools/"><code>AutoMemoryTools</code></a> and its companion system prompt into the request pipeline as a single, self-contained unit.</p>
-<p><img alt="AutoMemoryToolsAdvisor" src="../../images/spring-ai-auto-memory-tools-advisor.png" /></p>
-<h2 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h2>
-<p>On every <code>before()</code> call the advisor:</p>
-<ol>
-<li><strong>Augments the system message</strong> — appends <code>AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md</code> (with the configured memories root path rendered in) to whatever system message is already present.</li>
-<li><strong>Injects the six <code>AutoMemoryTools</code></strong> — registers <code>MemoryView</code>, <code>MemoryCreate</code>, <code>MemoryStrReplace</code>, <code>MemoryInsert</code>, <code>MemoryDelete</code>, and <code>MemoryRename</code> into the prompt's <code>ToolCallingChatOptions</code>. Existing callbacks with the same name are never duplicated.</li>
-<li><strong>Optionally appends a consolidation reminder</strong> — if the configurable <code>memoryConsolidationTrigger</code> predicate returns <code>true</code>, a <code>&lt;system-reminder&gt;</code> block is appended to the system message instructing the model to summarise and remove redundant memories.</li>
-</ol>
-<p>If the prompt carries no <code>ToolCallingChatOptions</code> the request is returned unchanged — both the tool injection and the system prompt augmentation are skipped.</p>
-<p><code>after()</code> is a passthrough. Memory persistence is driven entirely by the model via tool calls during the conversation; no post-processing is needed.</p>
-<h2 id="long-term-memory-vs-session-memory">Long-term memory vs. session memory<a class="headerlink" href="#long-term-memory-vs-session-memory" title="Permanent link">&para;</a></h2>
-<p><code>AutoMemoryToolsAdvisor</code> is a <strong>long-term memory</strong> mechanism. It is designed to complement, not replace, Spring AI's built-in short-term conversation memory (e.g. <code>MessageChatMemoryAdvisor</code> + <code>MessageWindowChatMemory</code>). The two layers serve fundamentally different purposes and should normally be used together:</p>
+<h1 id="autodreamservice">AutoDreamService<a class="headerlink" href="#autodreamservice" title="Permanent link">&para;</a></h1>
+<p>An out-of-band memory-consolidation ("dream") capability for <a href="../AutoMemoryTools/"><code>AutoMemoryTools</code></a>. A dedicated background subagent — the <strong>Dreamer</strong> — periodically reviews an agent's entire memory store (and, optionally, its owner's full conversation history) to deduplicate, prune, merge, and reorganize memories, without ever blocking or adding latency to the live agent's turn.</p>
+<h2 id="in-band-nudge-vs-out-of-band-dreaming">In-band nudge vs. out-of-band dreaming<a class="headerlink" href="#in-band-nudge-vs-out-of-band-dreaming" title="Permanent link">&para;</a></h2>
+<p><a href="../AutoMemoryToolsAdvisor/"><code>AutoMemoryToolsAdvisor</code></a> already ships a <code>memoryConsolidationTrigger</code> — a cheap, stateless nudge appended to the <em>live</em> agent's <em>current</em> turn, asking it to tidy up whatever memory is already in its context. <code>AutoDreamService</code> (with <a href="../AutoDreamAdvisor/"><code>AutoDreamAdvisor</code></a>) is a different, complementary mechanism:</p>
 <table>
 <thead>
 <tr>
 <th></th>
-<th>Session memory (<code>MessageChatMemoryAdvisor</code>)</th>
-<th>Long-term memory (<code>AutoMemoryToolsAdvisor</code>)</th>
+<th><code>memoryConsolidationTrigger</code></th>
+<th>Auto-Dream</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Scope</strong></td>
-<td>Current conversation only</td>
-<td>Persists across conversations</td>
+<td>Where it runs</td>
+<td>In-band, the live agent, same turn</td>
+<td>Out-of-band, a dedicated Dreamer subagent, background</td>
 </tr>
 <tr>
-<td><strong>Storage</strong></td>
-<td>In-process (<code>ChatMemory</code>)</td>
-<td>Files on disk via <code>AutoMemoryTools</code></td>
+<td>Blocks the user</td>
+<td>Adds to the current turn's latency/tokens</td>
+<td>Never — fires after the response is returned</td>
 </tr>
 <tr>
-<td><strong>Content</strong></td>
-<td>Full message exchange — every turn</td>
-<td>Curated facts worth keeping forever</td>
+<td>What it sees</td>
+<td>Whatever's already in the live agent's context this turn</td>
+<td>The entire memory store, and (optionally) the user's full cross-session history</td>
 </tr>
 <tr>
-<td><strong>Managed by</strong></td>
-<td>Spring AI automatically</td>
-<td>The model itself via tool calls</td>
+<td>State</td>
+<td>Stateless approximation, re-evaluated per call</td>
+<td>Persisted <code>DreamState</code> — real elapsed-time/turn-count conditions survive restarts</td>
 </tr>
 <tr>
-<td><strong>Expires</strong></td>
-<td>When the process stops (or window fills)</td>
-<td>Never — until the model deletes a file</td>
+<td>Cost</td>
+<td>Cheap, frequent, shallow</td>
+<td>Heavier, periodic, deep</td>
 </tr>
 </tbody>
 </table>
-<p>A typical agent setup combines both:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ChatClient</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatModel</span><span class="p">)</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="c1">// Long-term memory — facts that survive across sessions</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">            </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">"/home/user/.agent/memories"</span><span class="p">)</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">            </span><span class="p">.</span><span class="na">build</span><span class="p">(),</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">        </span><span class="c1">// Short-term memory — full conversation history for this session</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">        </span><span class="n">MessageChatMemoryAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">            </span><span class="n">MessageWindowChatMemory</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">maxMessages</span><span class="p">(</span><span class="mi">100</span><span class="p">).</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">            </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span></code></pre></div>
-<p>In this setup the model has the best of both worlds: the full context of the current conversation via the session window, and persistent knowledge about the user and project that it accumulated over previous sessions via the memory files.</p>
-<p><strong>Rule of thumb:</strong>
-- Ephemeral details — what was said in this session, in-progress task state — belong in session memory.
-- Durable facts worth having next week — user preferences, project decisions, behavioural feedback — belong in long-term memory.</p>
+<p>Use both together: <code>memoryConsolidationTrigger</code> for cheap, frequent tidy-nudges; Auto-Dream as the periodic deep-clean layer.</p>
 <h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">AutoMemoryToolsAdvisor</span><span class="w"> </span><span class="n">memoryAdvisor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">"/home/user/.agent/memories"</span><span class="p">)</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ChatClient</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatModel</span><span class="p">)</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span><span class="n">memoryAdvisor</span><span class="p">)</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AutoDreamService</span><span class="w"> </span><span class="n">dreamService</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoDreamService</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">())</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">DreamResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dreamService</span><span class="p">.</span><span class="na">runDreamCycle</span><span class="p">(</span><span class="s">"/path/to/memories"</span><span class="p">);</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="na">status</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">": "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="na">summary</span><span class="p">());</span>
 </span></code></pre></div>
-<p>That's all. On the first turn the model reads <code>MEMORY.md</code> via <code>MemoryView</code>, loads relevant memory files, and writes new memories at the end of the session — all without any extra wiring.</p>
+<div class="admonition warning">
+<p class="admonition-title">Always clone the builder</p>
+<p>Pass a <strong>cloned, unconfigured</strong> <code>ChatClient.Builder</code> — one that has not had the main agent's system prompt or tools chained onto it. <code>AutoDreamService</code> builds its own <code>ChatClient</code> for the Dreamer, scoped to exactly the tools it's allowed to use. If you pass the main agent's already-configured builder, the Dreamer inherits its tools too.</p>
+</div>
+<p>In practice, pair it with <a href="../AutoDreamAdvisor/"><code>AutoDreamAdvisor</code></a> so dream cycles fire automatically instead of only on demand:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ChatClient</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatModel</span><span class="p">)</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">        </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="n">memoryDir</span><span class="p">).</span><span class="na">build</span><span class="p">(),</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">        </span><span class="n">AutoDreamAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">            </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="n">memoryDir</span><span class="p">)</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">            </span><span class="p">.</span><span class="na">dreamService</span><span class="p">(</span><span class="n">dreamService</span><span class="p">)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">            </span><span class="p">.</span><span class="na">dreamTrigger</span><span class="p">(</span><span class="n">DreamTriggers</span><span class="p">.</span><span class="na">hoursAndSessions</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">))</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">            </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span></code></pre></div>
+<h2 id="the-dream-cycle">The Dream Cycle<a class="headerlink" href="#the-dream-cycle" title="Permanent link">&para;</a></h2>
+<p>Each call to <code>runDreamCycle(...)</code>:</p>
+<ol>
+<li><strong>Acquires a lock</strong> (<code>.dream.lock</code> in the memories directory) so two cycles never run concurrently against the same store. A lock older than <code>staleLockAfter</code> (default 15 minutes) is treated as abandoned — e.g. from a crashed cycle — and reclaimed.</li>
+<li><strong>Builds a dedicated <code>ChatClient</code></strong> for the Dreamer, scoped to <code>AutoMemoryTools</code> (and, optionally, a read-only cross-session search tool — see below) — never the caller's own tools.</li>
+<li><strong>Runs the four-phase pipeline</strong> described in the Dreamer's system prompt:<ol>
+<li><strong>Orient</strong> — reads <code>MEMORY.md</code> and the memory directory to see the current shape of the store.</li>
+<li><strong>Gather signal</strong> — reads through memory files (and, if available, searches cross-session history) for duplicates, contradictions, staleness, and dangling <code>MEMORY.md</code> links.</li>
+<li><strong>Consolidate</strong> — merges duplicates, deletes confirmed-stale/contradicted entries (biased toward merge-and-flag over delete, since this runs unsupervised), normalizes dates.</li>
+<li><strong>Prune &amp; reindex</strong> — fixes dangling links, keeps <code>MEMORY.md</code> under 200 lines.</li>
+</ol>
+</li>
+<li><strong>Persists <code>DreamState</code></strong> — records when the cycle ran, its outcome, and a summary — and releases the lock.</li>
+</ol>
+<p>A model failure during the cycle is captured as a failed <code>DreamResult</code> rather than propagated as an exception.</p>
 <h2 id="builder-configuration">Builder Configuration<a class="headerlink" href="#builder-configuration" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">AutoMemoryToolsAdvisor</span><span class="w"> </span><span class="n">advisor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">"/path/to/memories"</span><span class="p">)</span><span class="w">          </span><span class="c1">// required</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="p">.</span><span class="na">order</span><span class="p">(</span><span class="n">BaseAdvisor</span><span class="p">.</span><span class="na">HIGHEST_PRECEDENCE</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w">         </span><span class="c1">// optional</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="p">.</span><span class="na">memorySystemPrompt</span><span class="p">(</span><span class="n">customPromptResource</span><span class="p">)</span><span class="w">            </span><span class="c1">// optional</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="p">.</span><span class="na">memoryConsolidationTrigger</span><span class="p">((</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">instant</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="c1">// optional</span>
+<div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">AutoDreamService</span><span class="w"> </span><span class="n">dreamService</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoDreamService</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatClientBuilder</span><span class="p">)</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="p">.</span><span class="na">dreamMode</span><span class="p">(</span><span class="n">DreamMode</span><span class="p">.</span><span class="na">AUTO_APPLY</span><span class="p">)</span><span class="w">                 </span><span class="c1">// optional, default AUTO_APPLY</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="p">.</span><span class="na">dreamSystemPrompt</span><span class="p">(</span><span class="n">customPromptResource</span><span class="p">)</span><span class="w">          </span><span class="c1">// optional</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="p">.</span><span class="na">staleLockAfter</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofMinutes</span><span class="p">(</span><span class="mi">15</span><span class="p">))</span><span class="w">           </span><span class="c1">// optional, default 15 minutes</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="p">.</span><span class="na">sessionService</span><span class="p">(</span><span class="n">sessionService</span><span class="p">)</span><span class="w">                   </span><span class="c1">// optional — enables cross-session recall</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
 <table>
@@ -1938,149 +1904,119 @@
 </thead>
 <tbody>
 <tr>
-<td><code>memoriesRootDirectory(String)</code></td>
-<td><code>String</code></td>
+<td><code>builder(ChatClient.Builder)</code></td>
+<td><code>ChatClient.Builder</code></td>
 <td>— (<strong>required</strong>)</td>
-<td>Root directory for all memory files. Created automatically if absent.</td>
+<td>Base builder the Dreamer's <code>ChatClient</code> is cloned from. Must not already carry the main agent's system prompt/tools.</td>
 </tr>
 <tr>
-<td><code>order(int)</code></td>
-<td><code>int</code></td>
-<td><code>HIGHEST_PRECEDENCE + 200</code></td>
-<td>Advisor order. Runs before the default <code>ToolCallingAdvisor</code> at <code>+300</code>.</td>
+<td><code>dreamMode(DreamMode)</code></td>
+<td><code>DreamMode</code></td>
+<td><code>AUTO_APPLY</code></td>
+<td><code>AUTO_APPLY</code> edits memory files in place. <code>PROPOSE</code> edits a timestamped copy instead — see <a href="#dream-modes">Dream Modes</a>.</td>
 </tr>
 <tr>
-<td><code>memorySystemPrompt(Resource)</code></td>
+<td><code>dreamSystemPrompt(Resource)</code></td>
 <td><code>Resource</code></td>
-<td><code>classpath:/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md</code></td>
-<td>Prompt template to inject. Must contain the <code>{MEMORIES_ROOT_DIERCTORY}</code> placeholder.</td>
+<td><code>classpath:/prompt/AUTO_DREAM_SYSTEM_PROMPT.md</code></td>
+<td>Override the Dreamer's operating instructions.</td>
 </tr>
 <tr>
-<td><code>memoryConsolidationTrigger(BiPredicate&lt;ChatClientRequest, Instant&gt;)</code></td>
-<td><code>BiPredicate</code></td>
-<td><code>(req, t) -&gt; false</code></td>
-<td>Evaluated on each request. When <code>true</code>, a consolidation reminder is appended to the system message.</td>
+<td><code>staleLockAfter(Duration)</code></td>
+<td><code>Duration</code></td>
+<td><code>15 minutes</code></td>
+<td>Age at which an unreleased <code>.dream.lock</code> is treated as abandoned and reclaimed.</td>
+</tr>
+<tr>
+<td><code>sessionService(SessionService)</code></td>
+<td><code>SessionService</code></td>
+<td>none</td>
+<td>Optional. See <a href="#cross-session-recall-optional">Cross-Session Recall</a>.</td>
 </tr>
 </tbody>
 </table>
-<h3 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h3>
-<ul>
-<li><code>memoriesRootDirectory</code> must be a non-empty string — <code>build()</code> throws <code>IllegalArgumentException</code> if blank.</li>
-<li><code>memorySystemPrompt</code> must not be null — the builder method throws immediately if null is passed.</li>
-<li><code>memoryConsolidationTrigger</code> must not be null — the builder method throws immediately if null is passed.</li>
-</ul>
-<h2 id="memory-consolidation-trigger">Memory Consolidation Trigger<a class="headerlink" href="#memory-consolidation-trigger" title="Permanent link">&para;</a></h2>
-<p>Over time the memory store can accumulate redundant or outdated entries. The <code>memoryConsolidationTrigger</code> lets you inject a reminder at a chosen frequency to prompt the model to clean up:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// Trigger consolidation roughly every 20 requests (stateless approximation)</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">AutoMemoryToolsAdvisor</span><span class="w"> </span><span class="n">advisor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">"/path/to/memories"</span><span class="p">)</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="p">.</span><span class="na">memoryConsolidationTrigger</span><span class="p">((</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">instant</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">        </span><span class="n">Math</span><span class="p">.</span><span class="na">random</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">0.05</span><span class="p">)</span><span class="w">   </span><span class="c1">// ~5 % of requests</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<h3 id="running-a-cycle">Running a cycle<a class="headerlink" href="#running-a-cycle" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// Memory-only</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">DreamResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dreamService</span><span class="p">.</span><span class="na">runDreamCycle</span><span class="p">(</span><span class="n">memoriesRootDirectory</span><span class="p">);</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1">// With cross-session recall (requires sessionService(...) configured on the builder)</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">DreamResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dreamService</span><span class="p">.</span><span class="na">runDreamCycle</span><span class="p">(</span><span class="n">memoriesRootDirectory</span><span class="p">,</span><span class="w"> </span><span class="n">userId</span><span class="p">);</span>
 </span></code></pre></div>
-<p>When the predicate returns <code>true</code>, the following block is appended to the system message:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>&lt;system-reminder&gt;Consolidate the long-term memory by summarizing and removing redundant information.&lt;/system-reminder&gt;
+<p><code>DreamResult</code> is a small record: <code>status()</code> is <code>"completed"</code>, <code>"failed"</code>, or <code>"skipped"</code> (already locked), and <code>summary()</code> is the Dreamer's own account of what it changed.</p>
+<h2 id="dream-triggers">Dream Triggers<a class="headerlink" href="#dream-triggers" title="Permanent link">&para;</a></h2>
+<p><code>DreamTrigger</code> decides whether a background dream cycle should fire, evaluated against <strong>persisted</strong> <code>DreamState</code> rather than in-memory counters — so the decision survives process restarts, unlike a stateless <code>BiPredicate</code>.</p>
+<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">DreamTrigger</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">shouldDream</span><span class="p">(</span><span class="n">DreamState</span><span class="w"> </span><span class="n">state</span><span class="p">,</span><span class="w"> </span><span class="n">Instant</span><span class="w"> </span><span class="n">now</span><span class="p">);</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>The predicate receives:</p>
+<p><code>DreamTriggers</code> provides two factories:</p>
 <table>
 <thead>
 <tr>
-<th>Parameter</th>
-<th>Type</th>
-<th>Description</th>
+<th>Factory</th>
+<th>Behavior</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>request</code></td>
-<td><code>ChatClientRequest</code></td>
-<td>The full in-flight request — inspect messages, context, or metadata to decide.</td>
+<td><code>DreamTriggers.hoursAndSessions(hours, sessions)</code></td>
+<td>Fires only once <strong>both</strong> conditions hold: at least <code>hours</code> elapsed since the last dream, and at least <code>sessions</code> conversation turns processed since then. A store that has never been dreamed on satisfies the time condition immediately.</td>
 </tr>
 <tr>
-<td><code>instant</code></td>
-<td><code>Instant</code></td>
-<td>Wall-clock time of the current call — useful for time-based intervals.</td>
+<td><code>DreamTriggers.manualOnly()</code></td>
+<td>Never fires automatically — dream cycles only run when <code>runDreamCycle(...)</code> is called explicitly.</td>
 </tr>
 </tbody>
 </table>
-<p>Common trigger strategies:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// Time-based: every 24 hours</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">Instant</span><span class="o">[]</span><span class="w"> </span><span class="n">lastConsolidation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Instant</span><span class="p">.</span><span class="na">now</span><span class="p">()</span><span class="w"> </span><span class="p">};</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="p">.</span><span class="na">memoryConsolidationTrigger</span><span class="p">((</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">now</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">between</span><span class="p">(</span><span class="n">lastConsolidation</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="n">now</span><span class="p">).</span><span class="na">toHours</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">24</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">        </span><span class="n">lastConsolidation</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">now</span><span class="p">;</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">})</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="c1">// Turn-count-based: every N calls</span>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="n">AtomicInteger</span><span class="w"> </span><span class="n">counter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AtomicInteger</span><span class="p">();</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="p">.</span><span class="na">memoryConsolidationTrigger</span><span class="p">((</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">now</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span>
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">    </span><span class="n">counter</span><span class="p">.</span><span class="na">incrementAndGet</span><span class="p">()</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">50</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<p>Write a custom trigger for anything else — it's a single-method functional interface.</p>
+<h2 id="dream-modes">Dream Modes<a class="headerlink" href="#dream-modes" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Behavior</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AUTO_APPLY</code> (default)</td>
+<td>The Dreamer edits memory files directly.</td>
+<td>Single-user/single-agent memory store — the common case.</td>
+</tr>
+<tr>
+<td><code>PROPOSE</code></td>
+<td>The entire memory tree (minus dream bookkeeping files) is copied into <code>&lt;memoriesDir&gt;/.dream-proposals/&lt;timestamp&gt;/</code> first, and the Dreamer edits the copy instead. The live memory files are left untouched.</td>
+<td>Shared/multi-agent memory stores where blind auto-merge is riskier — review the proposal, then apply changes manually via the ordinary <code>Memory*</code> tools if you agree with them.</td>
+</tr>
+</tbody>
+</table>
+<p><code>PROPOSE</code> mode produces a plain directory copy — no diff is generated. Compare it against the live directory yourself (e.g. <code>diff -r</code>), or read the Dreamer's summary in the returned <code>DreamResult</code>.</p>
+<h2 id="cross-session-recall-optional">Cross-Session Recall (optional)<a class="headerlink" href="#cross-session-recall-optional" title="Permanent link">&para;</a></h2>
+<p>When <a href="https://github.com/spring-ai-community/spring-ai-session"><code>spring-ai-session</code></a> is on the classpath and <code>sessionService(...)</code> is configured, <code>runDreamCycle(memoriesRootDirectory, userId)</code> additionally gives the Dreamer a <strong>read-only</strong> <code>cross_session_search</code> tool (spring-ai-session's <code>CrossSessionRecallTools</code>), scoped to that one user's entire session history — not just the memory store.</p>
+<div class="highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">AutoDreamService</span><span class="w"> </span><span class="n">dreamService</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoDreamService</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">())</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="p">.</span><span class="na">sessionService</span><span class="p">(</span><span class="n">sessionService</span><span class="p">)</span><span class="w">   </span><span class="c1">// any SessionService — in-memory, JDBC, etc.</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">dreamService</span><span class="p">.</span><span class="na">runDreamCycle</span><span class="p">(</span><span class="n">memoriesRootDirectory</span><span class="p">,</span><span class="w"> </span><span class="s">"alice"</span><span class="p">);</span>
 </span></code></pre></div>
-<h2 id="advisor-ordering">Advisor Ordering<a class="headerlink" href="#advisor-ordering" title="Permanent link">&para;</a></h2>
-<p>The default order <code>BaseAdvisor.HIGHEST_PRECEDENCE + 200</code> places this advisor <strong>before</strong> the <code>ToolCallingAdvisor</code> (which sits at <code>+300</code>). This ordering ensures memory tools are registered in the options before the tool-calling advisor processes them.</p>
-<p>If you use other advisors that also modify tool options (e.g. additional <code>ToolCallingAdvisor</code> instances), verify that their relative order does not prevent the memory tools from reaching the model.</p>
-<h2 id="relation-to-automemorytools">Relation to AutoMemoryTools<a class="headerlink" href="#relation-to-automemorytools" title="Permanent link">&para;</a></h2>
-<p><code>AutoMemoryToolsAdvisor</code> is a thin orchestration layer. The six memory operations, sandboxing logic, and file conventions all live in <a href="../AutoMemoryTools/"><code>AutoMemoryTools</code></a>. The advisor adds:</p>
-<ul>
-<li>Automatic system prompt injection (no need to configure the prompt separately on the <code>ChatClient</code>)</li>
-<li>Automatic tool registration (no need to call <code>.defaultTools(memoryTools)</code>)</li>
-<li>Duplicate-filtering guard so memory tools are never registered twice</li>
-<li>The optional consolidation trigger</li>
-</ul>
-<h3 id="manual-setup-vs-advisor">Manual setup vs. advisor<a class="headerlink" href="#manual-setup-vs-advisor" title="Permanent link">&para;</a></h3>
-<p>If you need full control over when and how the system prompt and tools are applied, you can wire <code>AutoMemoryTools</code> directly without the advisor:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// Manual setup</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">AutoMemoryTools</span><span class="w"> </span><span class="n">memoryTools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoMemoryTools</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesDir</span><span class="p">(</span><span class="s">"/path/to/memories"</span><span class="p">)</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="n">String</span><span class="w"> </span><span class="n">memoryPrompt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">PromptTemplate</span><span class="p">(</span><span class="n">memorySystemPromptResource</span><span class="p">)</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="p">.</span><span class="na">render</span><span class="p">(</span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">"MEMORIES_ROOT_DIERCTORY"</span><span class="p">,</span><span class="w"> </span><span class="n">memoriesDir</span><span class="p">));</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ChatClient</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatModel</span><span class="p">)</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultSystem</span><span class="p">(</span><span class="n">baseSystemPrompt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"\n\n"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">memoryPrompt</span><span class="p">)</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span><span class="n">memoryTools</span><span class="p">)</span>
-</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>
-</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="c1">// Advisor setup — equivalent, less boilerplate</span>
-</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ChatClient</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatModel</span><span class="p">)</span>
-</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span>
-</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">        </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">            </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">"/path/to/memories"</span><span class="p">)</span>
-</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">            </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span></code></pre></div>
+<p>Both conditions must hold for cross-session recall to activate: <code>sessionService(...)</code> configured on the builder, <strong>and</strong> a non-empty <code>userId</code> passed to <code>runDreamCycle(...)</code>. Omit either and the Dreamer falls back to memory-only dreaming — no error, no behavior change from the base case.</p>
+<div class="admonition note">
+<p class="admonition-title">Optional dependency</p>
+<p><code>spring-ai-agent-utils</code> declares <code>spring-ai-session</code> as <code>provided</code> + <code>optional</code>. Consumers who never call <code>.sessionService(...)</code> don't need it on their own classpath — it's never pulled in transitively. Add it directly to your own project's dependencies to use this feature.</p>
+</div>
+<p>The Dreamer's kickoff prompt automatically tells it when <code>cross_session_search</code> is available and scopes its queries with <code>since = &lt;last dream's timestamp&gt;</code>, so each cycle only mines history since the previous one. See spring-ai-session's <a href="https://spring-ai-community.github.io/spring-ai-session/session-management/cross-session-recall/">Cross-Session Recall</a> docs for the tool itself.</p>
 <h2 id="system-prompt">System Prompt<a class="headerlink" href="#system-prompt" title="Permanent link">&para;</a></h2>
-<p>The default companion prompt (<code>AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md</code>) is bundled in the jar at <code>classpath:/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md</code>. It instructs the model to:</p>
-<ul>
-<li>Read <code>MEMORY.md</code> at the start of sessions where prior context may be relevant</li>
-<li>Use the two-step save workflow (<code>MemoryCreate</code> → <code>MemoryInsert</code> into <code>MEMORY.md</code>)</li>
-<li>Apply the four memory types (<code>user</code>, <code>feedback</code>, <code>project</code>, <code>reference</code>)</li>
-<li>Verify recalled memories before acting on them</li>
-<li>Avoid saving ephemeral state, code patterns, git history, or fix recipes</li>
-</ul>
-<p>The template contains one placeholder: <code>{MEMORIES_ROOT_DIERCTORY}</code> (note the spelling), which is filled with the configured <code>memoriesRootDirectory</code> at <code>build()</code> time.</p>
-<p>To use a custom prompt, provide any <code>Resource</code> that contains the same placeholder:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">"classpath:/my-custom-memory-prompt.md"</span><span class="p">)</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">Resource</span><span class="w"> </span><span class="n">customPrompt</span><span class="p">;</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">"/path/to/memories"</span><span class="p">)</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="p">.</span><span class="na">memorySystemPrompt</span><span class="p">(</span><span class="n">customPrompt</span><span class="p">)</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span></code></pre></div>
+<p>The default companion prompt is bundled at <code>classpath:/prompt/AUTO_DREAM_SYSTEM_PROMPT.md</code>. It encodes the four-phase pipeline described above, and — when cross-session recall is available — instructs the Dreamer to run a handful of <em>targeted</em> queries (not an exhaustive history read) for three signal categories: corrections ("no,", "don't", "actually", "instead"), explicit save requests ("remember that", "keep in mind"), and decisions ("we decided", "let's go with").</p>
+<p>Provide your own via <code>.dreamSystemPrompt(customResource)</code> if you need different phases or tone.</p>
 <h2 id="demo-application">Demo Application<a class="headerlink" href="#demo-application" title="Permanent link">&para;</a></h2>
-<p>See <a href="https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-advisor-demo"><code>memory-tools-advisor-demo</code></a> for a complete runnable example showing <code>AutoMemoryToolsAdvisor</code> combined with <code>MessageChatMemoryAdvisor</code> and a custom logging advisor.</p>
+<p>See <a href="https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-dream-demo">memory-tools-dream-demo</a> for a complete runnable example: seeded overlapping memories and a seeded past session (decision + correction) give both the memory-only and cross-session-recall phases of a dream cycle real signal to find, with both an automatic every-3rd-turn trigger and an on-demand <code>/dream</code> REPL command.</p>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../AutoMemoryTools/">AutoMemoryTools</a> — the underlying tool implementations, file conventions, and security model</li>
-<li><a href="../AutoDreamAdvisor/">AutoDreamAdvisor</a> — schedules out-of-band background consolidation, complementing <code>memoryConsolidationTrigger</code></li>
-<li><a href="../FileSystemTools/">FileSystemTools</a> — general-purpose file read/write/edit (not sandboxed)</li>
-<li><a href="https://code.claude.com/docs/en/memory">Claude Code — Memory</a> — the file-based memory design this library is modelled after</li>
-<li><a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool">Claude API SDK — Memory Tool</a> — the official tool specification</li>
+<li><a href="../AutoDreamAdvisor/">AutoDreamAdvisor</a> — the <code>ChatClient</code> advisor that schedules dream cycles automatically</li>
+<li><a href="../AutoMemoryTools/">AutoMemoryTools</a> — the memory store the Dreamer consolidates</li>
+<li><a href="../AutoMemoryToolsAdvisor/">AutoMemoryToolsAdvisor</a> — <code>memoryConsolidationTrigger</code>, the in-band complement to Auto-Dream</li>
+<li><a href="../TaskTools/">TaskTools</a> — the background-execution infrastructure Auto-Dream reuses for async cycles</li>
 </ul>
 
 

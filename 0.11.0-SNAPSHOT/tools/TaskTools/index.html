@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://spring-ai-community.github.io/spring-ai-agent-utils/0.11.0-SNAPSHOT/tools/TaskTools/">
       
       
-        <link rel="prev" href="../AutoMemoryToolsAdvisor/">
+        <link rel="prev" href="../AutoDreamAdvisor/">
       
       
         <link rel="next" href="../Subagent/">
@@ -1027,6 +1027,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -1115,6 +1119,62 @@
     
   
     AutoMemoryToolsAdvisor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AutoDreamService/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AutoDreamService
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AutoDreamAdvisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AutoDreamAdvisor
   
 
     
@@ -3086,7 +3146,7 @@
 </span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">            </span><span class="c1">// Configure Task tool with Claude subagents</span>
 </span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">            </span><span class="kd">var</span><span class="w"> </span><span class="n">taskTool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TaskTool</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">                </span><span class="p">.</span><span class="na">subagentTypes</span><span class="p">(</span><span class="n">ClaudeSubagentType</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">                    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">&quot;default&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">)</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">                    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"default"</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">)</span>
 </span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">                    </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
 </span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>
@@ -3097,7 +3157,7 @@
 </span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>
 </span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="w">            </span><span class="c1">// Use naturally - agent will delegate to sub-agents</span>
 </span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClient</span>
-</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="w">                </span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="s">&quot;Explore the authentication module and explain how it works&quot;</span><span class="p">)</span>
+</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="w">                </span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="s">"Explore the authentication module and explain how it works"</span><span class="p">)</span>
 </span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="w">                </span><span class="p">.</span><span class="na">call</span><span class="p">()</span>
 </span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="w">                </span><span class="p">.</span><span class="na">content</span><span class="p">();</span>
 </span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="w">        </span><span class="p">};</span>
@@ -3108,18 +3168,18 @@
 <h3 id="using-claudesubagenttype">Using ClaudeSubagentType<a class="headerlink" href="#using-claudesubagenttype" title="Permanent link">&para;</a></h3>
 <p><code>ClaudeSubagentType</code> is a convenience builder that creates a <code>SubagentType</code> bundling the Claude resolver and executor with default tools (Grep, Glob, Shell, FileSystem, WebFetch, TodoWrite) and optional extras (BraveWebSearch, Skills):</p>
 <div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">SubagentType</span><span class="w"> </span><span class="n">claudeType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClaudeSubagentType</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="c1">// Required: At least one ChatClient builder with key &quot;default&quot;</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">&quot;default&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">)</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="c1">// Required: At least one ChatClient builder with key "default"</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"default"</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">)</span>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="c1">// Optional: Additional model-specific ChatClient builders</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">&quot;opus&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">opusChatClientBuilder</span><span class="p">)</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">&quot;haiku&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">haikuChatClientBuilder</span><span class="p">)</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"opus"</span><span class="p">,</span><span class="w"> </span><span class="n">opusChatClientBuilder</span><span class="p">)</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"haiku"</span><span class="p">,</span><span class="w"> </span><span class="n">haikuChatClientBuilder</span><span class="p">)</span>
 </span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
 </span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">    </span><span class="c1">// Optional: Skills for sub-agents (preloaded into system prompt)</span>
 </span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">    </span><span class="p">.</span><span class="na">skillsResources</span><span class="p">(</span><span class="n">skillResources</span><span class="p">)</span>
 </span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
 </span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">    </span><span class="c1">// Optional: For web search</span>
-</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">    </span><span class="p">.</span><span class="na">braveApiKey</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getenv</span><span class="p">(</span><span class="s">&quot;BRAVE_API_KEY&quot;</span><span class="p">))</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">    </span><span class="p">.</span><span class="na">braveApiKey</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getenv</span><span class="p">(</span><span class="s">"BRAVE_API_KEY"</span><span class="p">))</span>
 </span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>
 </span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
@@ -3130,7 +3190,7 @@
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentTypes</span><span class="p">(</span><span class="n">claudeType</span><span class="p">)</span>
 </span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
 </span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="c1">// Optional: Custom subagent references (for Claude-based subagents)</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentReferences</span><span class="p">(</span><span class="n">ClaudeSubagentReferences</span><span class="p">.</span><span class="na">fromRootDirectory</span><span class="p">(</span><span class="s">&quot;/path/to/agents&quot;</span><span class="p">))</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentReferences</span><span class="p">(</span><span class="n">ClaudeSubagentReferences</span><span class="p">.</span><span class="na">fromRootDirectory</span><span class="p">(</span><span class="s">"/path/to/agents"</span><span class="p">))</span>
 </span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
 </span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="c1">// Optional: Custom task storage</span>
 </span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">    </span><span class="p">.</span><span class="na">taskRepository</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">DefaultTaskRepository</span><span class="p">())</span>
@@ -3147,13 +3207,13 @@
 </span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">ToolCallback</span><span class="w"> </span><span class="n">taskTool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TaskTool</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="c1">// Local Claude subagents</span>
 </span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentTypes</span><span class="p">(</span><span class="n">ClaudeSubagentType</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">        </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">&quot;default&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">)</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">        </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"default"</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">)</span>
 </span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">        </span><span class="p">.</span><span class="na">skillsResources</span><span class="p">(</span><span class="n">skillPaths</span><span class="p">)</span>
 </span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">        </span><span class="p">.</span><span class="na">braveApiKey</span><span class="p">(</span><span class="n">braveApiKey</span><span class="p">)</span>
 </span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="w">        </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
 </span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>
 </span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">    </span><span class="c1">// Remote A2A subagent</span>
-</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentReferences</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SubagentReference</span><span class="p">(</span><span class="s">&quot;http://localhost:10001/myagent&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A2ASubagentDefinition</span><span class="p">.</span><span class="na">KIND</span><span class="p">))</span>
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentReferences</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SubagentReference</span><span class="p">(</span><span class="s">"http://localhost:10001/myagent"</span><span class="p">,</span><span class="w"> </span><span class="n">A2ASubagentDefinition</span><span class="p">.</span><span class="na">KIND</span><span class="p">))</span>
 </span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentTypes</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SubagentType</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">A2ASubagentResolver</span><span class="p">(),</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">A2ASubagentExecutor</span><span class="p">()))</span>
 </span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>
 </span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
@@ -3161,9 +3221,9 @@
 <h3 id="multi-provider-and-multi-model-configuration">Multi-Provider and Multi-Model Configuration<a class="headerlink" href="#multi-provider-and-multi-model-configuration" title="Permanent link">&para;</a></h3>
 <p>Route subagents to different LLM providers and models based on their frontmatter <code>model</code> field. The <code>chatClientBuilder</code> keys represent named providers — these can be any Spring AI supported LLM provider (Anthropic, OpenAI, Ollama, etc.), not just Claude variants:</p>
 <div class="highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">SubagentType</span><span class="w"> </span><span class="n">claudeType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClaudeSubagentType</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">&quot;default&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">anthropicBuilder</span><span class="p">)</span><span class="w">  </span><span class="c1">// Fallback provider</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">&quot;openai&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">openAiBuilder</span><span class="p">)</span><span class="w">      </span><span class="c1">// OpenAI provider</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">&quot;ollama&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ollamaBuilder</span><span class="p">)</span><span class="w">      </span><span class="c1">// Ollama provider</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"default"</span><span class="p">,</span><span class="w"> </span><span class="n">anthropicBuilder</span><span class="p">)</span><span class="w">  </span><span class="c1">// Fallback provider</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"openai"</span><span class="p">,</span><span class="w"> </span><span class="n">openAiBuilder</span><span class="p">)</span><span class="w">      </span><span class="c1">// OpenAI provider</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"ollama"</span><span class="p">,</span><span class="w"> </span><span class="n">ollamaBuilder</span><span class="p">)</span><span class="w">      </span><span class="c1">// Ollama provider</span>
 </span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
 <p>The <code>model</code> frontmatter field supports two formats:</p>
@@ -3176,18 +3236,18 @@
 <h4 id="from-directories">From Directories<a class="headerlink" href="#from-directories" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.springaicommunity.agent.tools.task.claude.ClaudeSubagentReferences</span><span class="p">;</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">SubagentReference</span><span class="o">&gt;</span><span class="w"> </span><span class="n">refs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClaudeSubagentReferences</span><span class="p">.</span><span class="na">fromRootDirectory</span><span class="p">(</span><span class="s">&quot;/path/to/agents&quot;</span><span class="p">);</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">SubagentReference</span><span class="o">&gt;</span><span class="w"> </span><span class="n">refs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClaudeSubagentReferences</span><span class="p">.</span><span class="na">fromRootDirectory</span><span class="p">(</span><span class="s">"/path/to/agents"</span><span class="p">);</span>
 </span></code></pre></div>
 <h4 id="from-spring-resources">From Spring Resources<a class="headerlink" href="#from-spring-resources" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">&quot;${agent.tasks.paths}&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">"${agent.tasks.paths}"</span><span class="p">)</span>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Resource</span><span class="o">&gt;</span><span class="w"> </span><span class="n">agentPaths</span><span class="p">;</span>
 </span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
 </span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">SubagentReference</span><span class="o">&gt;</span><span class="w"> </span><span class="n">refs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClaudeSubagentReferences</span><span class="p">.</span><span class="na">fromResources</span><span class="p">(</span><span class="n">agentPaths</span><span class="p">);</span>
 </span></code></pre></div>
 <h4 id="multiple-sources">Multiple Sources<a class="headerlink" href="#multiple-sources" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">SubagentReference</span><span class="o">&gt;</span><span class="w"> </span><span class="n">refs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ClaudeSubagentReferences</span><span class="p">.</span><span class="na">fromRootDirectories</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="s">&quot;src/main/resources/agents&quot;</span><span class="p">,</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;user.home&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;/.claude/agents&quot;</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="s">"src/main/resources/agents"</span><span class="p">,</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">"user.home"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"/.claude/agents"</span>
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="p">));</span>
 </span></code></pre></div>
 <h2 id="creating-custom-sub-agents">Creating Custom Sub-Agents<a class="headerlink" href="#creating-custom-sub-agents" title="Permanent link">&para;</a></h2>
@@ -3211,7 +3271,7 @@
 </span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="gu">permissionMode: default              # Optional: permission handling mode</span>
 </span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="gu">---</span>
 </span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>
-</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="gh"># Your Sub-Agent&#39;s System Prompt</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="gh"># Your Sub-Agent's System Prompt</span>
 </span><span id="__span-15-12"><a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>
 </span><span id="__span-15-13"><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>You are a [role description]. You specialize in [domain].
 </span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>
@@ -3305,7 +3365,7 @@
 </span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
 </span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="c1">// 3. Register with TaskTool</span>
 </span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="n">TaskTool</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentReferences</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SubagentReference</span><span class="p">(</span><span class="s">&quot;my://agent-1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;MY_KIND&quot;</span><span class="p">))</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentReferences</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SubagentReference</span><span class="p">(</span><span class="s">"my://agent-1"</span><span class="p">,</span><span class="w"> </span><span class="s">"MY_KIND"</span><span class="p">))</span>
 </span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentTypes</span><span class="p">(</span><span class="n">myType</span><span class="p">)</span>
 </span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
@@ -3313,7 +3373,7 @@
 <h3 id="automatic-delegation">Automatic Delegation<a class="headerlink" href="#automatic-delegation" title="Permanent link">&para;</a></h3>
 <p>The main agent automatically delegates to sub-agents based on their descriptions:</p>
 <div class="highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">String</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClient</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="s">&quot;How does authentication work in this codebase?&quot;</span><span class="p">)</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="s">"How does authentication work in this codebase?"</span><span class="p">)</span>
 </span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="p">.</span><span class="na">call</span><span class="p">()</span>
 </span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span><span class="p">.</span><span class="na">content</span><span class="p">();</span>
 </span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="c1">// Main agent recognizes this as exploration task and delegates to Explore sub-agent</span>
@@ -3321,7 +3381,7 @@
 <h3 id="explicit-invocation">Explicit Invocation<a class="headerlink" href="#explicit-invocation" title="Permanent link">&para;</a></h3>
 <p>Users can explicitly request specific sub-agents:</p>
 <div class="highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">String</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClient</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">    </span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="s">&quot;Use the code-reviewer subagent to review my recent changes&quot;</span><span class="p">)</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">    </span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="s">"Use the code-reviewer subagent to review my recent changes"</span><span class="p">)</span>
 </span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="p">.</span><span class="na">call</span><span class="p">()</span>
 </span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">    </span><span class="p">.</span><span class="na">content</span><span class="p">();</span>
 </span></code></pre></div>
@@ -3329,14 +3389,14 @@
 <p>Long-running tasks can execute in the background:</p>
 <div class="highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1">// Main agent can launch background sub-agents</span>
 </span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">String</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClient</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">    </span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="s">&quot;Run the test-runner in the background and let me know when tests complete&quot;</span><span class="p">)</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">    </span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="s">"Run the test-runner in the background and let me know when tests complete"</span><span class="p">)</span>
 </span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">    </span><span class="p">.</span><span class="na">call</span><span class="p">()</span>
 </span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">    </span><span class="p">.</span><span class="na">content</span><span class="p">();</span>
 </span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="c1">// Returns task_id for later retrieval</span>
 </span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>
 </span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="c1">// Later, retrieve results via TaskOutputTool</span>
 </span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="n">String</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClient</span>
-</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="w">    </span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="s">&quot;Get the results from task task_12345&quot;</span><span class="p">)</span>
+</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="w">    </span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="s">"Get the results from task task_12345"</span><span class="p">)</span>
 </span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="w">    </span><span class="p">.</span><span class="na">call</span><span class="p">()</span>
 </span><span id="__span-20-12"><a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="w">    </span><span class="p">.</span><span class="na">content</span><span class="p">();</span>
 </span></code></pre></div>
@@ -3388,15 +3448,15 @@
 </span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w">    </span><span class="nd">@Bean</span>
 </span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">    </span><span class="n">CommandLineRunner</span><span class="w"> </span><span class="nf">demo</span><span class="p">(</span>
 </span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="w">            </span><span class="n">ChatClient</span><span class="p">.</span><span class="na">Builder</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">,</span>
-</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="w">            </span><span class="nd">@Value</span><span class="p">(</span><span class="s">&quot;${agent.skills.paths}&quot;</span><span class="p">)</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Resource</span><span class="o">&gt;</span><span class="w"> </span><span class="n">skillPaths</span><span class="p">,</span>
-</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">            </span><span class="nd">@Value</span><span class="p">(</span><span class="s">&quot;${BRAVE_API_KEY:#{null}}&quot;</span><span class="p">)</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">braveApiKey</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="w">            </span><span class="nd">@Value</span><span class="p">(</span><span class="s">"${agent.skills.paths}"</span><span class="p">)</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Resource</span><span class="o">&gt;</span><span class="w"> </span><span class="n">skillPaths</span><span class="p">,</span>
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">            </span><span class="nd">@Value</span><span class="p">(</span><span class="s">"${BRAVE_API_KEY:#{null}}"</span><span class="p">)</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">braveApiKey</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-25-9"><a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a>
 </span><span id="__span-25-10"><a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">args</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-25-11"><a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="w">            </span><span class="c1">// Configure Task tool with Claude subagents</span>
 </span><span id="__span-25-12"><a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="w">            </span><span class="kd">var</span><span class="w"> </span><span class="n">taskTool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TaskTool</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-25-13"><a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="w">                </span><span class="p">.</span><span class="na">subagentTypes</span><span class="p">(</span><span class="n">ClaudeSubagentType</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-25-14"><a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a><span class="w">                    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">&quot;default&quot;</span><span class="p">,</span>
-</span><span id="__span-25-15"><a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a><span class="w">                        </span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">().</span><span class="na">defaultAdvisors</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">MyLoggingAdvisor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;[TASK]&quot;</span><span class="p">)))</span>
+</span><span id="__span-25-14"><a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a><span class="w">                    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"default"</span><span class="p">,</span>
+</span><span id="__span-25-15"><a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a><span class="w">                        </span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">().</span><span class="na">defaultAdvisors</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">MyLoggingAdvisor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="s">"[TASK]"</span><span class="p">)))</span>
 </span><span id="__span-25-16"><a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a><span class="w">                    </span><span class="p">.</span><span class="na">skillsResources</span><span class="p">(</span><span class="n">skillPaths</span><span class="p">)</span>
 </span><span id="__span-25-17"><a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a><span class="w">                    </span><span class="p">.</span><span class="na">braveApiKey</span><span class="p">(</span><span class="n">braveApiKey</span><span class="p">)</span>
 </span><span id="__span-25-18"><a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a><span class="w">                    </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
@@ -3425,12 +3485,12 @@
 </span><span id="__span-25-41"><a id="__codelineno-25-41" name="__codelineno-25-41" href="#__codelineno-25-41"></a><span class="w">            </span><span class="c1">// Interactive chat loop</span>
 </span><span id="__span-25-42"><a id="__codelineno-25-42" name="__codelineno-25-42" href="#__codelineno-25-42"></a><span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Scanner</span><span class="w"> </span><span class="n">scanner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-25-43"><a id="__codelineno-25-43" name="__codelineno-25-43" href="#__codelineno-25-43"></a><span class="w">                </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-25-44"><a id="__codelineno-25-44" name="__codelineno-25-44" href="#__codelineno-25-44"></a><span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="s">&quot;\nUSER: &quot;</span><span class="p">);</span>
+</span><span id="__span-25-44"><a id="__codelineno-25-44" name="__codelineno-25-44" href="#__codelineno-25-44"></a><span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="s">"\nUSER: "</span><span class="p">);</span>
 </span><span id="__span-25-45"><a id="__codelineno-25-45" name="__codelineno-25-45" href="#__codelineno-25-45"></a><span class="w">                    </span><span class="n">String</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClient</span>
 </span><span id="__span-25-46"><a id="__codelineno-25-46" name="__codelineno-25-46" href="#__codelineno-25-46"></a><span class="w">                        </span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="n">scanner</span><span class="p">.</span><span class="na">nextLine</span><span class="p">())</span>
 </span><span id="__span-25-47"><a id="__codelineno-25-47" name="__codelineno-25-47" href="#__codelineno-25-47"></a><span class="w">                        </span><span class="p">.</span><span class="na">call</span><span class="p">()</span>
 </span><span id="__span-25-48"><a id="__codelineno-25-48" name="__codelineno-25-48" href="#__codelineno-25-48"></a><span class="w">                        </span><span class="p">.</span><span class="na">content</span><span class="p">();</span>
-</span><span id="__span-25-49"><a id="__codelineno-25-49" name="__codelineno-25-49" href="#__codelineno-25-49"></a><span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;\nASSISTANT: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">response</span><span class="p">);</span>
+</span><span id="__span-25-49"><a id="__codelineno-25-49" name="__codelineno-25-49" href="#__codelineno-25-49"></a><span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"\nASSISTANT: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">response</span><span class="p">);</span>
 </span><span id="__span-25-50"><a id="__codelineno-25-50" name="__codelineno-25-50" href="#__codelineno-25-50"></a><span class="w">                </span><span class="p">}</span>
 </span><span id="__span-25-51"><a id="__codelineno-25-51" name="__codelineno-25-51" href="#__codelineno-25-51"></a><span class="w">            </span><span class="p">}</span>
 </span><span id="__span-25-52"><a id="__codelineno-25-52" name="__codelineno-25-52" href="#__codelineno-25-52"></a><span class="w">        </span><span class="p">};</span>
@@ -3471,7 +3531,7 @@
 <p>Extend the system for new protocols like A2A rather than modifying core code.</p>
 <h3 id="5-version-control-custom-agents">5. Version Control Custom Agents<a class="headerlink" href="#5-version-control-custom-agents" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>git<span class="w"> </span>add<span class="w"> </span>.claude/agents/
-</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Add code-reviewer and test-runner sub-agents&quot;</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Add code-reviewer and test-runner sub-agents"</span>
 </span></code></pre></div>
 <h2 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h2>
 <h3 id="tasktool">TaskTool<a class="headerlink" href="#tasktool" title="Permanent link">&para;</a></h3>
@@ -3544,7 +3604,7 @@
 <h3 id="claudesubagentdefinition">ClaudeSubagentDefinition<a class="headerlink" href="#claudesubagentdefinition" title="Permanent link">&para;</a></h3>
 <p>The built-in Claude subagent definition uses the kind constant <code>"CLAUDE"</code>:</p>
 <div class="highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ClaudeSubagentDefinition</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">SubagentDefinition</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">KIND</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;CLAUDE&quot;</span><span class="p">;</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">KIND</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"CLAUDE"</span><span class="p">;</span>
 </span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>
 </span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">    </span><span class="c1">// Additional Claude-specific methods:</span>
 </span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">getModel</span><span class="p">();</span><span class="w">           </span><span class="c1">// Model override (sonnet, opus, haiku)</span>

@@ -1251,6 +1251,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -1339,6 +1343,62 @@
     
   
     AutoMemoryToolsAdvisor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AutoDreamService/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AutoDreamService
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AutoDreamAdvisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AutoDreamAdvisor
   
 
     
@@ -1876,10 +1936,10 @@
 <h2 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h2>
 <h3 id="constants">Constants<a class="headerlink" href="#constants" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// Parameter keys for system prompt placeholders</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">ENVIRONMENT_INFO_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ENVIRONMENT_INFO&quot;</span><span class="p">;</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">GIT_STATUS_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GIT_STATUS&quot;</span><span class="p">;</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">AGENT_MODEL_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;AGENT_MODEL&quot;</span><span class="p">;</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;AGENT_MODEL_KNOWLEDGE_CUTOFF&quot;</span><span class="p">;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">ENVIRONMENT_INFO_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"ENVIRONMENT_INFO"</span><span class="p">;</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">GIT_STATUS_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"GIT_STATUS"</span><span class="p">;</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">AGENT_MODEL_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"AGENT_MODEL"</span><span class="p">;</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"AGENT_MODEL_KNOWLEDGE_CUTOFF"</span><span class="p">;</span>
 </span></code></pre></div>
 <h3 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h3>
 <h4 id="agentenvironmentinfo"><code>AgentEnvironment.info()</code><a class="headerlink" href="#agentenvironmentinfo" title="Permanent link">&para;</a></h4>
@@ -1897,7 +1957,7 @@
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1">// Is directory a git repo: Yes</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1">// Platform: mac os x</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1">// OS Version: Mac OS X 14.5.0</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1">// Today&#39;s date: 2026-01-10</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1">// Today's date: 2026-01-10</span>
 </span></code></pre></div></p>
 <h4 id="agentenvironmentgitstatus"><code>AgentEnvironment.gitStatus()</code><a class="headerlink" href="#agentenvironmentgitstatus" title="Permanent link">&para;</a></h4>
 <p>Collects git repository status snapshot.</p>
@@ -1938,10 +1998,10 @@
 </span></code></pre></div>
 <h3 id="2-inject-configuration-values">2. Inject Configuration Values<a class="headerlink" href="#2-inject-configuration-values" title="Permanent link">&para;</a></h3>
 <p>Use <code>@Value</code> annotations to inject the configuration:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">&quot;${agent.model:Unknown}&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">"${agent.model:Unknown}"</span><span class="p">)</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">String</span><span class="w"> </span><span class="n">agentModel</span><span class="p">;</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">&quot;${agent.model.knowledge.cutoff:Unknown}&quot;</span><span class="p">)</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">"${agent.model.knowledge.cutoff:Unknown}"</span><span class="p">)</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">String</span><span class="w"> </span><span class="n">agentModelKnowledgeCutoff</span><span class="p">;</span>
 </span></code></pre></div>
 <h3 id="3-configure-system-prompt-with-parameters">3. Configure System Prompt with Parameters<a class="headerlink" href="#3-configure-system-prompt-with-parameters" title="Permanent link">&para;</a></h3>
@@ -1976,7 +2036,7 @@
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>Is directory a git repo: Yes
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>Platform: mac os x
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>OS Version: Mac OS X 14.5.0
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>Today&#39;s date: 2026-01-10
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>Today's date: 2026-01-10
 </span></code></pre></div>
 <h2 id="git-status-output">Git Status Output<a class="headerlink" href="#git-status-output" title="Permanent link">&para;</a></h2>
 <p>The <code>AgentEnvironment.gitStatus()</code> method returns a detailed git repository snapshot:</p>

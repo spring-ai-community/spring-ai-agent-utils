@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://spring-ai-community.github.io/spring-ai-agent-utils/0.11.0-SNAPSHOT/tools/ShellTools/">
+        <link rel="canonical" href="https://spring-ai-community.github.io/spring-ai-agent-utils/0.11.0-SNAPSHOT/tools/AutoDreamAdvisor/">
       
       
-        <link rel="prev" href="../FileSystemTools/">
+        <link rel="prev" href="../AutoDreamService/">
       
       
-        <link rel="next" href="../GrepTool/">
+        <link rel="next" href="../TaskTools/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Shell - Spring AI Agent Utils</title>
+        <title>AutoDreamAdvisor - Spring AI Agent Utils</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#shelltools" class="md-skip">
+        <a href="#autodreamadvisor" class="md-skip">
           Skip to content
         </a>
       
@@ -117,7 +117,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Shell
+              AutoDreamAdvisor
             
           </span>
         </div>
@@ -241,12 +241,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../AgentEnvironment/" class="md-tabs__link">
           
   
@@ -331,10 +329,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../AutoMemoryTools/" class="md-tabs__link">
           
   
@@ -474,10 +474,8 @@
       
   
   
-    
   
   
-  
     
     
       
@@ -499,22 +497,19 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
   
@@ -532,7 +527,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -603,37 +598,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Shell
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../ShellTools/" class="md-nav__link">
         
   
   
@@ -649,76 +617,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#available-tools" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Available Tools
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Available Tools">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-bash-execute-shell-commands" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Bash - Execute Shell Commands
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-bashoutput-monitor-background-processes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. BashOutput - Monitor Background Processes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-killshell-terminate-background-processes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. KillShell - Terminate Background Processes
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1120,8 +1018,10 @@
       
   
   
+    
   
   
+  
     
     
       
@@ -1137,19 +1037,22 @@
     
     
       
+        
+        
+      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   
@@ -1167,7 +1070,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1266,10 +1169,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../AutoDreamAdvisor/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AutoDreamAdvisor
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1285,6 +1215,120 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#builder-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Builder Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Builder Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#useridstring-and-cross-session-recall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        userId(String) and cross-session recall
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#turn-counting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Turn counting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#relationship-to-memoryconsolidationtrigger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relationship to memoryConsolidationTrigger
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#demo-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Demo Application
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1536,44 +1580,44 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#available-tools" class="md-nav__link">
+  <a href="#what-it-does" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Available Tools
+        What it does
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Available Tools">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#builder-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Builder Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Builder Configuration">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-bash-execute-shell-commands" class="md-nav__link">
+  <a href="#useridstring-and-cross-session-recall" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Bash - Execute Shell Commands
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-bashoutput-monitor-background-processes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. BashOutput - Monitor Background Processes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-killshell-terminate-background-processes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. KillShell - Terminate Background Processes
+        userId(String) and cross-session recall
       
     </span>
   </a>
@@ -1582,6 +1626,50 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#turn-counting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Turn counting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#relationship-to-memoryconsolidationtrigger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relationship to memoryConsolidationTrigger
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#demo-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Demo Application
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1628,10 +1716,10 @@
     
     
       <li class="md-path__item">
-        <a href="../AgentEnvironment/" class="md-path__link">
+        <a href="../AutoMemoryTools/" class="md-path__link">
           
   <span class="md-ellipsis">
-    Common Tools
+    Memory
   </span>
 
         </a>
@@ -1653,235 +1741,104 @@
   
 
 
-<h1 id="shelltools">ShellTools<a class="headerlink" href="#shelltools" title="Permanent link">&para;</a></h1>
-<p>A comprehensive shell execution toolkit that provides both synchronous and background command execution with full process management capabilities.</p>
-<p><strong>Features:</strong>
-- Synchronous command execution with configurable timeout
-- Background process execution for long-running commands
-- Real-time output monitoring for background processes
-- Separate stdout and stderr capture
-- Process lifecycle management (kill, status checks)
-- Regex filtering for output
-- Cross-platform support (Windows/Unix)
-- Automatic output truncation for large outputs
-- Exit code reporting</p>
-<h2 id="available-tools">Available Tools<a class="headerlink" href="#available-tools" title="Permanent link">&para;</a></h2>
-<h3 id="1-bash-execute-shell-commands">1. Bash - Execute Shell Commands<a class="headerlink" href="#1-bash-execute-shell-commands" title="Permanent link">&para;</a></h3>
-<p>The primary tool for executing shell commands either synchronously or in the background.</p>
-<p><strong>Parameters:</strong>
-- <code>command</code> (required) - The shell command to execute
-- <code>timeout</code> (optional) - Timeout in milliseconds (max 600000ms / 10 minutes, default: 120000ms / 2 minutes)
-- <code>description</code> (optional) - Clear description of what the command does (5-10 words)
-- <code>runInBackground</code> (optional) - Set to <code>true</code> to run command in background</p>
-<p><strong>Basic Usage:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ShellTools</span><span class="w"> </span><span class="n">shellTools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ShellTools</span><span class="p">();</span>
+<h1 id="autodreamadvisor">AutoDreamAdvisor<a class="headerlink" href="#autodreamadvisor" title="Permanent link">&para;</a></h1>
+<p>A <code>ChatClient</code> advisor that schedules periodic, out-of-band <a href="../AutoDreamService/"><code>AutoDreamService</code></a> memory-consolidation cycles on top of an <a href="../AutoMemoryTools/"><code>AutoMemoryTools</code></a> memory store — the same relationship <a href="../AutoMemoryToolsAdvisor/"><code>AutoMemoryToolsAdvisor</code></a> has to <code>AutoMemoryTools</code>, but for background dreaming instead of live-turn tool injection.</p>
+<h2 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h2>
+<p>Unlike <code>AutoMemoryToolsAdvisor</code>, which injects tools and augments the system prompt on every request, <code>AutoDreamAdvisor</code> never touches the live request or response:</p>
+<ul>
+<li><strong><code>before()</code> is a no-op.</strong> Dreaming never adds latency or tokens to the turn the user is waiting on.</li>
+<li><strong><code>after()</code></strong> loads the persisted <code>DreamState</code>, increments its turn counter, evaluates the configured <code>DreamTrigger</code>, and — only if it fires — submits the dream cycle to a background task and returns immediately. The dream cycle itself runs off the calling thread.</li>
+</ul>
+<p>Because it fires from <code>after()</code> rather than <code>before()</code>, <code>AutoDreamAdvisor</code> is order-insensitive relative to other advisors in practice: it doesn't depend on what any other advisor did to the response, and nothing downstream depends on it having run yet.</p>
+<h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AutoDreamService</span><span class="w"> </span><span class="n">dreamService</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoDreamService</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">()).</span><span class="na">build</span><span class="p">();</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">// Synchronous execution</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shellTools</span><span class="p">.</span><span class="na">bash</span><span class="p">(</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="s">"ls -la"</span><span class="p">,</span><span class="w">           </span><span class="c1">// command</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="kc">null</span><span class="p">,</span><span class="w">               </span><span class="c1">// timeout (uses default 2 minutes)</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="s">"List all files"</span><span class="p">,</span><span class="w">   </span><span class="c1">// description</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="kc">null</span><span class="w">               </span><span class="c1">// runInBackground (false)</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">);</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1">// With custom timeout</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shellTools</span><span class="p">.</span><span class="na">bash</span><span class="p">(</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="s">"npm install"</span><span class="p">,</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="mi">300000L</span><span class="p">,</span><span class="w">            </span><span class="c1">// 5 minute timeout</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="s">"Install dependencies"</span><span class="p">,</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">    </span><span class="kc">null</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="p">);</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="c1">// Background execution</span>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shellTools</span><span class="p">.</span><span class="na">bash</span><span class="p">(</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">    </span><span class="s">"npm run dev"</span><span class="p">,</span>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">    </span><span class="kc">null</span><span class="p">,</span>
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">    </span><span class="s">"Start dev server"</span><span class="p">,</span>
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">    </span><span class="kc">true</span><span class="w">               </span><span class="c1">// Run in background</span>
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="p">);</span>
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="c1">// Returns: "bash_id: shell_1234567890"</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">AutoDreamAdvisor</span><span class="w"> </span><span class="n">dreamAdvisor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoDreamAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">"/home/user/.agent/memories"</span><span class="p">)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="p">.</span><span class="na">dreamService</span><span class="p">(</span><span class="n">dreamService</span><span class="p">)</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="p">.</span><span class="na">dreamTrigger</span><span class="p">(</span><span class="n">DreamTriggers</span><span class="p">.</span><span class="na">hoursAndSessions</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">))</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ChatClient</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatModel</span><span class="p">)</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">        </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="n">dir</span><span class="p">).</span><span class="na">build</span><span class="p">(),</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">        </span><span class="n">dreamAdvisor</span><span class="p">,</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">        </span><span class="n">MessageChatMemoryAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatMemory</span><span class="p">).</span><span class="na">build</span><span class="p">())</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
-<p><strong>Output Format:</strong>
-<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>bash_id: shell_1234567890
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>[command output]
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>STDERR:
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>[error output if any]
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>Exit code: [exit code if non-zero]
-</span></code></pre></div></p>
-<p><strong>Important Notes:</strong>
-- Commands timeout after 2 minutes by default (configurable up to 10 minutes)
-- Output is truncated if it exceeds 30,000 characters
-- Background commands return immediately with a <code>bash_id</code> for monitoring
-- Use Unix shell (<code>/bin/bash</code>) on Linux/Mac, CMD on Windows
-- Don't use <code>&amp;</code> when using <code>runInBackground=true</code> (handled automatically)</p>
-<h3 id="2-bashoutput-monitor-background-processes">2. BashOutput - Monitor Background Processes<a class="headerlink" href="#2-bashoutput-monitor-background-processes" title="Permanent link">&para;</a></h3>
-<p>Retrieves output from running or completed background shell processes.</p>
-<p><strong>Parameters:</strong>
-- <code>bash_id</code> (required) - The ID of the background shell (from Bash tool)
-- <code>filter</code> (optional) - Regex pattern to filter output lines</p>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// Start background process</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">String</span><span class="w"> </span><span class="n">startResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shellTools</span><span class="p">.</span><span class="na">bash</span><span class="p">(</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="s">"mvn clean install"</span><span class="p">,</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="kc">null</span><span class="p">,</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="s">"Build project"</span><span class="p">,</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="kc">true</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">);</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c1">// Extract bash_id from result (e.g., "shell_1234567890")</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="c1">// Monitor output</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="n">String</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shellTools</span><span class="p">.</span><span class="na">bashOutput</span><span class="p">(</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="s">"shell_1234567890"</span><span class="p">,</span><span class="w">  </span><span class="c1">// bash_id</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="kc">null</span><span class="w">                 </span><span class="c1">// no filter</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="p">);</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="c1">// Filter output with regex (only show ERROR lines)</span>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="n">String</span><span class="w"> </span><span class="n">filteredOutput</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shellTools</span><span class="p">.</span><span class="na">bashOutput</span><span class="p">(</span>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="s">"shell_1234567890"</span><span class="p">,</span>
-</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">    </span><span class="s">".*ERROR.*"</span><span class="w">         </span><span class="c1">// regex filter</span>
-</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="p">);</span>
+<p>Point <code>AutoDreamAdvisor</code> and <code>AutoMemoryToolsAdvisor</code> at the same <code>memoriesRootDirectory</code> — one gives the live agent read/write memory tools, the other schedules the Dreamer that periodically cleans that same store up.</p>
+<h2 id="builder-configuration">Builder Configuration<a class="headerlink" href="#builder-configuration" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">AutoDreamAdvisor</span><span class="w"> </span><span class="n">advisor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoDreamAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">"/path/to/memories"</span><span class="p">)</span><span class="w">          </span><span class="c1">// required</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="p">.</span><span class="na">dreamService</span><span class="p">(</span><span class="n">dreamService</span><span class="p">)</span><span class="w">                           </span><span class="c1">// required</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="p">.</span><span class="na">dreamTrigger</span><span class="p">(</span><span class="n">DreamTriggers</span><span class="p">.</span><span class="na">hoursAndSessions</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">))</span><span class="w">  </span><span class="c1">// optional</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p">.</span><span class="na">userId</span><span class="p">(</span><span class="s">"alice"</span><span class="p">)</span><span class="w">                                      </span><span class="c1">// optional — enables cross-session recall</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="p">.</span><span class="na">taskRepository</span><span class="p">(</span><span class="n">customTaskRepository</span><span class="p">)</span><span class="w">                 </span><span class="c1">// optional</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="p">.</span><span class="na">order</span><span class="p">(</span><span class="n">BaseAdvisor</span><span class="p">.</span><span class="na">HIGHEST_PRECEDENCE</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">150</span><span class="p">)</span><span class="w">          </span><span class="c1">// optional</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
-<p><strong>Output Format:</strong>
-<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Shell ID: shell_1234567890
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Status: Running (or Completed)
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Exit code: 0
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>New output:
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>STDOUT:
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>[new stdout content since last check]
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>STDERR:
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>[new stderr content since last check]
-</span></code></pre></div></p>
-<p><strong>Key Features:</strong>
-- <strong>Incremental output</strong>: Only returns NEW output since last check
-- <strong>Regex filtering</strong>: Filter output lines matching a pattern (filtered lines are consumed)
-- <strong>Status tracking</strong>: Shows if process is running or completed
-- <strong>Exit code</strong>: Available when process completes</p>
-<p><strong>Important Notes:</strong>
-- Only shows output generated since the last <code>BashOutput</code> call
-- Filtered lines are marked as "read" and won't appear in subsequent calls
-- Returns "No new output since last check" if nothing new is available</p>
-<h3 id="3-killshell-terminate-background-processes">3. KillShell - Terminate Background Processes<a class="headerlink" href="#3-killshell-terminate-background-processes" title="Permanent link">&para;</a></h3>
-<p>Gracefully terminates a running background shell process.</p>
-<p><strong>Parameters:</strong>
-- <code>bash_id</code> (required) - The ID of the background shell to kill</p>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// Kill a background process</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">String</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shellTools</span><span class="p">.</span><span class="na">killShell</span><span class="p">(</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="s">"shell_1234567890"</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">);</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="c1">// Returns: "Successfully killed shell: shell_1234567890"</span>
-</span></code></pre></div>
-<p><strong>Termination Process:</strong>
-1. Attempts graceful shutdown with <code>destroy()</code>
-2. Waits up to 5 seconds for process to terminate
-3. Forces termination with <code>destroyForcibly()</code> if needed
-4. Removes process from active shell tracking</p>
-<p><strong>Example Workflow:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">ShellTools</span><span class="w"> </span><span class="n">shellTools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ShellTools</span><span class="p">();</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="c1">// 1. Start a long-running background task</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">String</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shellTools</span><span class="p">.</span><span class="na">bash</span><span class="p">(</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="s">"python train_model.py"</span><span class="p">,</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="kc">null</span><span class="p">,</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="s">"Train ML model"</span><span class="p">,</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="kc">true</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">);</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="c1">// Returns: "bash_id: shell_1234567890 ..."</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="c1">// 2. Periodically check progress</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="n">String</span><span class="w"> </span><span class="n">output1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shellTools</span><span class="p">.</span><span class="na">bashOutput</span><span class="p">(</span><span class="s">"shell_1234567890"</span><span class="p">,</span><span class="w"> </span><span class="s">".*epoch.*"</span><span class="p">);</span>
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="c1">// Shows only lines containing "epoch"</span>
-</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
-</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="n">Thread</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="mi">5000</span><span class="p">);</span>
-</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>
-</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="n">String</span><span class="w"> </span><span class="n">output2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shellTools</span><span class="p">.</span><span class="na">bashOutput</span><span class="p">(</span><span class="s">"shell_1234567890"</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
-</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="c1">// Shows all new output since last check</span>
-</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>
-</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="c1">// 3. Kill if needed</span>
-</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="n">String</span><span class="w"> </span><span class="n">killResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shellTools</span><span class="p">.</span><span class="na">killShell</span><span class="p">(</span><span class="s">"shell_1234567890"</span><span class="p">);</span>
-</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="c1">// Returns: "Successfully killed shell: shell_1234567890"</span>
-</span></code></pre></div>
-<p><strong>Cross-Platform Support:</strong></p>
 <table>
 <thead>
 <tr>
-<th>Platform</th>
-<th>Shell Used</th>
-<th>Example</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Windows</td>
-<td><code>cmd.exe /c</code></td>
-<td><code>cmd.exe /c dir</code></td>
-</tr>
-<tr>
-<td>Linux/Mac</td>
-<td><code>/bin/bash -c</code></td>
-<td><code>/bin/bash -c ls -la</code></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Configuration &amp; Limits:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Setting</th>
+<th>Builder method</th>
+<th>Type</th>
 <th>Default</th>
-<th>Maximum</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Timeout</td>
-<td>120000ms (2 min)</td>
-<td>600000ms (10 min)</td>
-<td>Command execution timeout</td>
+<td><code>memoriesRootDirectory(String)</code></td>
+<td><code>String</code></td>
+<td>— (<strong>required</strong>)</td>
+<td>Same memory store an <code>AutoMemoryToolsAdvisor</code> is pointed at.</td>
 </tr>
 <tr>
-<td>Output Length</td>
-<td>N/A</td>
-<td>30000 chars</td>
-<td>Output truncated if exceeded</td>
+<td><code>dreamService(AutoDreamService)</code></td>
+<td><code>AutoDreamService</code></td>
+<td>— (<strong>required</strong>)</td>
+<td>The service that actually runs dream cycles.</td>
+</tr>
+<tr>
+<td><code>dreamTrigger(DreamTrigger)</code></td>
+<td><code>DreamTrigger</code></td>
+<td><code>DreamTriggers.manualOnly()</code></td>
+<td>Decides whether a cycle should fire on each turn. See <a href="../AutoDreamService/#dream-triggers">AutoDreamService — Dream Triggers</a>.</td>
+</tr>
+<tr>
+<td><code>userId(String)</code></td>
+<td><code>String</code></td>
+<td>none</td>
+<td>Optional. When set, triggered cycles call the cross-session-aware <code>runDreamCycle(dir, userId)</code> overload instead of the memory-only one — see below.</td>
+</tr>
+<tr>
+<td><code>taskRepository(TaskRepository)</code></td>
+<td><code>TaskRepository</code></td>
+<td>a fresh <code>DefaultTaskRepository</code></td>
+<td>Where the background dream task is submitted. Override to share a <code>TaskRepository</code> with <code>TaskTool</code> or other background work.</td>
+</tr>
+<tr>
+<td><code>order(int)</code></td>
+<td><code>int</code></td>
+<td><code>HIGHEST_PRECEDENCE + 150</code></td>
+<td>Advisor order — higher precedence than <code>AutoMemoryToolsAdvisor</code>'s default (<code>+200</code>).</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Best Practices:</strong></p>
-<ol>
-<li>
-<p><strong>Use descriptive names</strong>: Provide clear descriptions for better logging
-   <div class="highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">shellTools</span><span class="p">.</span><span class="na">bash</span><span class="p">(</span><span class="s">"git status"</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="s">"Check git status"</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
-</span></code></pre></div></p>
-</li>
-<li>
-<p><strong>Background for long tasks</strong>: Use background execution for commands that take &gt; 30 seconds
-   <div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">shellTools</span><span class="p">.</span><span class="na">bash</span><span class="p">(</span><span class="s">"npm run test"</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="s">"Run test suite"</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
-</span></code></pre></div></p>
-</li>
-<li>
-<p><strong>Monitor background processes</strong>: Regularly check output of background processes
-   <div class="highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">String</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">shellTools</span><span class="p">.</span><span class="na">bashOutput</span><span class="p">(</span><span class="n">bashId</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
-</span></code></pre></div></p>
-</li>
-<li>
-<p><strong>Filter wisely</strong>: Use regex filters to focus on relevant output
-   <div class="highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">// Only show test failures</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">shellTools</span><span class="p">.</span><span class="na">bashOutput</span><span class="p">(</span><span class="n">bashId</span><span class="p">,</span><span class="w"> </span><span class="s">".*(FAIL|ERROR).*"</span><span class="p">);</span>
-</span></code></pre></div></p>
-</li>
-<li>
-<p><strong>Clean up</strong>: Kill background processes when no longer needed
-   <div class="highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">shellTools</span><span class="p">.</span><span class="na">killShell</span><span class="p">(</span><span class="n">bashId</span><span class="p">);</span>
-</span></code></pre></div></p>
-</li>
-</ol>
+<h3 id="useridstring-and-cross-session-recall"><code>userId(String)</code> and cross-session recall<a class="headerlink" href="#useridstring-and-cross-session-recall" title="Permanent link">&para;</a></h3>
+<p>Setting <code>.userId(...)</code> only has an effect if the advisor's <code>dreamService</code> was itself built with <code>.sessionService(...)</code> configured (see <a href="../AutoDreamService/#cross-session-recall-optional">AutoDreamService — Cross-Session Recall</a>). If the service has no <code>sessionService</code>, <code>userId</code> is passed through but ignored — the Dreamer still only sees the memory store. There's no error in either misconfiguration direction; both degrade gracefully to memory-only dreaming.</p>
+<h2 id="turn-counting">Turn counting<a class="headerlink" href="#turn-counting" title="Permanent link">&para;</a></h2>
+<p><code>DreamState.sessionsSinceLastDream()</code> counts <strong>conversation turns processed by this advisor instance</strong> — every call to <code>after()</code> increments it, regardless of whether the turn involved memory tools at all. This is not the same thing as a <code>spring-ai-session</code> "session": there is no dependency on session-transcript storage for the trigger itself, only (optionally) for what the Dreamer can search once a cycle starts.</p>
+<h2 id="relationship-to-memoryconsolidationtrigger">Relationship to <code>memoryConsolidationTrigger</code><a class="headerlink" href="#relationship-to-memoryconsolidationtrigger" title="Permanent link">&para;</a></h2>
+<p><code>AutoDreamAdvisor</code> and <code>AutoMemoryToolsAdvisor</code>'s <code>memoryConsolidationTrigger</code> are complementary, not alternatives — see the comparison table in <a href="../AutoDreamService/#in-band-nudge-vs-out-of-band-dreaming">AutoDreamService</a>. A typical setup uses both: the in-band nudge for cheap, frequent tidy-ups, and <code>AutoDreamAdvisor</code> for periodic, deeper background cleanup.</p>
+<h2 id="demo-application">Demo Application<a class="headerlink" href="#demo-application" title="Permanent link">&para;</a></h2>
+<p>See <a href="https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-dream-demo">memory-tools-dream-demo</a> — combines <code>AutoMemoryToolsAdvisor</code>, <code>AutoDreamAdvisor</code>, and <code>SessionMemoryAdvisor</code> in one runnable example.</p>
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../AutoDreamService/">AutoDreamService</a> — the service this advisor schedules; dream cycle mechanics, <code>DreamTrigger</code>/<code>DreamMode</code>, cross-session recall</li>
+<li><a href="../AutoMemoryToolsAdvisor/">AutoMemoryToolsAdvisor</a> — the live-turn counterpart this advisor complements</li>
+<li><a href="../AutoMemoryTools/">AutoMemoryTools</a> — the memory store both advisors operate on</li>
+</ul>
 
 
 
