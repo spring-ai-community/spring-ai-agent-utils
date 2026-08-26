@@ -20,7 +20,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 
 /**
@@ -32,7 +31,6 @@ import org.springframework.ai.tool.annotation.Tool;
  * time and that all task data is properly formatted.
  *
  * @author Christian Tzolov
- * @author zz_zhi
  */
 public class TodoWriteTool {
 
@@ -44,10 +42,6 @@ public class TodoWriteTool {
 	public interface TodoEventHandler {
 
 		void handle(Todos todos);
-
-		default void handle(Todos todos, ToolContext toolContext) {
-			handle(todos);
-		}
 
 	}
 
@@ -247,22 +241,14 @@ public class TodoWriteTool {
 
 		When in doubt, use this tool. Being proactive with task management demonstrates attentiveness and ensures you complete all requirements successfully.
 		""")
-	public String todoWrite(Todos todos, ToolContext toolContext) { // @formatter:on
+	public String todoWrite(Todos todos) { // @formatter:on
 
 		// Validate the todos
 		this.validateTodos(todos);
 
-		this.todoListConsumer.handle(todos, toolContext);
+		this.todoListConsumer.handle(todos);
 
 		return "Todos have been modified successfully. Ensure that you continue to use the todo list to track your progress. Please proceed with the current tasks if applicable";
-	}
-
-	/**
-	 * Backward-compatible overload without {@link ToolContext}. Delegates to
-	 * {@link #todoWrite(Todos, ToolContext)} with a {@code null} context.
-	 */
-	public String todoWrite(Todos todos) {
-		return todoWrite(todos, null);
 	}
 
 	/**
