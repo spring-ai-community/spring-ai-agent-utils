@@ -155,16 +155,15 @@ public class Skills {
 	 * @throws IOException if an I/O error occurs while reading
 	 */
 	private static List<Skill> loadJarResource(Resource resource) throws IOException {
+		if (resource instanceof ClassPathResource classPathResource) {
+			return loadFromClasspath(classPathResource.getPath(), classPathResource.getClassLoader());
+		}
+
 		URL resourceUrl;
 		try {
 			resourceUrl = resource.getURL();
 		}
 		catch (FileNotFoundException ex) {
-			// ClassPathResource for a JAR directory without an explicit directory entry
-			// cannot resolve to a URL. Fall back to classpath scanning.
-			if (resource instanceof ClassPathResource classPathResource) {
-				return loadFromClasspath(classPathResource.getPath());
-			}
 			throw ex;
 		}
 
@@ -193,9 +192,14 @@ public class Skills {
 	 * @throws IOException if an I/O error occurs during scanning or reading
 	 */
 	private static List<Skill> loadFromClasspath(String classpathPrefix) throws IOException {
+		return loadFromClasspath(classpathPrefix, null);
+	}
+
+	private static List<Skill> loadFromClasspath(String classpathPrefix, ClassLoader classLoader) throws IOException {
 		// Primary: Spring's ResourcePatternResolver — works for well-formed JARs with
 		// explicit directory entries and for resources on the filesystem.
-		ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+		PathMatchingResourcePatternResolver resolver = (classLoader != null)
+				? new PathMatchingResourcePatternResolver(classLoader) : new PathMatchingResourcePatternResolver();
 		Resource[] resources = resolver.getResources("classpath*:" + classpathPrefix + "/**/SKILL.md");
 
 		if (resources.length > 0) {
@@ -212,7 +216,7 @@ public class Skills {
 		// Fallback: Manual JAR scanning for JARs without directory entries.
 		// Uses the same strategy as Spring's own
 		// PathMatchingResourcePatternResolver.addAllClassLoaderJarRoots().
-		return scanClasspathJarsForSkills(classpathPrefix);
+		return scanClasspathJarsForSkills(classpathPrefix, classLoader);
 	}
 
 	/**
@@ -220,17 +224,21 @@ public class Skills {
 	 * via {@code ClassLoader.getResources("META-INF/MANIFEST.MF")} — a technique used by
 	 * Spring internally when standard classpath resolution is insufficient.
 	 */
-	private static List<Skill> scanClasspathJarsForSkills(String classpathPrefix) throws IOException {
+	private static List<Skill> scanClasspathJarsForSkills(String classpathPrefix, ClassLoader classLoader)
+			throws IOException {
 		String prefix = classpathPrefix.endsWith("/") ? classpathPrefix : classpathPrefix + "/";
 
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		if (classLoader == null) {
-			classLoader = Skills.class.getClassLoader();
+		ClassLoader cl = classLoader;
+		if (cl == null) {
+			cl = Thread.currentThread().getContextClassLoader();
+		}
+		if (cl == null) {
+			cl = Skills.class.getClassLoader();
 		}
 
 		List<Skill> skills = new ArrayList<>();
 
-		Enumeration<URL> manifests = classLoader.getResources("META-INF/MANIFEST.MF");
+		Enumeration<URL> manifests = cl.getResources("META-INF/MANIFEST.MF");
 		while (manifests.hasMoreElements()) {
 			URL manifestUrl = manifests.nextElement();
 			if (!"jar".equals(manifestUrl.getProtocol())) {
