@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
@@ -30,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.UrlResource;
@@ -41,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * Tests for {@link SkillsTool}.
  *
  * @author Claude Code
+ * @author kezhenxu94
  */
 @DisplayName("SkillsTool Tests")
 class SkillsToolTest {
@@ -63,6 +67,24 @@ class SkillsToolTest {
 			This is another skill content.
 			""";
 
+	private static List<String> toolNames(ToolCallbackProvider provider) {
+		return Arrays.stream(provider.getToolCallbacks()).map(tc -> tc.getToolDefinition().name()).toList();
+	}
+
+	private static ToolCallback toolNamed(ToolCallbackProvider provider, String name) {
+		return Arrays.stream(provider.getToolCallbacks())
+			.filter(tc -> name.equals(tc.getToolDefinition().name()))
+			.findFirst()
+			.orElseThrow(() -> new AssertionError("No tool callback named: " + name));
+	}
+
+	private static Path writeSkill(Path parentDir, String directoryName, String skillMd) throws IOException {
+		Path skillDir = parentDir.resolve(directoryName);
+		Files.createDirectories(skillDir);
+		Files.writeString(skillDir.resolve("SKILL.md"), skillMd, StandardCharsets.UTF_8);
+		return skillDir;
+	}
+
 	@Nested
 	@DisplayName("Filesystem Skills")
 	class FilesystemSkillsTests {
@@ -70,59 +92,92 @@ class SkillsToolTest {
 		@Test
 		@DisplayName("should load skills from directory via addSkillsDirectory")
 		void shouldLoadSkillsFromDirectory(@TempDir Path tempDir) throws IOException {
-			Path skillDir = tempDir.resolve("my-skill");
-			Files.createDirectories(skillDir);
-			Files.writeString(skillDir.resolve("SKILL.md"), SKILL_MD_CONTENT, StandardCharsets.UTF_8);
+			writeSkill(tempDir, "my-skill", SKILL_MD_CONTENT);
 
-			ToolCallback callback = SkillsTool.builder()
-				.addSkillsDirectory(tempDir.toString())
-				.build();
+			ToolCallbackProvider provider = SkillsTool.builder().addSkillsDirectory(tempDir.toString()).build();
 
-			assertThat(callback).isNotNull();
-			assertThat(callback.getToolDefinition().description()).contains("test-skill");
+			assertThat(toolNames(provider)).containsExactly("test-skill");
+			assertThat(toolNamed(provider, "test-skill").getToolDefinition().description()).contains("A test skill");
 		}
 
 		@Test
 		@DisplayName("should load skills from FileSystemResource via addSkillsResource")
 		void shouldLoadSkillsFromFileSystemResource(@TempDir Path tempDir) throws IOException {
-			Path skillDir = tempDir.resolve("my-skill");
-			Files.createDirectories(skillDir);
-			Files.writeString(skillDir.resolve("SKILL.md"), SKILL_MD_CONTENT, StandardCharsets.UTF_8);
+			writeSkill(tempDir, "my-skill", SKILL_MD_CONTENT);
 
-			ToolCallback callback = SkillsTool.builder()
+			ToolCallbackProvider provider = SkillsTool.builder()
 				.addSkillsResource(new FileSystemResource(tempDir.toFile()))
 				.build();
 
-			assertThat(callback).isNotNull();
-			assertThat(callback.getToolDefinition().description()).contains("test-skill");
+			assertThat(toolNames(provider)).containsExactly("test-skill");
 		}
 
 		@Test
-		@DisplayName("should load multiple skills from nested directories")
-		void shouldLoadMultipleSkillsFromNestedDirectories(@TempDir Path tempDir) throws IOException {
-			Path skillDir1 = tempDir.resolve("skill-one");
-			Files.createDirectories(skillDir1);
-			Files.writeString(skillDir1.resolve("SKILL.md"), SKILL_MD_CONTENT, StandardCharsets.UTF_8);
+		@DisplayName("should create one tool callback per skill")
+		void shouldCreateOneToolCallbackPerSkill(@TempDir Path tempDir) throws IOException {
+			writeSkill(tempDir, "skill-one", SKILL_MD_CONTENT);
+			writeSkill(tempDir, "skill-two", SKILL_MD_CONTENT_2);
 
-			Path skillDir2 = tempDir.resolve("skill-two");
-			Files.createDirectories(skillDir2);
-			Files.writeString(skillDir2.resolve("SKILL.md"), SKILL_MD_CONTENT_2, StandardCharsets.UTF_8);
+			ToolCallbackProvider provider = SkillsTool.builder().addSkillsDirectory(tempDir.toString()).build();
 
-			ToolCallback callback = SkillsTool.builder()
+			assertThat(toolNames(provider)).containsExactlyInAnyOrder("test-skill", "another-skill");
+			assertThat(toolNamed(provider, "test-skill").getToolDefinition().description()).contains("A test skill")
+				.doesNotContain("Another test skill");
+			assertThat(toolNamed(provider, "another-skill").getToolDefinition().description())
+				.contains("Another test skill")
+				.doesNotContain("A test skill");
+		}
+
+		@Test
+		@DisplayName("should expose extra front-matter fields in the tool description")
+		void shouldExposeExtraFrontMatterFields(@TempDir Path tempDir) throws IOException {
+			writeSkill(tempDir, "my-skill", """
+					---
+					name: rich-skill
+					description: A rich skill
+					allowed-tools: Read, Grep
+					model: claude-sonnet-4-5-20250929
+					---
+
+					Content.
+					""");
+
+			ToolCallbackProvider provider = SkillsTool.builder().addSkillsDirectory(tempDir.toString()).build();
+
+			assertThat(toolNamed(provider, "rich-skill").getToolDefinition().description()).contains("A rich skill")
+				.contains("allowed-tools: Read, Grep")
+				.contains("model: claude-sonnet-4-5-20250929");
+		}
+
+		@Test
+		@DisplayName("should declare a no-argument input schema")
+		void shouldDeclareNoArgumentInputSchema(@TempDir Path tempDir) throws IOException {
+			writeSkill(tempDir, "my-skill", SKILL_MD_CONTENT);
+
+			ToolCallbackProvider provider = SkillsTool.builder().addSkillsDirectory(tempDir.toString()).build();
+
+			assertThat(toolNamed(provider, "test-skill").getToolDefinition().inputSchema())
+				.contains("\"properties\" : { }");
+		}
+
+		@Test
+		@DisplayName("should apply a custom tool description template per skill")
+		void shouldApplyCustomToolDescriptionTemplate(@TempDir Path tempDir) throws IOException {
+			writeSkill(tempDir, "my-skill", SKILL_MD_CONTENT);
+
+			ToolCallbackProvider provider = SkillsTool.builder()
 				.addSkillsDirectory(tempDir.toString())
+				.toolDescriptionTemplate("Custom prefix: %s")
 				.build();
 
-			assertThat(callback).isNotNull();
-			String description = callback.getToolDefinition().description();
-			assertThat(description).contains("test-skill");
-			assertThat(description).contains("another-skill");
+			assertThat(toolNamed(provider, "test-skill").getToolDefinition().description())
+				.isEqualTo("Custom prefix: A test skill");
 		}
 
 		@Test
 		@DisplayName("should throw when directory does not exist")
 		void shouldThrowWhenDirectoryDoesNotExist() {
-			assertThatThrownBy(
-					() -> SkillsTool.builder().addSkillsDirectory("/nonexistent/directory").build())
+			assertThatThrownBy(() -> SkillsTool.builder().addSkillsDirectory("/nonexistent/directory").build())
 				.isInstanceOf(RuntimeException.class)
 				.hasMessageContaining("Root directory does not exist: /nonexistent/directory");
 		}
@@ -133,6 +188,102 @@ class SkillsToolTest {
 			assertThatThrownBy(() -> SkillsTool.builder().addSkillsDirectory(tempDir.toString()).build())
 				.isInstanceOf(IllegalArgumentException.class)
 				.hasMessageContaining("At least one skill must be configured");
+		}
+
+		@Test
+		@DisplayName("should throw on duplicate skill names")
+		void shouldThrowOnDuplicateSkillNames(@TempDir Path tempDir) throws IOException {
+			writeSkill(tempDir, "first", SKILL_MD_CONTENT);
+			writeSkill(tempDir, "second", SKILL_MD_CONTENT);
+
+			assertThatThrownBy(() -> SkillsTool.builder().addSkillsDirectory(tempDir.toString()).build())
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessageContaining("Duplicate skill tool name 'test-skill'");
+		}
+
+		@Test
+		@DisplayName("should support scoped skill names")
+		void shouldSupportScopedSkillNames(@TempDir Path tempDir) throws IOException {
+			writeSkill(tempDir, "project-a", """
+					---
+					name: project-a:pdf
+					description: The project-a PDF skill
+					---
+
+					Project A content.
+					""");
+			writeSkill(tempDir, "project-b", """
+					---
+					name: project-b:pdf
+					description: The project-b PDF skill
+					---
+
+					Project B content.
+					""");
+
+			ToolCallbackProvider provider = SkillsTool.builder().addSkillsDirectory(tempDir.toString()).build();
+
+			assertThat(toolNames(provider)).containsExactlyInAnyOrder("project-a_pdf", "project-b_pdf");
+			assertThat(toolNamed(provider, "project-a_pdf").call("{}")).contains("Project A content.");
+			assertThat(toolNamed(provider, "project-b_pdf").call("{}")).contains("Project B content.");
+		}
+
+		@Test
+		@DisplayName("should throw when scoped skill names collide after tool name derivation")
+		void shouldThrowWhenDerivedToolNamesCollide(@TempDir Path tempDir) throws IOException {
+			writeSkill(tempDir, "scoped", """
+					---
+					name: project-a:pdf
+					description: A scoped skill
+					---
+
+					Content.
+					""");
+			writeSkill(tempDir, "flat", """
+					---
+					name: project-a_pdf
+					description: A flat skill
+					---
+
+					Content.
+					""");
+
+			assertThatThrownBy(() -> SkillsTool.builder().addSkillsDirectory(tempDir.toString()).build())
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessageContaining("Duplicate skill tool name 'project-a_pdf'");
+		}
+
+		@Test
+		@DisplayName("should throw on a skill name that is too long for a tool name")
+		void shouldThrowOnTooLongSkillName(@TempDir Path tempDir) throws IOException {
+			writeSkill(tempDir, "my-skill", """
+					---
+					name: %s
+					description: A skill with a very long name
+					---
+
+					Content.
+					""".formatted("x".repeat(65)));
+
+			assertThatThrownBy(() -> SkillsTool.builder().addSkillsDirectory(tempDir.toString()).build())
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessageContaining("is too long");
+		}
+
+		@Test
+		@DisplayName("should throw when the name front-matter field is missing")
+		void shouldThrowWhenNameIsMissing(@TempDir Path tempDir) throws IOException {
+			writeSkill(tempDir, "my-skill", """
+					---
+					description: A skill without a name
+					---
+
+					Content.
+					""");
+
+			assertThatThrownBy(() -> SkillsTool.builder().addSkillsDirectory(tempDir.toString()).build())
+				.isInstanceOf(IllegalArgumentException.class)
+				.hasMessageContaining("Missing required 'name' front-matter field in skill:");
 		}
 
 	}
@@ -176,25 +327,19 @@ class SkillsToolTest {
 		void shouldLoadSkillsFromJarResource() throws Exception {
 			UrlResource jarResource = new UrlResource("jar:" + jarPath.toUri() + "!/skills");
 
-			ToolCallback callback = SkillsTool.builder().addSkillsResource(jarResource).build();
+			ToolCallbackProvider provider = SkillsTool.builder().addSkillsResource(jarResource).build();
 
-			assertThat(callback).isNotNull();
-			String description = callback.getToolDefinition().description();
-			assertThat(description).contains("test-skill");
-			assertThat(description).contains("another-skill");
+			assertThat(toolNames(provider)).containsExactlyInAnyOrder("test-skill", "another-skill");
 		}
 
 		@Test
 		@DisplayName("should load single skill from nested JAR path")
 		void shouldLoadSingleSkillFromNestedJarPath() throws Exception {
-			UrlResource jarResource = new UrlResource(
-					"jar:" + jarPath.toUri() + "!/skills/my-skill");
+			UrlResource jarResource = new UrlResource("jar:" + jarPath.toUri() + "!/skills/my-skill");
 
-			ToolCallback callback = SkillsTool.builder().addSkillsResource(jarResource).build();
+			ToolCallbackProvider provider = SkillsTool.builder().addSkillsResource(jarResource).build();
 
-			assertThat(callback).isNotNull();
-			String description = callback.getToolDefinition().description();
-			assertThat(description).contains("test-skill");
+			assertThat(toolNames(provider)).containsExactly("test-skill");
 		}
 
 	}
@@ -206,15 +351,13 @@ class SkillsToolTest {
 		@Test
 		@DisplayName("should load pdf skill from anthropics__skills__pdf JAR on classpath")
 		void shouldLoadPdfSkillFromClasspathJar() {
-			ClassPathResource resource = new ClassPathResource(
-					"META-INF/resources/skills/anthropics/skills");
+			ClassPathResource resource = new ClassPathResource("META-INF/resources/skills/anthropics/skills");
 
-			ToolCallback callback = SkillsTool.builder().addSkillsResource(resource).build();
+			ToolCallbackProvider provider = SkillsTool.builder().addSkillsResource(resource).build();
 
-			assertThat(callback).isNotNull();
-			assertThat(callback.getToolDefinition().description()).contains("pdf");
+			assertThat(toolNames(provider)).contains("pdf");
 
-			String result = callback.call("{\"command\":\"pdf\"}");
+			String result = toolNamed(provider, "pdf").call("{}");
 			assertThat(result).contains("Base directory for this skill:");
 			assertThat(result).contains("PDF");
 		}
@@ -224,15 +367,13 @@ class SkillsToolTest {
 		void shouldLoadSpringBootSkillFromClasspathJar() {
 			// sivalabs JAR uses META-INF/skills/ (not META-INF/resources/skills/)
 			// and includes explicit directory entries, exercising a different code path
-			ClassPathResource resource = new ClassPathResource(
-					"META-INF/skills/sivaprasadreddy/sivalabs-agent-skills");
+			ClassPathResource resource = new ClassPathResource("META-INF/skills/sivaprasadreddy/sivalabs-agent-skills");
 
-			ToolCallback callback = SkillsTool.builder().addSkillsResource(resource).build();
+			ToolCallbackProvider provider = SkillsTool.builder().addSkillsResource(resource).build();
 
-			assertThat(callback).isNotNull();
-			assertThat(callback.getToolDefinition().description()).contains("spring-boot-skill");
+			assertThat(toolNames(provider)).contains("spring-boot-skill");
 
-			String result = callback.call("{\"command\":\"spring-boot-skill\"}");
+			String result = toolNamed(provider, "spring-boot-skill").call("{}");
 			assertThat(result).contains("Base directory for this skill:");
 			assertThat(result).contains("Spring Boot");
 		}
@@ -240,21 +381,17 @@ class SkillsToolTest {
 	}
 
 	@Nested
-	@DisplayName("SkillsFunction")
-	class SkillsFunctionTests {
+	@DisplayName("SkillFunction")
+	class SkillFunctionTests {
 
 		@Test
 		@DisplayName("should return content with base directory for filesystem skill")
 		void shouldReturnContentWithBaseDirectory(@TempDir Path tempDir) throws IOException {
-			Path skillDir = tempDir.resolve("my-skill");
-			Files.createDirectories(skillDir);
-			Files.writeString(skillDir.resolve("SKILL.md"), SKILL_MD_CONTENT, StandardCharsets.UTF_8);
+			Path skillDir = writeSkill(tempDir, "my-skill", SKILL_MD_CONTENT);
 
-			ToolCallback callback = SkillsTool.builder()
-				.addSkillsDirectory(tempDir.toString())
-				.build();
+			ToolCallbackProvider provider = SkillsTool.builder().addSkillsDirectory(tempDir.toString()).build();
 
-			String result = callback.call("{\"command\":\"test-skill\"}");
+			String result = toolNamed(provider, "test-skill").call("{}");
 
 			assertThat(result).contains("Base directory for this skill:");
 			assertThat(result).contains(skillDir.toString());
@@ -262,19 +399,13 @@ class SkillsToolTest {
 		}
 
 		@Test
-		@DisplayName("should return not found message for unknown skill")
-		void shouldReturnNotFoundForUnknownSkill(@TempDir Path tempDir) throws IOException {
-			Path skillDir = tempDir.resolve("my-skill");
-			Files.createDirectories(skillDir);
-			Files.writeString(skillDir.resolve("SKILL.md"), SKILL_MD_CONTENT, StandardCharsets.UTF_8);
+		@DisplayName("should not register a tool for an unknown skill")
+		void shouldNotRegisterToolForUnknownSkill(@TempDir Path tempDir) throws IOException {
+			writeSkill(tempDir, "my-skill", SKILL_MD_CONTENT);
 
-			ToolCallback callback = SkillsTool.builder()
-				.addSkillsDirectory(tempDir.toString())
-				.build();
+			ToolCallbackProvider provider = SkillsTool.builder().addSkillsDirectory(tempDir.toString()).build();
 
-			String result = callback.call("{\"command\":\"nonexistent\"}");
-
-			assertThat(result).contains("Skill not found: nonexistent");
+			assertThat(toolNames(provider)).doesNotContain("nonexistent");
 		}
 
 		@Test
@@ -295,9 +426,9 @@ class SkillsToolTest {
 
 			UrlResource jarResource = new UrlResource("jar:" + jarPath.toUri() + "!/skills");
 
-			ToolCallback callback = SkillsTool.builder().addSkillsResource(jarResource).build();
+			ToolCallbackProvider provider = SkillsTool.builder().addSkillsResource(jarResource).build();
 
-			String result = callback.call("{\"command\":\"jar-skill\"}");
+			String result = toolNamed(provider, "jar-skill").call("{}");
 
 			assertThat(result).contains("Base directory for this skill: skills/jar-skill");
 			assertThat(result).contains("JAR skill content.");

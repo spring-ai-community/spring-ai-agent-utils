@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests for {@link AgentUtilsRuntimeHints}.
  *
  * @author Christian Tzolov
+ * @author kezhenxu94
  */
 class AgentUtilsRuntimeHintsTests {
 
@@ -67,17 +68,9 @@ class AgentUtilsRuntimeHintsTests {
 	}
 
 	@Test
-	void skillsInputReflectionIsRegistered() {
+	void skillFunctionReflectionIsRegistered() {
 		assertThat(RuntimeHintsPredicates.reflection()
-			.onType(SkillsTool.SkillsInput.class)
-			.withMemberCategories(MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS, MemberCategory.INVOKE_PUBLIC_METHODS))
-			.accepts(this.hints);
-	}
-
-	@Test
-	void skillsFunctionReflectionIsRegistered() {
-		assertThat(RuntimeHintsPredicates.reflection()
-			.onType(SkillsTool.SkillsFunction.class)
+			.onType(SkillsTool.SkillFunction.class)
 			.withMemberCategories(MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS, MemberCategory.INVOKE_PUBLIC_METHODS))
 			.accepts(this.hints);
 	}

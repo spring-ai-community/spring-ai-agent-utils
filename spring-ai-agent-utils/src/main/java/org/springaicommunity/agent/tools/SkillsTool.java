@@ -16,80 +16,74 @@
 package org.springaicommunity.agent.tools;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springaicommunity.agent.common.workspace.Workspace;
 import org.springaicommunity.agent.utils.Skills;
 
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 /**
+ * Registers every loaded skill as its own {@link ToolCallback}, named after the skill.
+ * Skill selection is therefore plain tool selection: the model calls the skill's tool
+ * (without arguments) instead of picking a name out of a catalog embedded in a single
+ * tool description.
+ *
  * @author Christian Tzolov
+ * @author kezhenxu94
  */
 public class SkillsTool {
 
+	/**
+	 * Characters that the model providers do not accept in a tool name. Scoped skill
+	 * names (e.g. {@code project-a:pdf}) remain valid skill names - the illegal
+	 * characters are replaced when deriving the tool name.
+	 */
+	private static final Pattern ILLEGAL_TOOL_NAME_CHARS = Pattern.compile("[^a-zA-Z0-9_-]");
+
+	/**
+	 * Maximum tool name length accepted by the model providers.
+	 */
+	private static final int MAX_TOOL_NAME_LENGTH = 64;
+
 	private static final String TOOL_DESCRIPTION_TEMPLATE = """
-			Execute a skill within the main conversation
-
-			<skills_instructions>
-			When users ask you to perform tasks, check if any of the available skills below can help complete the task more effectively. Skills provide specialized capabilities and domain knowledge.
-
-			How to use skills:
-			- Invoke skills using this tool with the skill name only (no arguments)
-			- When you invoke a skill, you will see <command-message>The "{name}" skill is loading</command-message>
-			- The skill's prompt will expand and provide detailed instructions on how to complete the task
-
-			NOTE: Response always starts start with the base directory of the skill execution environment. You can use this to retrieve additional files of call shell commands.
-			Skill description follows after the base directory line.
-
-			Important:
-			- Only use skills listed in <available_skills> below
-			- Do not invoke a skill that is already running
-			</skills_instructions>
-
-			<available_skills>
 			%s
-			</available_skills>
+
+			Returns the instructions to follow for this skill, preceded by a "Base directory for this skill: <path>" line - use that path to read the skill's other files or run its scripts.
 			""";
 
-	public static record SkillsInput(
-			@ToolParam(description = "The skill name (no arguments). E.g., \"pdf\" or \"xlsx\"") String command) {
-	}
+	/**
+	 * Returns the instructions of a single skill. Takes no input.
+	 */
+	public static class SkillFunction implements Supplier<String> {
 
-	public static class SkillsFunction implements Function<SkillsInput, String> {
+		private final Skill skill;
 
-		private Map<String, Skill> skillsMap;
+		private final Workspace workspace;
 
-		private Workspace workspace;
-
-		public SkillsFunction(Map<String, Skill> skillsMap) {
-			this(skillsMap, null);
+		public SkillFunction(Skill skill) {
+			this(skill, null);
 		}
 
-		public SkillsFunction(Map<String, Skill> skillsMap, Workspace workspace) {
-			this.skillsMap = skillsMap;
+		public SkillFunction(Skill skill, Workspace workspace) {
+			this.skill = skill;
 			this.workspace = workspace;
 		}
 
 		@Override
-		public String apply(SkillsInput input) {
-			Skill skill = this.skillsMap.get(input.command());
-
-			if (skill != null) {
-				String basePath = (this.workspace != null) ? this.workspace.display(skill.basePath())
-						: skill.basePath();
-				return "Base directory for this skill: %s\n\n%s".formatted(basePath, skill.content());
-			}
-
-			return "Skill not found: " + input.command();
+		public String get() {
+			String basePath = (this.workspace != null) ? this.workspace.display(this.skill.basePath())
+					: this.skill.basePath();
+			return "Base directory for this skill: %s\n\n%s".formatted(basePath, this.skill.content());
 		}
 
 	}
@@ -110,6 +104,10 @@ public class SkillsTool {
 
 		}
 
+		/**
+		 * @param template description template applied to every skill tool. Must contain
+		 * a single {@code %s} placeholder, replaced by the skill's rendered front-matter.
+		 */
 		public Builder toolDescriptionTemplate(String template) {
 			this.toolDescriptionTemplate = template;
 			return this;
@@ -150,14 +148,36 @@ public class SkillsTool {
 			return this;
 		}
 
-		public ToolCallback build() {
+		/**
+		 * @return one {@link ToolCallback} per configured skill, named after the skill.
+		 */
+		public ToolCallbackProvider build() {
 			Assert.notEmpty(this.skills, "At least one skill must be configured");
 
-			String skillsXml = this.skills.stream().map(s -> s.toXml()).collect(Collectors.joining("\n"));
+			Map<String, Skill> skillsByToolName = new LinkedHashMap<>();
 
-			return FunctionToolCallback.builder("Skill", new SkillsFunction(toSkillsMap(this.skills), this.workspace))
-				.description(this.toolDescriptionTemplate.formatted(skillsXml))
-				.inputType(SkillsInput.class)
+			for (Skill skill : this.skills) {
+				String toolName = skill.toolName();
+
+				Skill previous = skillsByToolName.put(toolName, skill);
+
+				if (previous != null) {
+					throw new IllegalArgumentException(
+							"Duplicate skill tool name '%s' derived from skill '%s' in '%s' and skill '%s' in '%s'. Skill names must be unique."
+								.formatted(toolName, previous.name(), previous.basePath(), skill.name(),
+										skill.basePath()));
+				}
+			}
+
+			return ToolCallbackProvider.from(skillsByToolName.entrySet()
+				.stream()
+				.map(e -> this.toToolCallback(e.getKey(), e.getValue()))
+				.toList());
+		}
+
+		private ToolCallback toToolCallback(String toolName, Skill skill) {
+			return FunctionToolCallback.builder(toolName, new SkillFunction(skill, this.workspace))
+				.description(this.toolDescriptionTemplate.formatted(skill.toDescription()))
 				.build();
 		}
 
@@ -169,7 +189,44 @@ public class SkillsTool {
 	public static record Skill(String basePath, Map<String, Object> frontMatter, String content) {
 
 		public String name() {
-			return this.frontMatter().get("name").toString();
+			Object name = this.frontMatter().get("name");
+			Assert.notNull(name, "Missing required 'name' front-matter field in skill: " + this.basePath());
+			return name.toString();
+		}
+
+		/**
+		 * The name of the tool registered for this skill. Scoped skill names (e.g.
+		 * {@code project-a:pdf}) are supported: characters that the model providers do
+		 * not allow in a tool name are replaced by {@code _} (e.g.
+		 * {@code project-a_pdf}).
+		 */
+		public String toolName() {
+			String name = this.name();
+			String toolName = ILLEGAL_TOOL_NAME_CHARS.matcher(name).replaceAll("_");
+
+			Assert.isTrue(toolName.length() <= MAX_TOOL_NAME_LENGTH,
+					"Skill name '%s' in '%s' is too long: a skill name is used as the tool name and must be at most %d characters."
+						.formatted(name, this.basePath(), MAX_TOOL_NAME_LENGTH));
+
+			return toolName;
+		}
+
+		/**
+		 * Renders the skill front-matter as the plain-text description of the skill tool:
+		 * the {@code description} field followed by any remaining fields (e.g.
+		 * {@code allowed-tools}, {@code model}) as {@code key: value} lines.
+		 */
+		public String toDescription() {
+			String description = String.valueOf(this.frontMatter().getOrDefault("description", ""));
+
+			String remainingFrontMatter = this.frontMatter()
+				.entrySet()
+				.stream()
+				.filter(e -> !"name".equals(e.getKey()) && !"description".equals(e.getKey()))
+				.map(e -> "%s: %s".formatted(e.getKey(), e.getValue()))
+				.collect(Collectors.joining("\n"));
+
+			return remainingFrontMatter.isEmpty() ? description : description + "\n\n" + remainingFrontMatter;
 		}
 
 		public String toXml() {
@@ -182,17 +239,6 @@ public class SkillsTool {
 			return "<skill>\n%s\n</skill>".formatted(frontMatterXml);
 		}
 
-	}
-
-	private static Map<String, Skill> toSkillsMap(List<Skill> skills) {
-
-		Map<String, Skill> skillsMap = new HashMap<>();
-
-		for (Skill skill : skills) {
-			skillsMap.put(skill.name(), skill);
-		}
-
-		return skillsMap;
 	}
 
 }

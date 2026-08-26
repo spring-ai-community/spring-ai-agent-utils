@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springaicommunity.agent.common.workspace.Workspace;
 
-import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -131,12 +131,12 @@ class WorkspaceAdoptionTest {
 
 		};
 
-		ToolCallback callback = SkillsTool.builder()
+		ToolCallbackProvider provider = SkillsTool.builder()
 			.addSkillsDirectory(this.workspaceDir.resolve("skills").toString())
 			.workspace(sandboxView)
 			.build();
 
-		String result = callback.call("{\"command\":\"test-skill\"}");
+		String result = provider.getToolCallbacks()[0].call("{}");
 
 		assertThat(result).contains("Base directory for this skill: /workspace/skills/test-skill");
 		assertThat(result).doesNotContain(this.workspaceDir.toString());
@@ -148,11 +148,11 @@ class WorkspaceAdoptionTest {
 		Files.createDirectories(skillDir);
 		Files.writeString(skillDir.resolve("SKILL.md"), SKILL_MD, StandardCharsets.UTF_8);
 
-		ToolCallback callback = SkillsTool.builder()
+		ToolCallbackProvider provider = SkillsTool.builder()
 			.addSkillsDirectory(this.workspaceDir.resolve("skills").toString())
 			.build();
 
-		assertThat(callback.call("{\"command\":\"test-skill\"}"))
+		assertThat(provider.getToolCallbacks()[0].call("{}"))
 			.contains("Base directory for this skill: " + skillDir);
 	}
 

@@ -1,6 +1,6 @@
 # Migration Guide: 0.11.0 to 0.12.0
 
-This release introduces the sandboxing foundation: the `ExecBackend` and `Workspace` SPIs, directory confinement for the search tools, and the `spring-ai-agent-utils-docker-cli` module. It also adds two agent-loop utilities: `InterruptAdvisor` (cooperative cancellation of in-flight turns) and `ToolCallListener` (tool invocation observability). **There are no breaking API changes** — all existing code compiles and runs unchanged. There is **one behavioral change** to review (background shells) and a few output-level changes worth knowing about.
+This release introduces the sandboxing foundation: the `ExecBackend` and `Workspace` SPIs, directory confinement for the search tools, and the `spring-ai-agent-utils-docker-cli` module. It also adds two agent-loop utilities: `InterruptAdvisor` (cooperative cancellation of in-flight turns) and `ToolCallListener` (tool invocation observability). It also changes `SkillsTool` to register **one tool per skill** — the only breaking API change. There is **one behavioral change** to review (background shells) and a few output-level changes worth knowing about.
 
 ## Dependency Version
 
@@ -13,6 +13,22 @@ This release introduces the sandboxing foundation: the `ExecBackend` and `Worksp
 ```
 
 The Spring AI dependency is unchanged (2.0.1).
+
+## Breaking change: one tool per skill
+
+`SkillsTool.builder().build()` now returns a `ToolCallbackProvider` with one `ToolCallback` per skill, named after the skill, instead of a single `Skill` tool whose description embedded an `<available_skills>` catalog:
+
+```java
+// Before
+ToolCallback skillsTool = SkillsTool.builder().addSkillsDirectory(".claude/skills").build();
+// model called: Skill(command="pdf")
+
+// After
+ToolCallbackProvider skillsTool = SkillsTool.builder().addSkillsDirectory(".claude/skills").build();
+// model calls: pdf() — no arguments
+```
+
+`ChatClient.Builder.defaultTools(...)` and `defaultToolCallbacks(...)` both accept a `ToolCallbackProvider`, so only code that stored the result in a `ToolCallback` variable needs updating. `SkillsTool.SkillsInput` and `SkillsTool.SkillsFunction` are replaced by `SkillsTool.SkillFunction`, `toolDescriptionTemplate`'s `%s` is now a single skill's front-matter, and duplicate skill names now fail at `build()` instead of silently shadowing each other. See [SkillsTool](SkillsTool.md) for the full details.
 
 ## Behavioral change: background shells are per-instance
 
