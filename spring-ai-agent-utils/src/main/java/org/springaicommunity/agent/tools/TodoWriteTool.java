@@ -31,6 +31,7 @@ import org.springframework.ai.tool.annotation.Tool;
  * time and that all task data is properly formatted.
  *
  * @author Christian Tzolov
+ * @author kezhenxu94
  */
 public class TodoWriteTool {
 
@@ -241,12 +242,14 @@ public class TodoWriteTool {
 
 		When in doubt, use this tool. Being proactive with task management demonstrates attentiveness and ensures you complete all requirements successfully.
 		""")
-	public String todoWrite(Todos todos) { // @formatter:on
+	public String todoWrite(List<Todos.TodoItem> todos) { // @formatter:on
+
+		Todos todoList = new Todos(todos);
 
 		// Validate the todos
-		this.validateTodos(todos);
+		this.validateTodos(todoList);
 
-		this.todoListConsumer.handle(todos);
+		this.todoListConsumer.handle(todoList);
 
 		return "Todos have been modified successfully. Ensure that you continue to use the todo list to track your progress. Please proceed with the current tasks if applicable";
 	}
