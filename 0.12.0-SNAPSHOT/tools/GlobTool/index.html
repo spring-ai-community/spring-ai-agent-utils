@@ -1480,6 +1480,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#directory-confinement-alloweddirectory-alloweddirectories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Directory confinement (allowedDirectory / allowedDirectories)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3003,6 +3014,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#directory-confinement-alloweddirectory-alloweddirectories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Directory confinement (allowedDirectory / allowedDirectories)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3751,6 +3773,24 @@
 <li><a href="../FileSystemTools/">FileSystemTools</a> - For reading/writing files</li>
 <li><a href="../ShellTools/">ShellTools</a> - For running system commands</li>
 </ul>
+<h2 id="directory-confinement-alloweddirectory-alloweddirectories">Directory confinement (<code>allowedDirectory</code> / <code>allowedDirectories</code>)<a class="headerlink" href="#directory-confinement-alloweddirectory-alloweddirectories" title="Permanent link">&para;</a></h2>
+<p>By itself, <code>workingDirectory(...)</code> is only the <strong>default</strong> used when the model omits the
+<code>path</code> argument — an explicit <code>path</code> is taken as-is. To confine searches to a workspace,
+also configure allowed directories (same semantics and shared implementation with
+<code>FileSystemTools</code>; empty = unrestricted):</p>
+<div class="highlight"><pre><span></span><code><span id="__span-59-1"><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a><span class="n">GlobTool</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-59-2"><a id="__codelineno-59-2" name="__codelineno-59-2" href="#__codelineno-59-2"></a><span class="w">    </span><span class="p">.</span><span class="na">workingDirectory</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span><span class="w">     </span><span class="c1">// default when path is omitted</span>
+</span><span id="__span-59-3"><a id="__codelineno-59-3" name="__codelineno-59-3" href="#__codelineno-59-3"></a><span class="w">    </span><span class="p">.</span><span class="na">allowedDirectory</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span><span class="w">     </span><span class="c1">// jail: explicit paths must stay inside</span>
+</span><span id="__span-59-4"><a id="__codelineno-59-4" name="__codelineno-59-4" href="#__codelineno-59-4"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span></code></pre></div>
+<p>The resolved search path — whether from the model or the <code>workingDirectory</code> fallback —
+is validated before any filesystem access (raw <code>..</code> components rejected, normalized
+prefix check, symlink resolution). In addition, when confinement is configured the
+directory traversal does <strong>not</strong> follow symbolic links, so a link inside the workspace
+cannot expose content outside it (unconfined tools keep following links, as before).
+A violation returns:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-60-1"><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a>Error: Access denied. Path is outside the allowed directories: /etc
+</span></code></pre></div>
 
 
 
