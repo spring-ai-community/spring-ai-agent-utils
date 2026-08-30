@@ -84,7 +84,7 @@ The resolver expects each A2A-compatible agent to expose an [Agent Card](https:/
 <dependency>
     <groupId>org.springaicommunity</groupId>
     <artifactId>spring-ai-agent-utils-a2a</artifactId>
-    <version>0.11.0</version>
+    <version>0.12.0</version>
 </dependency>
 ```
 
