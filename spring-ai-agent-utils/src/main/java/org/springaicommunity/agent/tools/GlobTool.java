@@ -50,18 +50,27 @@ public class GlobTool {
 
 	private final Path workingDirectory;
 
+	private final AllowedDirectories allowedDirectories;
+
 	/**
 	 * Constructor with configurable parameters.
 	 * @param maxDepth Maximum directory traversal depth to prevent infinite recursion
 	 * (default: 100)
 	 * @param maxResults Maximum number of results to return (default: 1000)
-	 * @param workingDirectory The working directory to use when path is not specified.
-	 * If null, defaults to current JVM working directory.
+	 * @param workingDirectory The working directory to use when path is not specified. If
+	 * null, defaults to current JVM working directory.
 	 */
 	protected GlobTool(int maxDepth, int maxResults, Path workingDirectory) {
+		this(maxDepth, maxResults, workingDirectory, List.of());
+	}
+
+	protected GlobTool(int maxDepth, int maxResults, Path workingDirectory, List<Path> allowedDirectories) {
 		this.maxDepth = maxDepth;
 		this.maxResults = maxResults;
-		this.workingDirectory = workingDirectory;
+		// Operator-supplied config: normalize so the model-input '..' defense in the
+		// confinement check does not reject the tool's own working directory.
+		this.workingDirectory = (workingDirectory != null) ? workingDirectory.toAbsolutePath().normalize() : null;
+		this.allowedDirectories = new AllowedDirectories(allowedDirectories);
 	}
 
 	// @formatter:off
@@ -80,7 +89,8 @@ public class GlobTool {
 		Assert.hasText(pattern, "	The glob pattern must not be empty");
 
 		try {
-			// Determine search path - use configured workingDirectory if path not specified
+			// Determine search path - use configured workingDirectory if path not
+			// specified
 			Path searchPath;
 			if (StringUtils.hasText(path)) {
 				searchPath = Paths.get(path);
@@ -90,6 +100,12 @@ public class GlobTool {
 			}
 			else {
 				searchPath = Paths.get(".");
+			}
+
+			// Confinement check shared with FileSystemTools (see AllowedDirectories)
+			String accessError = this.allowedDirectories.validate(searchPath.toString());
+			if (accessError != null) {
+				return accessError;
 			}
 
 			if (!Files.exists(searchPath)) {
@@ -106,7 +122,11 @@ public class GlobTool {
 			// Find matching files
 			List<FileInfo> matchingFiles = new ArrayList<>();
 
-			try (Stream<Path> paths = Files.walk(searchPath, this.maxDepth, FileVisitOption.FOLLOW_LINKS)) {
+			// Under confinement, do not follow symbolic links during traversal — a link
+			// inside the workspace must not expose content outside the allowed
+			// directories.
+			try (Stream<Path> paths = this.allowedDirectories.isRestricted() ? Files.walk(searchPath, this.maxDepth)
+					: Files.walk(searchPath, this.maxDepth, FileVisitOption.FOLLOW_LINKS)) {
 				paths.filter(Files::isRegularFile)
 					.filter(p -> !this.isIgnoredPath(p))
 					.filter(p -> this.matchesPattern(p, searchPath, matcher))
@@ -201,6 +221,8 @@ public class GlobTool {
 
 		private Path workingDirectory = null;
 
+		private final AllowedDirectories.Collector allowedDirectories = new AllowedDirectories.Collector();
+
 		private Builder() {
 		}
 
@@ -215,8 +237,8 @@ public class GlobTool {
 		}
 
 		/**
-		 * Set the working directory to use when the agent doesn't specify a path.
-		 * This allows tools to operate within a sandbox/workspace context.
+		 * Set the working directory to use when the agent doesn't specify a path. This
+		 * allows tools to operate within a sandbox/workspace context.
 		 * @param workingDirectory the working directory path
 		 * @return this builder
 		 */
@@ -235,8 +257,41 @@ public class GlobTool {
 			return this;
 		}
 
+		/**
+		 * Adds a directory to the list of allowed paths. When configured, the resolved
+		 * search path (explicit {@code path} argument or the workingDirectory fallback)
+		 * must fall within the union of allowed directories — same semantics as
+		 * FileSystemTools. Empty (the default) means unrestricted.
+		 * @param allowedDirectory the directory to allow searches within
+		 * @return this builder
+		 */
+		public Builder allowedDirectory(Path allowedDirectory) {
+			this.allowedDirectories.add(allowedDirectory);
+			return this;
+		}
+
+		/**
+		 * Adds a directory to the list of allowed paths.
+		 * @param allowedDirectory the directory path as a string; ignored if {@code null}
+		 * @return this builder
+		 */
+		public Builder allowedDirectory(String allowedDirectory) {
+			this.allowedDirectories.add(allowedDirectory);
+			return this;
+		}
+
+		/**
+		 * Adds multiple directories to the list of allowed paths.
+		 * @param allowedDirectories the directories to allow searches within
+		 * @return this builder
+		 */
+		public Builder allowedDirectories(Path... allowedDirectories) {
+			this.allowedDirectories.addAll(allowedDirectories);
+			return this;
+		}
+
 		public GlobTool build() {
-			return new GlobTool(maxDepth, maxResults, workingDirectory);
+			return new GlobTool(maxDepth, maxResults, workingDirectory, this.allowedDirectories.toList());
 		}
 
 	}

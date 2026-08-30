@@ -57,6 +57,8 @@ public class GrepTool {
 
 	private final Path workingDirectory;
 
+	private final AllowedDirectories allowedDirectories;
+
 	// File type mappings (common extensions)
 	private static final Map<String, String[]> FILE_TYPE_EXTENSIONS = new HashMap<>();
 	static {
@@ -85,7 +87,7 @@ public class GrepTool {
 	 */
 	@Deprecated
 	public GrepTool() {
-		this(100000, 100, 10000, null);
+		this(100000, 100, 10000, null, List.of());
 	}
 
 	/**
@@ -95,14 +97,18 @@ public class GrepTool {
 	 * (default: 100)
 	 * @param maxLineLength Maximum line length to process, longer lines are skipped
 	 * (default: 10000)
-	 * @param workingDirectory The working directory to use when path is not specified.
-	 * If null, defaults to current JVM working directory.
+	 * @param workingDirectory The working directory to use when path is not specified. If
+	 * null, defaults to current JVM working directory.
 	 */
-	private GrepTool(int maxOutputLength, int maxDepth, int maxLineLength, Path workingDirectory) {
+	private GrepTool(int maxOutputLength, int maxDepth, int maxLineLength, Path workingDirectory,
+			List<Path> allowedDirectories) {
 		this.maxOutputLength = maxOutputLength;
 		this.maxDepth = maxDepth;
 		this.maxLineLength = maxLineLength;
-		this.workingDirectory = workingDirectory;
+		// Operator-supplied config: normalize so the model-input '..' defense in the
+		// confinement check does not reject the tool's own working directory.
+		this.workingDirectory = (workingDirectory != null) ? workingDirectory.toAbsolutePath().normalize() : null;
+		this.allowedDirectories = new AllowedDirectories(allowedDirectories);
 	}
 
 	/**
@@ -146,7 +152,8 @@ public class GrepTool {
 		@ToolParam(description = "Enable multiline mode where . matches newlines and patterns can span lines. Default: false.", required = false) Boolean multiline) { // @formatter:on
 
 		try {
-			// Determine search path - use configured workingDirectory if path not specified
+			// Determine search path - use configured workingDirectory if path not
+			// specified
 			Path searchPath;
 			if (StringUtils.hasText(path)) {
 				searchPath = Paths.get(path);
@@ -156,6 +163,14 @@ public class GrepTool {
 			}
 			else {
 				searchPath = Paths.get(".");
+			}
+
+			// Confinement check shared with FileSystemTools (see AllowedDirectories):
+			// the resolved search path must fall within the allowed directories, whether
+			// it came from the model or from the workingDirectory fallback.
+			String accessError = this.allowedDirectories.validate(searchPath.toString());
+			if (accessError != null) {
+				return accessError;
 			}
 
 			if (!Files.exists(searchPath)) {
@@ -383,7 +398,11 @@ public class GrepTool {
 		}
 		else if (Files.isDirectory(searchPath)) {
 			// Directory traversal
-			try (Stream<Path> paths = Files.walk(searchPath, this.maxDepth, FileVisitOption.FOLLOW_LINKS)) {
+			// Under confinement, do not follow symbolic links during traversal — a link
+			// inside the workspace must not expose content outside the allowed
+			// directories.
+			try (Stream<Path> paths = this.allowedDirectories.isRestricted() ? Files.walk(searchPath, this.maxDepth)
+					: Files.walk(searchPath, this.maxDepth, FileVisitOption.FOLLOW_LINKS)) {
 				paths.filter(Files::isRegularFile)
 					.filter(p -> this.matchesGlob(p, matchers))
 					.filter(p -> !this.isIgnoredPath(p))
@@ -532,6 +551,8 @@ public class GrepTool {
 
 		private Path workingDirectory = null;
 
+		private final AllowedDirectories.Collector allowedDirectories = new AllowedDirectories.Collector();
+
 		public Builder maxOutputLength(int maxOutputLength) {
 			this.maxOutputLength = maxOutputLength;
 			return this;
@@ -568,8 +589,42 @@ public class GrepTool {
 			return this;
 		}
 
+		/**
+		 * Adds a directory to the list of allowed paths. When configured, the resolved
+		 * search path (explicit {@code path} argument or the workingDirectory fallback)
+		 * must fall within the union of allowed directories — same semantics as
+		 * FileSystemTools. Empty (the default) means unrestricted.
+		 * @param allowedDirectory the directory to allow searches within
+		 * @return this builder
+		 */
+		public Builder allowedDirectory(Path allowedDirectory) {
+			this.allowedDirectories.add(allowedDirectory);
+			return this;
+		}
+
+		/**
+		 * Adds a directory to the list of allowed paths.
+		 * @param allowedDirectory the directory path as a string; ignored if {@code null}
+		 * @return this builder
+		 */
+		public Builder allowedDirectory(String allowedDirectory) {
+			this.allowedDirectories.add(allowedDirectory);
+			return this;
+		}
+
+		/**
+		 * Adds multiple directories to the list of allowed paths.
+		 * @param allowedDirectories the directories to allow searches within
+		 * @return this builder
+		 */
+		public Builder allowedDirectories(Path... allowedDirectories) {
+			this.allowedDirectories.addAll(allowedDirectories);
+			return this;
+		}
+
 		public GrepTool build() {
-			return new GrepTool(this.maxOutputLength, this.maxDepth, this.maxLineLength, this.workingDirectory);
+			return new GrepTool(this.maxOutputLength, this.maxDepth, this.maxLineLength, this.workingDirectory,
+					this.allowedDirectories.toList());
 		}
 
 	}

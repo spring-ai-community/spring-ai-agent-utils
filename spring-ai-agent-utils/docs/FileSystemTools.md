@@ -335,3 +335,11 @@ String result = fileTools.edit(
 | "old_string not found" | Text doesn't exist in file | Verify exact string including whitespace |
 | "appears N times" | Multiple matches found | Add more context or use `replace_all=true` |
 | "must be different" | old_string equals new_string | Ensure you're actually changing the content |
+
+## Confining the search tools too
+
+Since the search tools share this check, configure them together so the confinement is consistent:
+`FileSystemTools`, `GrepTool`, `GlobTool` and `ListDirectoryTool` all accept
+`allowedDirectory(...)` / `allowedDirectories(...)` with identical semantics (one shared
+implementation) — without it on the search tools, an explicit `path` argument can read
+outside the workspace even when Read/Write/Edit are confined.
