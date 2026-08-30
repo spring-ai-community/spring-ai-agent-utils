@@ -487,7 +487,7 @@ class ShellToolsTest {
 			String result = shellTools.bash("echo 'Test'", null, null, null);
 
 			String shellId = extractShellId(result);
-			assertThat(shellId).matches("shell_\\d+");
+			assertThat(shellId).matches("shell_run_\\d+");
 		}
 
 	}
@@ -496,7 +496,7 @@ class ShellToolsTest {
 	 * Helper method to extract shell_id from command output
 	 */
 	private String extractShellId(String output) {
-		Pattern pattern = Pattern.compile("bash_id: (shell_\\d+)");
+		Pattern pattern = Pattern.compile("bash_id: (shell_(?:run_)?\\d+)");
 		Matcher matcher = pattern.matcher(output);
 		if (matcher.find()) {
 			return matcher.group(1);

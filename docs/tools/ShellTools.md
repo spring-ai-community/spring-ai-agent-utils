@@ -28,7 +28,7 @@ The primary tool for executing shell commands either synchronously or in the bac
 **Basic Usage:**
 
 ```java
-ShellTools shellTools = new ShellTools();
+ShellTools shellTools = ShellTools.builder().build();
 
 // Synchronous execution
 String result = shellTools.bash(
@@ -159,7 +159,7 @@ String result = shellTools.killShell(
 **Example Workflow:**
 
 ```java
-ShellTools shellTools = new ShellTools();
+ShellTools shellTools = ShellTools.builder().build();
 
 // 1. Start a long-running background task
 String start = shellTools.bash(
@@ -225,3 +225,43 @@ String killResult = shellTools.killShell("shell_1234567890");
    ```java
    shellTools.killShell(bashId);
    ```
+
+## Execution backend & working directory
+
+`ShellTools` executes commands through a pluggable `ExecBackend` (SPI in
+`spring-ai-agent-utils-common`, package `org.springaicommunity.agent.common.exec`).
+The default `LocalExecBackend` runs processes on the host JVM; alternative
+implementations can execute inside a container or on a remote worker without any
+tool changes.
+
+```java
+// Confine local execution to a workspace directory (per session/agent)
+ShellTools tools = ShellTools.builder()
+    .workingDirectory(Path.of("/workspace/session-42"))
+    .build();
+
+// Or supply a fully configured backend
+ShellTools tools = ShellTools.builder()
+    .execBackend(LocalExecBackend.builder()
+        .workingDirectory(workDir)
+        .cleanEnvironment(true)                 // child processes do NOT inherit the JVM env
+        .environment(Map.of("LANG", "C"))
+        .build())
+    .build();
+```
+
+Security notes:
+
+- **Working directory** — without one, commands run in the JVM's current directory.
+  Always set a per-session working directory when commands are model-authored.
+- **Environment** — by default child processes inherit the full JVM environment
+  (historical behavior). Enable `cleanEnvironment(true)` so secrets in host
+  environment variables are not visible to model-authored commands.
+- **Shell namespaces** — background shells (`BashOutput`/`KillShell`) are tracked
+  per `ShellTools` instance, not globally. Agents holding *different* instances have
+  separate shell namespaces; agents that *share* an instance (for example Claude
+  subagents, which reuse the single `ShellTools` created by `ClaudeSubagentType`)
+  share a namespace and can see each other's shells. Migration note: the registry
+  was previously JVM-global — if you relied on reading or killing a shell from a
+  different `ShellTools` instance, share one instance between those agents
+  explicitly.

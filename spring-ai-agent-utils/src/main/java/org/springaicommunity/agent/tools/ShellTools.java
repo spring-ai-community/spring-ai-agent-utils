@@ -1,5 +1,5 @@
 /*
-* Copyright 2025 - 2025 the original author or authors.
+* Copyright 2025 - 2026 the original author or authors.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,150 +15,61 @@
 */
 package org.springaicommunity.agent.tools;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
+import org.springaicommunity.agent.common.exec.ExecBackend;
+import org.springaicommunity.agent.common.exec.ExecHandle;
+import org.springaicommunity.agent.common.exec.ExecResult;
+import org.springaicommunity.agent.common.exec.ExecSpec;
+import org.springaicommunity.agent.exec.LocalExecBackend;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.util.Assert;
 
 /**
+ * Shell tools (Bash, BashOutput, KillShell) executing through a pluggable
+ * {@link ExecBackend}. By default commands run on the host JVM
+ * ({@link LocalExecBackend}); configure a different backend to execute inside a
+ * sandbox/container, or use the {@code workingDirectory} builder option to confine local
+ * execution to a workspace directory. Background shells are tracked per
+ * {@code ShellTools} instance, so separate agents/sessions have separate shell
+ * namespaces.
+ *
  * @author Christian Tzolov
  */
 public class ShellTools {
 
-	// Storage for background processes
-	private static final Map<String, BackgroundProcess> backgroundProcesses = new ConcurrentHashMap<>();
+	private static final int MAX_OUTPUT_LENGTH = 30_000;
 
-	// Inner class to manage background processes
-	private static class BackgroundProcess {
+	// Synchronous run ids live in their own "shell_run_" namespace so they can never
+	// collide with backend-minted background handle ids ("shell_<n>").
+	private static final java.util.concurrent.atomic.AtomicLong SYNC_RUN_SEQUENCE = new java.util.concurrent.atomic.AtomicLong(
+			System.currentTimeMillis());
 
-		final Process process;
+	private final ExecBackend execBackend;
 
-		final StringBuilder stdout;
+	// Background shells owned by this instance (not process-global).
+	private final Map<String, ExecHandle> backgroundShells = new ConcurrentHashMap<>();
 
-		final StringBuilder stderr;
+	protected ShellTools(ExecBackend execBackend) {
+		Assert.notNull(execBackend, "execBackend must not be null");
+		this.execBackend = execBackend;
+	}
 
-		final Thread stdoutReader;
-
-		final Thread stderrReader;
-
-		int lastStdoutPosition = 0;
-
-		int lastStderrPosition = 0;
-
-		BackgroundProcess(Process process) {
-			this.process = process;
-			this.stdout = new StringBuilder();
-			this.stderr = new StringBuilder();
-
-			// Start thread to read stdout
-			this.stdoutReader = new Thread(() -> {
-				try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-					String line;
-					while ((line = reader.readLine()) != null) {
-						synchronized (stdout) {
-							stdout.append(line).append("\n");
-						}
-					}
-				}
-				catch (IOException e) {
-					// Process terminated or stream closed
-				}
-			});
-			this.stdoutReader.setDaemon(true);
-			this.stdoutReader.start();
-
-			// Start thread to read stderr
-			this.stderrReader = new Thread(() -> {
-				try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-					String line;
-					while ((line = reader.readLine()) != null) {
-						synchronized (stderr) {
-							stderr.append(line).append("\n");
-						}
-					}
-				}
-				catch (IOException e) {
-					// Process terminated or stream closed
-				}
-			});
-			this.stderrReader.setDaemon(true);
-			this.stderrReader.start();
-		}
-
-		String getNewOutput(String filter) {
-			StringBuilder result = new StringBuilder();
-
-			synchronized (stdout) {
-				String newStdout = stdout.substring(lastStdoutPosition);
-				if (filter != null && !filter.isEmpty()) {
-					Pattern pattern = Pattern.compile(filter);
-					newStdout = filterOutput(newStdout, pattern);
-				}
-				if (!newStdout.isEmpty()) {
-					result.append("STDOUT:\n").append(newStdout);
-				}
-				lastStdoutPosition = stdout.length();
-			}
-
-			synchronized (stderr) {
-				String newStderr = stderr.substring(lastStderrPosition);
-				if (filter != null && !filter.isEmpty()) {
-					Pattern pattern = Pattern.compile(filter);
-					newStderr = filterOutput(newStderr, pattern);
-				}
-				if (!newStderr.isEmpty()) {
-					if (result.length() > 0)
-						result.append("\n");
-					result.append("STDERR:\n").append(newStderr);
-				}
-				lastStderrPosition = stderr.length();
-			}
-
-			return result.toString();
-		}
-
-		private String filterOutput(String output, Pattern pattern) {
-			String[] lines = output.split("\n");
-			StringBuilder filtered = new StringBuilder();
-			for (String line : lines) {
-				if (pattern.matcher(line).find()) {
-					filtered.append(line).append("\n");
-				}
-			}
-			return filtered.toString();
-		}
-
-		boolean isAlive() {
-			return process.isAlive();
-		}
-
-		void destroy() {
-			process.destroy();
-			try {
-				if (!process.waitFor(5, TimeUnit.SECONDS)) {
-					process.destroyForcibly();
-				}
-			}
-			catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				process.destroyForcibly();
-			}
-		}
-
-		int getExitCode() {
-			return process.exitValue();
-		}
-
+	/**
+	 * @deprecated use {@link #builder()} — allows configuring the execution backend and
+	 * working directory.
+	 */
+	@Deprecated
+	public ShellTools() {
+		this(LocalExecBackend.builder().build());
 	}
 
 	//
-	// Shell comnmands
+	// Shell commands
 	//
 
 	// @formatter:off
@@ -240,129 +151,71 @@ public class ShellTools {
 		@ToolParam(description = "Clear, concise description of what this command does in 5-10 words, in active voice. Examples:\nInput: ls\nOutput: List files in current directory\n\nInput: git status\nOutput: Show working tree status\n\nInput: npm install\nOutput: Install package dependencies\n\nInput: mkdir foo\nOutput: Create directory 'foo'", required = false) String description,
 		@ToolParam(description = "Set to true to run this command in the background. Use BashOutput to read the output later.", required = false) Boolean runInBackground) { // @formatter:on
 
-		// Generate unique shell ID for all executions
-		String shellId = "shell_" + System.currentTimeMillis();
-
-		try {
-			// Determine the shell to use based on OS
-			String[] shellCommand;
-			String os = System.getProperty("os.name").toLowerCase();
-			if (os.contains("win")) {
-				shellCommand = new String[] { "cmd.exe", "/c", command };
-			}
-			else {
-				shellCommand = new String[] { "/bin/bash", "-c", command };
-			}
-
-			ProcessBuilder processBuilder = new ProcessBuilder(shellCommand);
-			processBuilder.redirectErrorStream(false);
-
-			// Set working directory if available in tool context
-			// processBuilder.directory(new File(workingDirectory));
-
-			Process process = processBuilder.start();
-
-			if (Boolean.TRUE.equals(runInBackground)) {
-				// Run in background
-				BackgroundProcess bgProcess = new BackgroundProcess(process);
-				backgroundProcesses.put(shellId, bgProcess);
-
-				return String.format(
-						"bash_id: %s\n\nBackground shell started with ID: %s\nUse BashOutput tool with bash_id='%s' to retrieve output.",
-						shellId, shellId, shellId);
-			}
-			else {
-				// Run synchronously with timeout
-				long timeoutMs = timeout != null ? Math.min(timeout, 600000) : 120000;
-
-				StringBuilder stdout = new StringBuilder();
-				StringBuilder stderr = new StringBuilder();
-
-				// Read stdout
-				Thread stdoutThread = new Thread(() -> {
-					try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-						String line;
-						while ((line = reader.readLine()) != null) {
-							stdout.append(line).append("\n");
-						}
-					}
-					catch (IOException e) {
-						// Ignore
-					}
-				});
-
-				// Read stderr
-				Thread stderrThread = new Thread(() -> {
-					try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-						String line;
-						while ((line = reader.readLine()) != null) {
-							stderr.append(line).append("\n");
-						}
-					}
-					catch (IOException e) {
-						// Ignore
-					}
-				});
-
-				stdoutThread.start();
-				stderrThread.start();
-
-				boolean completed = process.waitFor(timeoutMs, TimeUnit.MILLISECONDS);
-
-				if (!completed) {
-					process.destroy();
-					if (!process.waitFor(5, TimeUnit.SECONDS)) {
-						process.destroyForcibly();
-					}
-					return String.format("bash_id: %s\n\nCommand timed out after %dms", shellId, timeoutMs);
-				}
-
-				stdoutThread.join(1000);
-				stderrThread.join(1000);
-
-				int exitCode = process.exitValue();
-				StringBuilder result = new StringBuilder();
-
-				// Add bash_id at the beginning
-				result.append("bash_id: ").append(shellId).append("\n\n");
-
-				if (stdout.length() > 0) {
-					result.append(stdout.toString());
-				}
-
-				if (stderr.length() > 0) {
-					if (result.length() > result.indexOf("\n\n") + 2)
-						result.append("\n");
-					result.append("STDERR:\n").append(stderr.toString());
-				}
-
-				if (exitCode != 0) {
-					if (result.length() > result.indexOf("\n\n") + 2)
-						result.append("\n");
-					result.append("Exit code: ").append(exitCode);
-				}
-
-				// Truncate if too long
-				String output = result.toString();
-				if (output.length() > 30000) {
-					// Keep the bash_id header
-					String header = output.substring(0, output.indexOf("\n\n") + 2);
-					String content = output.substring(output.indexOf("\n\n") + 2);
-					output = header + content.substring(0, Math.min(content.length(), 30000 - header.length()))
-							+ "\n... (output truncated)";
-				}
-
-				return output;
-			}
-
+		if (command == null || command.isBlank()) {
+			return "Error: command must not be blank";
 		}
-		catch (IOException e) {
-			return "Error executing command: " + e.getMessage();
+		// Timeout policy (<=0 -> default, clamp to max) is owned by ExecSpec; read the
+		// effective value back so diagnostics never report a value we didn't honor.
+		ExecSpec spec = new ExecSpec(command, timeout != null ? timeout : ExecSpec.DEFAULT_TIMEOUT_MILLIS, Map.of());
+
+		if (Boolean.TRUE.equals(runInBackground)) {
+			ExecHandle handle;
+			try {
+				handle = this.execBackend.start(spec);
+			}
+			catch (RuntimeException e) {
+				// Backends throw with the raw reason; presentation prefix is added once
+				// here.
+				return "Error executing command: " + e.getMessage();
+			}
+			this.backgroundShells.put(handle.id(), handle);
+			return String.format(
+					"bash_id: %s\n\nBackground shell started with ID: %s\nUse BashOutput tool with bash_id='%s' to retrieve output.",
+					handle.id(), handle.id(), handle.id());
 		}
-		catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			return "Command execution interrupted: " + e.getMessage();
+
+		String shellId = "shell_run_" + SYNC_RUN_SEQUENCE.incrementAndGet();
+		ExecResult execResult = this.execBackend.run(spec);
+
+		switch (execResult.status()) {
+			case TIMED_OUT:
+				return String.format("bash_id: %s\n\nCommand timed out after %dms", shellId, spec.timeoutMillis());
+			case LAUNCH_FAILED:
+				return "Error executing command: " + execResult.stderr();
+			case INTERRUPTED:
+				return "Command execution interrupted: " + execResult.stderr();
+			case COMPLETED:
+				break;
 		}
+
+		StringBuilder result = new StringBuilder();
+		result.append("bash_id: ").append(shellId).append("\n\n");
+
+		if (!execResult.stdout().isEmpty()) {
+			result.append(execResult.stdout());
+		}
+		if (!execResult.stderr().isEmpty()) {
+			if (result.length() > result.indexOf("\n\n") + 2) {
+				result.append("\n");
+			}
+			result.append("STDERR:\n").append(execResult.stderr());
+		}
+		if (execResult.exitCode() != 0) {
+			if (result.length() > result.indexOf("\n\n") + 2) {
+				result.append("\n");
+			}
+			result.append("Exit code: ").append(execResult.exitCode());
+		}
+
+		// Truncate if too long, keeping the bash_id header
+		String output = result.toString();
+		if (output.length() > MAX_OUTPUT_LENGTH) {
+			String header = output.substring(0, output.indexOf("\n\n") + 2);
+			String content = output.substring(output.indexOf("\n\n") + 2);
+			output = header + content.substring(0, Math.min(content.length(), MAX_OUTPUT_LENGTH - header.length()))
+					+ "\n... (output truncated)";
+		}
+		return output;
 	}
 
 	// @formatter:off
@@ -379,21 +232,20 @@ public class ShellTools {
 		@ToolParam(description = "The ID of the background shell to retrieve output from") String bash_id,
 		@ToolParam(description = "Optional regular expression to filter the output lines. Only lines matching this regex will be included in the result. Any lines that do not match will no longer be available to read.", required = false) String filter) { // @formatter:on
 
-		BackgroundProcess bgProcess = backgroundProcesses.get(bash_id);
-
-		if (bgProcess == null) {
+		ExecHandle handle = this.backgroundShells.get(bash_id);
+		if (handle == null) {
 			return "Error: No background shell found with ID: " + bash_id;
 		}
 
-		String newOutput = bgProcess.getNewOutput(filter);
+		String newOutput = handle.newOutput(filter);
 
 		StringBuilder result = new StringBuilder();
 		result.append("Shell ID: ").append(bash_id).append("\n");
-		result.append("Status: ").append(bgProcess.isAlive() ? "Running" : "Completed").append("\n");
+		result.append("Status: ").append(handle.isAlive() ? "Running" : "Completed").append("\n");
 
-		if (!bgProcess.isAlive()) {
+		if (!handle.isAlive()) {
 			try {
-				result.append("Exit code: ").append(bgProcess.getExitCode()).append("\n");
+				result.append("Exit code: ").append(handle.exitCode()).append("\n");
 			}
 			catch (IllegalThreadStateException e) {
 				// Process not yet terminated
@@ -406,7 +258,6 @@ public class ShellTools {
 		else {
 			result.append("\nNo new output since last check.");
 		}
-
 		return result.toString();
 	}
 
@@ -421,18 +272,17 @@ public class ShellTools {
 	public String killShell(
 		@ToolParam(description = "The ID of the background shell to kill") String bash_id) { // @formatter:on
 
-		BackgroundProcess bgProcess = backgroundProcesses.get(bash_id);
-
-		if (bgProcess == null) {
+		ExecHandle handle = this.backgroundShells.get(bash_id);
+		if (handle == null) {
 			return "Error: No background shell found with ID: " + bash_id;
 		}
 
-		if (!bgProcess.isAlive()) {
-			backgroundProcesses.remove(bash_id);
+		if (!handle.isAlive()) {
+			this.backgroundShells.remove(bash_id);
 			return "Shell " + bash_id + " was already terminated. Removed from active shells.";
 		}
 
-		bgProcess.destroy();
+		handle.kill();
 
 		// Wait a bit to confirm termination
 		try {
@@ -442,19 +292,56 @@ public class ShellTools {
 			Thread.currentThread().interrupt();
 		}
 
-		backgroundProcesses.remove(bash_id);
-
+		this.backgroundShells.remove(bash_id);
 		return "Successfully killed shell: " + bash_id;
 	}
 
 	public static Builder builder() {
 		return new Builder();
 	}
-	
+
 	public static class Builder {
-		public ShellTools build() {
-			return new ShellTools();
+
+		private ExecBackend execBackend;
+
+		private Path workingDirectory;
+
+		private Builder() {
 		}
+
+		/**
+		 * Execution backend for all commands. Default: {@link LocalExecBackend} on the
+		 * host JVM.
+		 */
+		public Builder execBackend(ExecBackend execBackend) {
+			this.execBackend = execBackend;
+			return this;
+		}
+
+		/**
+		 * Convenience: run commands locally with this working directory. Mutually
+		 * exclusive with {@link #execBackend(ExecBackend)} — a custom backend owns its
+		 * own working directory.
+		 */
+		public Builder workingDirectory(Path workingDirectory) {
+			this.workingDirectory = workingDirectory;
+			return this;
+		}
+
+		public Builder workingDirectory(String workingDirectory) {
+			return workingDirectory(workingDirectory != null ? Paths.get(workingDirectory) : null);
+		}
+
+		public ShellTools build() {
+			Assert.state(this.execBackend == null || this.workingDirectory == null,
+					"Set either execBackend or workingDirectory, not both — a custom backend owns its working directory");
+			ExecBackend backend = this.execBackend;
+			if (backend == null) {
+				backend = LocalExecBackend.builder().workingDirectory(this.workingDirectory).build();
+			}
+			return new ShellTools(backend);
+		}
+
 	}
 
 }
