@@ -15,20 +15,29 @@
 */
 package org.springaicommunity.agent.utils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import java.util.Map;
 
+import org.springaicommunity.agent.common.exec.ExecBackend;
+import org.springaicommunity.agent.common.exec.ExecResult;
+import org.springaicommunity.agent.common.exec.ExecSpec;
+import org.springaicommunity.agent.common.workspace.Workspace;
+import org.springaicommunity.agent.exec.LocalExecBackend;
+
+/**
+ * Renders environment context blocks (working directory, git status) for inclusion in
+ * agent system prompts. The no-argument methods describe the host JVM's current
+ * directory; the {@link Workspace} and {@link ExecBackend} overloads describe the
+ * environment the agent's tools actually operate in, so a sandboxed agent is not shown
+ * host paths or host git state it cannot reach.
+ *
+ * @author Christian Tzolov
+ */
 public class AgentEnvironment {
-
-	private static final boolean IS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("win");
 
 	public static final String ENVIRONMENT_INFO_KEY = "ENVIRONMENT_INFO";
 
@@ -38,10 +47,30 @@ public class AgentEnvironment {
 
 	public static final String AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY = "AGENT_MODEL_KNOWLEDGE_CUTOFF";
 
-	public static String info() {
+	private static final long GIT_COMMAND_TIMEOUT_MILLIS = 30_000;
 
-		String workingDirectory = System.getProperty("user.dir");
-		boolean isGitRepo = new File(workingDirectory, ".git").exists();
+	/** Force untranslated git output so the parsing below is locale-independent. */
+	private static final Map<String, String> GIT_ENV = Map.of("LC_ALL", "C", "LANG", "C");
+
+	/** Environment info for the host JVM's current working directory. */
+	public static String info() {
+		return info(hostWorkspace());
+	}
+
+	/**
+	 * Environment info for the given workspace: the working directory line shows
+	 * {@link Workspace#display(Path) workspace.display(root)} — the path as the model
+	 * should see it — and the git-repo check runs against the workspace root. Platform,
+	 * OS version and date describe the JVM host; override the rendered block if the
+	 * execution environment differs.
+	 * @param workspace the workspace the agent's tools operate in
+	 * @return the rendered environment info block
+	 */
+	public static String info(Workspace workspace) {
+
+		Path root = workspace.root();
+		String workingDirectory = workspace.display(root);
+		boolean isGitRepo = Files.exists(root.resolve(".git"));
 		String platform = System.getProperty("os.name").toLowerCase();
 		String osVersion = System.getProperty("os.name") + " " + System.getProperty("os.version");
 		String todayDate = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
@@ -56,16 +85,39 @@ public class AgentEnvironment {
 		return sb.toString();
 	}
 
+	/** Git status snapshot of the host JVM's current working directory. */
 	public static String gitStatus() {
+		return gitStatus(hostWorkspace());
+	}
+
+	/**
+	 * Git status snapshot of the given workspace, executed locally at the workspace root.
+	 * @param workspace the workspace whose root to inspect
+	 * @return the rendered git status block, or an empty string when git is unavailable
+	 * or the root is not a git work tree
+	 */
+	public static String gitStatus(Workspace workspace) {
+		return gitStatus(LocalExecBackend.builder().workingDirectory(workspace.root()).build());
+	}
+
+	/**
+	 * Git status snapshot produced by running git through the given execution backend —
+	 * inside a sandbox, the reported status is the sandbox's view of the repository. The
+	 * backend's own working directory determines which repository is inspected.
+	 * @param execBackend the backend to run git commands on
+	 * @return the rendered git status block, or an empty string when git is unavailable
+	 * or the working directory is not a git work tree
+	 */
+	public static String gitStatus(ExecBackend execBackend) {
 
 		// Check if git is available
-		if (!isGitAvailable()) {
+		if (!isGitAvailable(execBackend)) {
 			System.out.println("Git is not available or not in PATH.\n");
 			return "";
 		}
 
 		// Check if we're in a git repository
-		String gitCheck = runGitCommand("rev-parse", "--is-inside-work-tree");
+		String gitCheck = runGit(execBackend, "git rev-parse --is-inside-work-tree");
 		if (!"true".equals(gitCheck)) {
 			System.out.println("Not inside a git repository.\n");
 			return "";
@@ -76,96 +128,61 @@ public class AgentEnvironment {
 		sb.append("Note that this status is a snapshot in time, and will not update during the conversation.\n");
 
 		// Get current branch
-		String currentBranch = runGitCommand("rev-parse", "--abbrev-ref", "HEAD");
+		String currentBranch = runGit(execBackend, "git rev-parse --abbrev-ref HEAD");
 		sb.append("Current branch: ").append(currentBranch).append("\n\n");
 
 		// Get main/master branch (for PRs)
-		String mainBranch = getMainBranch();
+		String mainBranch = getMainBranch(execBackend);
 		sb.append("Main branch (you will usually use this for PRs): ").append(mainBranch).append("\n\n");
 
 		// Get git status
-		String status = runGitCommand("status", "--short");
+		String status = runGit(execBackend, "git status --short");
 		sb.append("Status:\n").append(status.isEmpty() ? "Working tree clean\n\n" : status).append("\n\n");
 
 		// Get recent commits
-		String recentCommits = runGitCommand("log", "--oneline", "-n", "5");
+		String recentCommits = runGit(execBackend, "git log --oneline -n 5");
 		sb.append("Recent commits:\n").append(recentCommits);
 
 		return sb.toString();
 	}
 
-	private static boolean isGitAvailable() {
-		try {
-			String result = runGitCommand("--version");
-			return result != null && result.contains("git version");
-		}
-		catch (Exception e) {
-			return false;
-		}
+	private static Workspace hostWorkspace() {
+		return Workspace.local(Paths.get(System.getProperty("user.dir")));
 	}
 
-	private static String getMainBranch() {
+	private static boolean isGitAvailable(ExecBackend execBackend) {
+		String result = runGit(execBackend, "git --version");
+		return result.contains("git version");
+	}
+
+	private static String getMainBranch(ExecBackend execBackend) {
 		// Try to detect the main branch name
 		String[] possibleMains = { "main", "master" };
 		for (String branch : possibleMains) {
-			String result = runGitCommand("rev-parse", "--verify", "--quiet", branch);
-			if (result != null && !result.isEmpty() && !result.toLowerCase().contains("fatal")) {
+			String result = runGit(execBackend, "git rev-parse --verify --quiet " + branch);
+			if (!result.isEmpty()) {
 				return branch;
 			}
 		}
 		// Try to get from remote
-		String remoteBranch = runGitCommand("symbolic-ref", "refs/remotes/origin/HEAD", "--short");
-		if (remoteBranch != null && !remoteBranch.isEmpty()) {
+		String remoteBranch = runGit(execBackend, "git symbolic-ref refs/remotes/origin/HEAD --short");
+		if (!remoteBranch.isEmpty()) {
 			return remoteBranch.replace("origin/", "");
 		}
 		return "main";
 	}
 
 	/**
-	 * Runs a git command in a cross-platform manner. On Windows, uses cmd.exe /c to
-	 * ensure proper command execution. On Unix/Mac, runs git directly.
+	 * Runs a git command through the execution backend and returns its trimmed stdout, or
+	 * an empty string when the command did not complete or exited non-zero.
 	 */
-	private static String runGitCommand(String... gitArgs) {
+	private static String runGit(ExecBackend execBackend, String command) {
 		try {
-			List<String> command = new ArrayList<>();
-
-			if (IS_WINDOWS) {
-				command.add("cmd.exe");
-				command.add("/c");
-				command.add("git");
-			}
-			else {
-				command.add("git");
-			}
-
-			for (String arg : gitArgs) {
-				command.add(arg);
-			}
-
-			ProcessBuilder pb = new ProcessBuilder(command);
-			pb.directory(new File(System.getProperty("user.dir")));
-			pb.redirectErrorStream(true);
-
-			// Set environment to ensure consistent output
-			pb.environment().put("LC_ALL", "C");
-			pb.environment().put("LANG", "C");
-
-			Process process = pb.start();
-
-			String result;
-			try (BufferedReader reader = new BufferedReader(
-					new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
-				result = reader.lines().collect(Collectors.joining("\n"));
-			}
-
-			// Wait with timeout to prevent hanging
-			boolean finished = process.waitFor(30, TimeUnit.SECONDS);
-			if (!finished) {
-				process.destroyForcibly();
+			ExecResult result = execBackend.run(new ExecSpec(command, GIT_COMMAND_TIMEOUT_MILLIS, GIT_ENV));
+			if (result.status() != ExecResult.Status.COMPLETED || result.exitCode() != 0) {
 				return "";
 			}
-
-			return result.trim();
+			return result.stdout().trim();
 		}
 		catch (Exception e) {
 			return "";

@@ -24,6 +24,7 @@ import org.springaicommunity.agent.common.exec.ExecBackend;
 import org.springaicommunity.agent.common.exec.ExecHandle;
 import org.springaicommunity.agent.common.exec.ExecResult;
 import org.springaicommunity.agent.common.exec.ExecSpec;
+import org.springaicommunity.agent.common.workspace.Workspace;
 import org.springaicommunity.agent.exec.LocalExecBackend;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -330,6 +331,21 @@ public class ShellTools {
 
 		public Builder workingDirectory(String workingDirectory) {
 			return workingDirectory(workingDirectory != null ? Paths.get(workingDirectory) : null);
+		}
+
+		/**
+		 * Convenience: run commands locally rooted at the given workspace — shorthand for
+		 * {@code workingDirectory(workspace.root())}. Mutually exclusive with
+		 * {@link #execBackend(ExecBackend)}, same as {@code workingDirectory}. Unlike the
+		 * {@code workspace} option on the file/search tools, this does NOT restrict what
+		 * commands can access — a shell can leave its working directory. Use a sandboxed
+		 * {@link ExecBackend} for actual isolation.
+		 * @param workspace the workspace whose root becomes the working directory
+		 * @return this builder
+		 */
+		public Builder workspace(Workspace workspace) {
+			Assert.notNull(workspace, "workspace must not be null");
+			return workingDirectory(workspace.root());
 		}
 
 		public ShellTools build() {

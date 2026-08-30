@@ -40,6 +40,11 @@ FileSystemTools tools = FileSystemTools.builder()
 
 // No restriction (default — backward compatible)
 FileSystemTools tools = FileSystemTools.builder().build();
+
+// Workspace shorthand — confines operations to the workspace root
+FileSystemTools tools = FileSystemTools.builder()
+    .workspace(Workspace.local(Path.of("/workspace/project")))
+    .build();
 ```
 
 **Security guarantees:**

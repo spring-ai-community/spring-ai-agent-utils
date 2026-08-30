@@ -828,6 +828,11 @@ GlobTool.builder()
     .workingDirectory(workspace)     // default when path is omitted
     .allowedDirectory(workspace)     // jail: explicit paths must stay inside
     .build();
+
+// Equivalent one-call form using the Workspace abstraction
+GlobTool.builder()
+    .workspace(Workspace.local(workspace))
+    .build();
 ```
 
 The resolved search path — whether from the model or the `workingDirectory` fallback —
