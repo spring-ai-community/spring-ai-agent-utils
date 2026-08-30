@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://spring-ai-community.github.io/spring-ai-agent-utils/0.12.0-SNAPSHOT/tools/migration-0.9/">
+        <link rel="canonical" href="https://spring-ai-community.github.io/spring-ai-agent-utils/0.12.0-SNAPSHOT/tools/migration-0.12/">
       
       
-        <link rel="prev" href="../migration-0.12/">
+        <link rel="prev" href="../DockerCliExecBackend/">
       
       
-        <link rel="next" href="../migration-0.5/">
+        <link rel="next" href="../migration-0.9/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>0.7.x to 0.9.0 - Spring AI Agent Utils</title>
+        <title>0.11.0 to 0.12.0 - Spring AI Agent Utils</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#migration-guide-07x-to-090" class="md-skip">
+        <a href="#migration-guide-0110-to-0120" class="md-skip">
           Skip to content
         </a>
       
@@ -117,7 +117,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              0.7.x to 0.9.0
+              0.11.0 to 0.12.0
             
           </span>
         </div>
@@ -401,7 +401,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../migration-0.12/" class="md-tabs__link">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -1528,34 +1528,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../migration-0.12/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    0.11.0 to 0.12.0
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -1575,7 +1547,7 @@
   <span class="md-ellipsis">
     
   
-    0.7.x to 0.9.0
+    0.11.0 to 0.12.0
   
 
     
@@ -1593,7 +1565,7 @@
   <span class="md-ellipsis">
     
   
-    0.7.x to 0.9.0
+    0.11.0 to 0.12.0
   
 
     
@@ -1630,104 +1602,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#spring-ai-api-changes" class="md-nav__link">
+  <a href="#behavioral-change-background-shells-are-per-instance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Spring AI API Changes
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Spring AI API Changes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#toolcalladvisor-removed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ToolCallAdvisor removed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#defaulttoolcallbacks-defaulttools" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        defaultToolCallbacks() → defaultTools()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openai-starter-artifact-renamed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        OpenAI starter artifact renamed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openai-property-prefix-renamed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        OpenAI property prefix renamed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#modeloptionsutilstojsonstring-removed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ModelOptionsUtils.toJsonString() removed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#toolcallingchatoptionscopy-removed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ToolCallingChatOptions.copy() removed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#defaulttoolcallingchatoptions-public-constructor-removed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DefaultToolCallingChatOptions public constructor removed
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#memory-advisor-ordering" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Memory Advisor Ordering
+        Behavioral change: background shells are per-instance
       
     </span>
   </a>
@@ -1735,10 +1613,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#conversation-id-required-on-prompt-calls" class="md-nav__link">
+  <a href="#deprecations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Conversation ID Required on Prompt Calls
+        Deprecations
       
     </span>
   </a>
@@ -1746,10 +1624,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#consolidate-multiple-defaulttools-calls" class="md-nav__link">
+  <a href="#output-level-changes-no-code-impact" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Consolidate Multiple defaultTools() Calls
+        Output-level changes (no code impact)
       
     </span>
   </a>
@@ -1757,10 +1635,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#toolcallingadvisor-requires-at-least-one-registered-tool-spring-ai-6325" class="md-nav__link">
+  <a href="#new-in-0120-opt-in-no-migration-required" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ToolCallingAdvisor Requires at Least One Registered Tool (spring-ai #6325)
+        New in 0.12.0 (opt-in, no migration required)
       
     </span>
   </a>
@@ -1771,6 +1649,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-0.9/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0.7.x to 0.9.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1849,104 +1755,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#spring-ai-api-changes" class="md-nav__link">
+  <a href="#behavioral-change-background-shells-are-per-instance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Spring AI API Changes
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Spring AI API Changes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#toolcalladvisor-removed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ToolCallAdvisor removed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#defaulttoolcallbacks-defaulttools" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        defaultToolCallbacks() → defaultTools()
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openai-starter-artifact-renamed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        OpenAI starter artifact renamed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#openai-property-prefix-renamed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        OpenAI property prefix renamed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#modeloptionsutilstojsonstring-removed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ModelOptionsUtils.toJsonString() removed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#toolcallingchatoptionscopy-removed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ToolCallingChatOptions.copy() removed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#defaulttoolcallingchatoptions-public-constructor-removed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DefaultToolCallingChatOptions public constructor removed
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#memory-advisor-ordering" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Memory Advisor Ordering
+        Behavioral change: background shells are per-instance
       
     </span>
   </a>
@@ -1954,10 +1766,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#conversation-id-required-on-prompt-calls" class="md-nav__link">
+  <a href="#deprecations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Conversation ID Required on Prompt Calls
+        Deprecations
       
     </span>
   </a>
@@ -1965,10 +1777,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#consolidate-multiple-defaulttools-calls" class="md-nav__link">
+  <a href="#output-level-changes-no-code-impact" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Consolidate Multiple defaultTools() Calls
+        Output-level changes (no code impact)
       
     </span>
   </a>
@@ -1976,10 +1788,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#toolcallingadvisor-requires-at-least-one-registered-tool-spring-ai-6325" class="md-nav__link">
+  <a href="#new-in-0120-opt-in-no-migration-required" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ToolCallingAdvisor Requires at Least One Registered Tool (spring-ai #6325)
+        New in 0.12.0 (opt-in, no migration required)
       
     </span>
   </a>
@@ -2029,7 +1841,7 @@
     
     
       <li class="md-path__item">
-        <a href="../migration-0.12/" class="md-path__link">
+        <a href="./" class="md-path__link">
           
   <span class="md-ellipsis">
     Migration
@@ -2054,171 +1866,55 @@
   
 
 
-<h1 id="migration-guide-07x-to-090">Migration Guide: 0.7.x to 0.9.0<a class="headerlink" href="#migration-guide-07x-to-090" title="Permanent link">&para;</a></h1>
-<p>This release upgrades the Spring AI dependency from <code>2.0.0-M7</code> to <code>2.0.0-RC1</code> and Spring Framework from <code>7.0.1</code> to <code>7.0.7</code>. Several Spring AI APIs changed in ways that require updates to application code.</p>
+<h1 id="migration-guide-0110-to-0120">Migration Guide: 0.11.0 to 0.12.0<a class="headerlink" href="#migration-guide-0110-to-0120" title="Permanent link">&para;</a></h1>
+<p>This release introduces the sandboxing foundation: the <code>ExecBackend</code> and <code>Workspace</code> SPIs, directory confinement for the search tools, and the <code>spring-ai-agent-utils-docker-cli</code> module. <strong>There are no breaking API changes</strong> — all existing code compiles and runs unchanged. There is <strong>one behavioral change</strong> to review (background shells) and a few output-level changes worth knowing about.</p>
 <h2 id="dependency-version">Dependency Version<a class="headerlink" href="#dependency-version" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">&lt;dependency&gt;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.springaicommunity<span class="nt">&lt;/groupId&gt;</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>spring-ai-agent-utils<span class="nt">&lt;/artifactId&gt;</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="nt">&lt;version&gt;</span>0.9.0<span class="nt">&lt;/version&gt;</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="nt">&lt;version&gt;</span>0.12.0<span class="nt">&lt;/version&gt;</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nt">&lt;/dependency&gt;</span>
 </span></code></pre></div>
-<h2 id="spring-ai-api-changes">Spring AI API Changes<a class="headerlink" href="#spring-ai-api-changes" title="Permanent link">&para;</a></h2>
-<h3 id="toolcalladvisor-removed"><code>ToolCallAdvisor</code> removed<a class="headerlink" href="#toolcalladvisor-removed" title="Permanent link">&para;</a></h3>
-<p><code>ToolCallAdvisor</code> is deprecated and no longer needs to be registered. Tool calling is now handled automatically by the framework when tools are present on the <code>ChatClient</code>.</p>
-<p><strong>Before:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="n">ToolCallAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="n">MessageChatMemoryAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">(...).</span><span class="na">build</span><span class="p">());</span>
+<p>The Spring AI dependency is unchanged (2.0.1).</p>
+<h2 id="behavioral-change-background-shells-are-per-instance">Behavioral change: background shells are per-instance<a class="headerlink" href="#behavioral-change-background-shells-are-per-instance" title="Permanent link">&para;</a></h2>
+<p>In 0.11.0 the background-shell registry was JVM-global: any <code>ShellTools</code> instance could read (<code>BashOutput</code>) or kill (<code>KillShell</code>) a shell started through any other instance. In 0.12.0 each <code>ShellTools</code> instance owns its background shells — separate instances have separate shell namespaces.</p>
+<p>This is the right default (separate agents/sessions no longer see each other's shells), but if you relied on cross-instance visibility, those lookups now return <code>Error: No background shell found with ID ...</code> with no compile-time signal.</p>
+<p><strong>Before (0.11.0 — worked by accident of the global registry):</strong></p>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">ShellTools</span><span class="w"> </span><span class="n">agentA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ShellTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">ShellTools</span><span class="w"> </span><span class="n">agentB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ShellTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1">// agentB could read/kill shells started by agentA</span>
 </span></code></pre></div>
-<p><strong>After:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="n">MessageChatMemoryAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">(...).</span><span class="na">build</span><span class="p">());</span>
+<p><strong>After (0.12.0 — share one instance where shared visibility is intended):</strong></p>
+<div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">ShellTools</span><span class="w"> </span><span class="n">shared</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ShellTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1">// register the same instance with both agents</span>
 </span></code></pre></div>
-<p>If you were using <code>disableInternalConversationHistory()</code> or <code>conversationHistoryEnabled(false)</code>, that behaviour is now controlled by advisor ordering — see the <a href="#memory-advisor-ordering">Memory advisor ordering</a> section below.</p>
-<h3 id="defaulttoolcallbacks-defaulttools"><code>defaultToolCallbacks()</code> → <code>defaultTools()</code><a class="headerlink" href="#defaulttoolcallbacks-defaulttools" title="Permanent link">&para;</a></h3>
-<p><code>ChatClient.Builder.defaultToolCallbacks()</code> is deprecated. Use <code>defaultTools()</code> instead. It accepts the same types: individual <code>ToolCallback</code> objects, <code>ToolCallbackProvider</code> instances, and annotated POJO classes.</p>
-<p><strong>Before:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">chatClientBuilder</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultToolCallbacks</span><span class="p">(</span><span class="n">SkillsTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultToolCallbacks</span><span class="p">(</span><span class="n">mcpToolCallbackProvider</span><span class="p">);</span>
+<p>Note: Claude subagents already share the single <code>ShellTools</code> created by <code>ClaudeSubagentType</code>, so they keep a shared namespace without changes.</p>
+<h2 id="deprecations">Deprecations<a class="headerlink" href="#deprecations" title="Permanent link">&para;</a></h2>
+<p>Move off the deprecated no-argument constructors to the builders — they now carry the configuration that matters (execution backend, working directory, confinement):</p>
+<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// Before</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">ShellTools</span><span class="w"> </span><span class="n">shell</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ShellTools</span><span class="p">();</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">GrepTool</span><span class="w"> </span><span class="n">grep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">GrepTool</span><span class="p">();</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1">// After</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">ShellTools</span><span class="w"> </span><span class="n">shell</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ShellTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">workingDirectory</span><span class="p">(</span><span class="n">workDir</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">GrepTool</span><span class="w"> </span><span class="n">grep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrepTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">workingDirectory</span><span class="p">(</span><span class="n">workDir</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
-<p><strong>After:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">chatClientBuilder</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span><span class="n">SkillsTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span><span class="n">mcpToolCallbackProvider</span><span class="p">);</span>
-</span></code></pre></div>
-<h3 id="openai-starter-artifact-renamed">OpenAI starter artifact renamed<a class="headerlink" href="#openai-starter-artifact-renamed" title="Permanent link">&para;</a></h3>
-<p>The OpenAI SDK starter artifact has been renamed:</p>
-<table>
-<thead>
-<tr>
-<th>Before</th>
-<th>After</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>spring-ai-starter-model-openai-sdk</code></td>
-<td><code>spring-ai-starter-model-openai</code></td>
-</tr>
-</tbody>
-</table>
-<div class="highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="cm">&lt;!-- After --&gt;</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nt">&lt;dependency&gt;</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.springframework.ai<span class="nt">&lt;/groupId&gt;</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>spring-ai-starter-model-openai<span class="nt">&lt;/artifactId&gt;</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="nt">&lt;/dependency&gt;</span>
-</span></code></pre></div>
-<h3 id="openai-property-prefix-renamed">OpenAI property prefix renamed<a class="headerlink" href="#openai-property-prefix-renamed" title="Permanent link">&para;</a></h3>
-<p>All <code>spring.ai.openai-sdk.*</code> properties are renamed to <code>spring.ai.openai.*</code>:</p>
-<table>
-<thead>
-<tr>
-<th>Before</th>
-<th>After</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>spring.ai.openai-sdk.api-key</code></td>
-<td><code>spring.ai.openai.api-key</code></td>
-</tr>
-<tr>
-<td><code>spring.ai.openai-sdk.chat.options.model</code></td>
-<td><code>spring.ai.openai.chat.options.model</code></td>
-</tr>
-<tr>
-<td><code>spring.ai.openai-sdk.chat.options.temperature</code></td>
-<td><code>spring.ai.openai.chat.options.temperature</code></td>
-</tr>
-</tbody>
-</table>
-<h3 id="modeloptionsutilstojsonstring-removed"><code>ModelOptionsUtils.toJsonString()</code> removed<a class="headerlink" href="#modeloptionsutilstojsonstring-removed" title="Permanent link">&para;</a></h3>
-<p>If you reference <code>ModelOptionsUtils.toJsonString()</code> in custom advisor or tool code, replace it with <code>JsonHelper</code>:</p>
-<p><strong>Before:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.springframework.ai.model.ModelOptionsUtils</span><span class="p">;</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">String</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ModelOptionsUtils</span><span class="p">.</span><span class="na">toJsonString</span><span class="p">(</span><span class="n">object</span><span class="p">);</span>
-</span></code></pre></div>
-<p><strong>After:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.springframework.ai.util.JsonHelper</span><span class="p">;</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">String</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">JsonHelper</span><span class="p">().</span><span class="na">toJson</span><span class="p">(</span><span class="n">object</span><span class="p">);</span>
-</span></code></pre></div>
-<h3 id="toolcallingchatoptionscopy-removed"><code>ToolCallingChatOptions.copy()</code> removed<a class="headerlink" href="#toolcallingchatoptionscopy-removed" title="Permanent link">&para;</a></h3>
-<p><code>copy()</code> has been removed from the <code>ToolCallingChatOptions</code> interface. Use <code>mutate().build()</code> instead:</p>
-<p><strong>Before:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">ToolCallingChatOptions</span><span class="w"> </span><span class="n">copy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">toolOptions</span><span class="p">.</span><span class="na">copy</span><span class="p">();</span>
-</span></code></pre></div>
-<p><strong>After:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">ToolCallingChatOptions</span><span class="w"> </span><span class="n">copy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">toolOptions</span><span class="p">.</span><span class="na">mutate</span><span class="p">().</span><span class="na">build</span><span class="p">();</span>
-</span></code></pre></div>
-<h3 id="defaulttoolcallingchatoptions-public-constructor-removed"><code>DefaultToolCallingChatOptions</code> public constructor removed<a class="headerlink" href="#defaulttoolcallingchatoptions-public-constructor-removed" title="Permanent link">&para;</a></h3>
-<p>The no-arg public constructor is no longer available. Use the builder:</p>
-<p><strong>Before:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">new</span><span class="w"> </span><span class="n">DefaultToolCallingChatOptions</span><span class="p">()</span>
-</span></code></pre></div>
-<p><strong>After:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">DefaultToolCallingChatOptions</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">()</span>
-</span></code></pre></div>
-<h2 id="memory-advisor-ordering">Memory Advisor Ordering<a class="headerlink" href="#memory-advisor-ordering" title="Permanent link">&para;</a></h2>
-<p><code>MessageChatMemoryAdvisor</code> must be placed <strong>outside</strong> (before) the tool-calling loop so that memory is only read/written once per user turn rather than on every tool-call iteration. The advisor's default order (<code>Advisor.DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER = HIGHEST_PRECEDENCE + 200</code>) already satisfies this — do not override it with a higher value.</p>
-<p><strong>Incorrect</strong> (places memory inside the tool-call loop):</p>
-<div class="highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">MessageChatMemoryAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">memory</span><span class="p">)</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="p">.</span><span class="na">order</span><span class="p">(</span><span class="n">Ordered</span><span class="p">.</span><span class="na">HIGHEST_PRECEDENCE</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1000</span><span class="p">)</span><span class="w">  </span><span class="c1">// wrong — higher value = inner = inside tool loop</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">()</span>
-</span></code></pre></div>
-<p><strong>Correct</strong> (use the default order):</p>
-<div class="highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">MessageChatMemoryAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">memory</span><span class="p">).</span><span class="na">build</span><span class="p">()</span>
-</span></code></pre></div>
-<p>The auto-configured <code>ToolCallingAdvisor</code> sits at <code>HIGHEST_PRECEDENCE + 300</code>. Memory at the default <code>HIGHEST_PRECEDENCE + 200</code> is numerically lower and therefore outermost, wrapping all tool calls in a single memory read/write cycle.</p>
-<h2 id="conversation-id-required-on-prompt-calls">Conversation ID Required on Prompt Calls<a class="headerlink" href="#conversation-id-required-on-prompt-calls" title="Permanent link">&para;</a></h2>
-<p>Spring AI 2.0.0-RC1 no longer infers a default conversation ID. You must supply <code>ChatMemory.CONVERSATION_ID</code> explicitly on each <code>.prompt()</code> call, otherwise <code>MessageChatMemoryAdvisor</code> silently uses a <code>null</code> key and memory is not persisted correctly.</p>
-<p><strong>Before (memory silently broken):</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">chatClient</span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="n">userInput</span><span class="p">).</span><span class="na">call</span><span class="p">().</span><span class="na">content</span><span class="p">();</span>
-</span></code></pre></div>
-<p><strong>After:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">chatClient</span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="n">userInput</span><span class="p">)</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="p">.</span><span class="na">advisors</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="n">ChatMemory</span><span class="p">.</span><span class="na">CONVERSATION_ID</span><span class="p">,</span><span class="w"> </span><span class="s">"session-1"</span><span class="p">))</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="p">.</span><span class="na">call</span><span class="p">()</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="p">.</span><span class="na">content</span><span class="p">();</span>
-</span></code></pre></div>
-<p>Use a stable, meaningful ID. For single-session CLI agents <code>"session-1"</code> is fine. For multi-user or multi-session applications, use a per-session identifier (e.g. a UUID generated at startup or stored in session state).</p>
-<h2 id="consolidate-multiple-defaulttools-calls">Consolidate Multiple <code>defaultTools()</code> Calls<a class="headerlink" href="#consolidate-multiple-defaulttools-calls" title="Permanent link">&para;</a></h2>
-<p>Previously, multiple <code>.defaultTools()</code> chains were processed independently and could lead to subtle ordering issues. Prefer a single <code>defaultTools(...)</code> varargs call that registers all tools together:</p>
-<p><strong>Before:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">chatClientBuilder</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span><span class="n">taskTools</span><span class="p">)</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span><span class="n">SkillsTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">        </span><span class="n">ShellTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
-</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">        </span><span class="n">FileSystemTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">());</span>
-</span></code></pre></div>
-<p><strong>After:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">chatClientBuilder</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">        </span><span class="n">taskTools</span><span class="p">,</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">        </span><span class="n">SkillsTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">        </span><span class="n">ShellTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">        </span><span class="n">FileSystemTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">());</span>
-</span></code></pre></div>
-<h2 id="toolcallingadvisor-requires-at-least-one-registered-tool-spring-ai-6325"><code>ToolCallingAdvisor</code> Requires at Least One Registered Tool (spring-ai #6325)<a class="headerlink" href="#toolcallingadvisor-requires-at-least-one-registered-tool-spring-ai-6325" title="Permanent link">&para;</a></h2>
-<p>When using <code>AutoMemoryToolsAdvisor</code> without any other tools pre-registered on the <code>ChatClient</code>, the auto-configured <code>ToolCallingAdvisor</code> may not activate because there are no tools in the default configuration to trigger it. The advisor injects memory tools at request time, but the framework checks for tools at build time.</p>
-<p><strong>Workaround</strong> — register a dummy tool on the <code>ChatClient</code> until the upstream issue is resolved:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">DummyTools</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="nd">@Tool</span><span class="p">(</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"No-op placeholder tool"</span><span class="p">)</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">noop</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">input</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="p">}</span>
-</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
-</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="n">chatClientBuilder</span>
-</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">DummyTools</span><span class="p">())</span><span class="w">  </span><span class="c1">// workaround for spring-ai#6325</span>
-</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">        </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">"/path/to/memories"</span><span class="p">)</span>
-</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">        </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span></code></pre></div>
-<p>Track the upstream fix at <a href="https://github.com/spring-projects/spring-ai/issues/6325">spring-projects/spring-ai#6325</a>.</p>
+<h2 id="output-level-changes-no-code-impact">Output-level changes (no code impact)<a class="headerlink" href="#output-level-changes-no-code-impact" title="Permanent link">&para;</a></h2>
+<p>These change what the model (or a log reader) sees, not any API:</p>
+<ul>
+<li><strong><code>AgentEnvironment.gitStatus()</code></strong> no longer leaks git error text into the rendered block. Previously, in a repository with no local <code>main</code>/<code>master</code> and no <code>origin/HEAD</code> symref, the "Main branch" line could contain a literal <code>fatal: ...</code> message; failed git commands now contribute empty strings and the main-branch detection falls back to <code>main</code>. Git commands also run through the <code>ExecBackend</code> SPI (platform shell) instead of a private <code>ProcessBuilder</code>.</li>
+<li><strong><code>FileSystemTools.read</code></strong> header says <code>Showing lines 1-N of at least M</code> when the line limit truncates the read, instead of implying the file was fully counted.</li>
+<li><strong><code>Bash</code> with a blank command</strong> returns <code>Error: command must not be blank</code> instead of spawning a shell.</li>
+<li>Synchronous <code>Bash</code> run ids moved to their own <code>shell_run_&lt;n&gt;</code> namespace so they can never collide with background shell ids.</li>
+</ul>
+<h2 id="new-in-0120-opt-in-no-migration-required">New in 0.12.0 (opt-in, no migration required)<a class="headerlink" href="#new-in-0120-opt-in-no-migration-required" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><code>ExecBackend</code> SPI</strong> (<code>org.springaicommunity.agent.common.exec</code>) — pluggable command execution; <code>ShellTools.builder().execBackend(...)</code> and <code>AgentEnvironment.gitStatus(ExecBackend)</code>. <code>LocalExecBackend</code> (the default) adds <code>workingDirectory</code>, <code>cleanEnvironment</code> and <code>shellCommand</code> options.</li>
+<li><strong><code>Workspace</code> SPI</strong> (<code>org.springaicommunity.agent.common.workspace</code>) — root directory + host-to-model path display; one-call <code>workspace(...)</code> option on the tool builders, <code>SkillsTool</code> base-path mapping, <code>AgentEnvironment.info(Workspace)</code>.</li>
+<li><strong>Directory confinement for search tools</strong> — <code>allowedDirectory(...)</code> on <code>GrepTool</code>, <code>GlobTool</code> and <code>ListDirectoryTool</code>, sharing the FileSystemTools jail semantics. Note: when confinement is configured, directory traversal does <strong>not</strong> follow symbolic links (unconfined behavior is unchanged).</li>
+<li><strong><code>spring-ai-agent-utils-docker-cli</code></strong> — a Docker <code>ExecBackend</code> running commands in a sandbox container (new <code>exec-backends/</code> module group, managed by the BOM).</li>
+</ul>
+<p>See <a href="../WorkspaceAndExecSPI/">Workspace &amp; Exec SPI</a> for the overview and <a href="../DockerCliExecBackend/">DockerCliExecBackend</a> for the full sandbox recipe.</p>
 
 
 

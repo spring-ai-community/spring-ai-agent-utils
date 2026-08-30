@@ -10,11 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://spring-ai-community.github.io/spring-ai-agent-utils/0.12.0-SNAPSHOT/tools/migration-0.5/">
+        <link rel="canonical" href="https://spring-ai-community.github.io/spring-ai-agent-utils/0.12.0-SNAPSHOT/tools/WorkspaceAndExecSPI/">
       
       
-        <link rel="prev" href="../migration-0.9/">
+        <link rel="prev" href="../Subagent/">
       
+      
+        <link rel="next" href="../DockerCliExecBackend/">
       
       
         
@@ -25,7 +27,7 @@
     
     
       
-        <title>0.4.x to 0.5.0 - Spring AI Agent Utils</title>
+        <title>Workspace & Exec SPI - Spring AI Agent Utils</title>
       
     
     
@@ -76,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#migration-guide-04x-to-050" class="md-skip">
+        <a href="#workspace-exec-spi-sandboxing-overview" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +117,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              0.4.x to 0.5.0
+              Workspace & Exec SPI
             
           </span>
         </div>
@@ -371,11 +373,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../WorkspaceAndExecSPI/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -393,12 +397,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../migration-0.12/" class="md-tabs__link">
           
   
@@ -1340,8 +1342,10 @@
       
   
   
+    
   
   
+  
     
     
       
@@ -1353,19 +1357,22 @@
     
     
       
+        
+        
+      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
         
           
-          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
             
   
   
@@ -1383,7 +1390,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_8">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1398,10 +1405,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../WorkspaceAndExecSPI/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workspace & Exec SPI
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1417,6 +1451,70 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#execbackend-where-commands-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ExecBackend — where commands run
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workspace-where-files-live-and-what-the-model-sees" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workspace — where files live, and what the model sees
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-the-two-compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the two compose
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#module-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module map
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1461,10 +1559,8 @@
       
   
   
-    
   
   
-  
     
     
       
@@ -1478,22 +1574,19 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
         
           
-          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
             
   
   
@@ -1511,7 +1604,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_9">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1582,37 +1675,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    0.4.x to 0.5.0
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../migration-0.5/" class="md-nav__link">
         
   
   
@@ -1628,109 +1694,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#module-changes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Module Changes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#package-relocations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Package Relocations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#api-changes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        API Changes
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="API Changes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tasktoolcallbackprovider-removed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        TaskToolCallbackProvider removed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tasktoolbuilder-simplified" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        TaskTool.Builder simplified
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#taskcall-is-now-a-top-level-record" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        TaskCall is now a top-level record
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#a2a-subagents-with-claude-subagents" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A2A subagents with Claude subagents
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1770,10 +1733,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#module-changes" class="md-nav__link">
+  <a href="#execbackend-where-commands-run" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Module Changes
+        ExecBackend — where commands run
       
     </span>
   </a>
@@ -1781,10 +1744,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#package-relocations" class="md-nav__link">
+  <a href="#workspace-where-files-live-and-what-the-model-sees" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Package Relocations
+        Workspace — where files live, and what the model sees
       
     </span>
   </a>
@@ -1792,63 +1755,24 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#api-changes" class="md-nav__link">
+  <a href="#how-the-two-compose" class="md-nav__link">
     <span class="md-ellipsis">
       
-        API Changes
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="API Changes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tasktoolcallbackprovider-removed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        TaskToolCallbackProvider removed
+        How the two compose
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#tasktoolbuilder-simplified" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#module-map" class="md-nav__link">
     <span class="md-ellipsis">
       
-        TaskTool.Builder simplified
+        Module map
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#taskcall-is-now-a-top-level-record" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        TaskCall is now a top-level record
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#a2a-subagents-with-claude-subagents" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A2A subagents with Claude subagents
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1895,10 +1819,10 @@
     
     
       <li class="md-path__item">
-        <a href="../migration-0.12/" class="md-path__link">
+        <a href="./" class="md-path__link">
           
   <span class="md-ellipsis">
-    Migration
+    Execution Backends
   </span>
 
         </a>
@@ -1920,193 +1844,145 @@
   
 
 
-<h1 id="migration-guide-04x-to-050">Migration Guide: 0.4.x to 0.5.0<a class="headerlink" href="#migration-guide-04x-to-050" title="Permanent link">&para;</a></h1>
-<h2 id="module-changes">Module Changes<a class="headerlink" href="#module-changes" title="Permanent link">&para;</a></h2>
-<p>The single <code>spring-ai-agent-utils</code> module has been split into three:</p>
+<h1 id="workspace-exec-spi-sandboxing-overview">Workspace &amp; Exec SPI - Sandboxing Overview<a class="headerlink" href="#workspace-exec-spi-sandboxing-overview" title="Permanent link">&para;</a></h1>
+<p>The agent tools are decoupled from the host machine through two small SPIs in <code>spring-ai-agent-utils-common</code>. Together they answer the two questions any sandboxed agent deployment has to answer:</p>
 <table>
 <thead>
 <tr>
-<th>New Module</th>
-<th>Description</th>
+<th>Seam</th>
+<th>Package</th>
+<th>Question it answers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>ExecBackend</code></strong></td>
+<td><code>org.springaicommunity.agent.common.exec</code></td>
+<td><em>Where do shell commands run?</em></td>
+</tr>
+<tr>
+<td><strong><code>Workspace</code></strong></td>
+<td><code>org.springaicommunity.agent.common.workspace</code></td>
+<td><em>Where do files live, and how are paths shown to the model?</em></td>
+</tr>
+</tbody>
+</table>
+<p>Tools describe <strong>what</strong> to do; the backend and workspace decide <strong>where and how</strong>. Swapping the host for a container changes configuration, never tool code.</p>
+<h2 id="execbackend-where-commands-run">ExecBackend — where commands run<a class="headerlink" href="#execbackend-where-commands-run" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">ExecBackend</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="n">ExecResult</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">ExecSpec</span><span class="w"> </span><span class="n">spec</span><span class="p">);</span><span class="w">      </span><span class="c1">// synchronous, honors the spec's timeout</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="n">ExecHandle</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="n">ExecSpec</span><span class="w"> </span><span class="n">spec</span><span class="p">);</span><span class="w">    </span><span class="c1">// background: poll output, kill</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li><strong><code>ExecSpec</code></strong> — the command line as the model authored it, a wall-clock timeout (policy owned by the spec: default 2 min, capped at 10 min), and per-invocation environment variables. Shell selection and working directory are deliberately <em>backend</em> concerns.</li>
+<li><strong><code>ExecResult</code></strong> — status (<code>COMPLETED</code>, <code>TIMED_OUT</code>, <code>LAUNCH_FAILED</code>, <code>INTERRUPTED</code>), exit code, separate stdout/stderr. Failures are reported, never thrown.</li>
+<li><strong><code>ExecHandle</code></strong> — a background command: <code>isAlive()</code>, cursor-based <code>newOutput(filter)</code> (each call returns only output produced since the last one), <code>exitCode()</code>, <code>kill()</code> (graceful, then forced).</li>
+</ul>
+<p><strong>Who uses it:</strong> <a href="../ShellTools/">ShellTools</a> routes <code>Bash</code>/<code>BashOutput</code>/<code>KillShell</code> through the configured backend, and <a href="../AgentEnvironment/">AgentEnvironment</a> runs its git-status commands through it, so a sandboxed agent reports the sandbox's view of the repository.</p>
+<p><strong>Implementations:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Implementation</th>
+<th>Module</th>
+<th>Runs commands</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LocalExecBackend</code> (default)</td>
+<td><code>spring-ai-agent-utils</code></td>
+<td>On the host JVM, with working directory, clean-environment mode and shell selection</td>
+</tr>
+<tr>
+<td><a href="../DockerCliExecBackend/"><code>DockerCliExecBackend</code></a></td>
+<td><code>spring-ai-agent-utils-docker-cli</code></td>
+<td>Inside a Docker container, via the <code>docker</code> CLI</td>
+</tr>
+</tbody>
+</table>
+<p>Custom implementations are a small class: implement <code>run</code> (and <code>start</code> if you support background shells — throwing <code>UnsupportedOperationException</code> there is acceptable for remote/queued executors). An adapter over <a href="https://github.com/spring-ai-community/agent-sandbox">agent-sandbox</a>'s <code>Sandbox.exec()</code> is straightforward for the synchronous path — the shapes are compatible.</p>
+<h2 id="workspace-where-files-live-and-what-the-model-sees">Workspace — where files live, and what the model sees<a class="headerlink" href="#workspace-where-files-live-and-what-the-model-sees" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@FunctionalInterface</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Workspace</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="n">Path</span><span class="w"> </span><span class="nf">root</span><span class="p">();</span><span class="w">                                     </span><span class="c1">// host-side root directory</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">display</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">hostPath</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span><span class="w">  </span><span class="c1">// host path -&gt; model-visible path</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="n">Workspace</span><span class="w"> </span><span class="nf">local</span><span class="p">(</span><span class="n">Path</span><span class="w"> </span><span class="n">root</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span><span class="w">        </span><span class="c1">// identity display</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>A workspace is a root directory plus a <em>display mapping</em>. For local execution the mapping is the identity; for a container with a bind-mounted workspace it rewrites host paths to their in-container form, so the model is never shown a path its shell cannot use.</p>
+<p><strong>Who uses it</strong> — one <code>workspace(...)</code> call per tool builder, with per-tool semantics:</p>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th><code>workspace(...)</code> effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../GrepTool/">GrepTool</a> / <a href="../GlobTool/">GlobTool</a> / ListDirectoryTool</td>
+<td>Working directory <strong>and</strong> allowed-directory confinement</td>
+</tr>
+<tr>
+<td><a href="../FileSystemTools/">FileSystemTools</a></td>
+<td>Allowed-directory confinement</td>
+</tr>
+<tr>
+<td><a href="../ShellTools/">ShellTools</a></td>
+<td>Working directory only (a shell can't be confined from Java — that's what a sandboxed <code>ExecBackend</code> is for)</td>
+</tr>
+<tr>
+<td><a href="../SkillsTool/">SkillsTool</a></td>
+<td>Announces skill base directories via <code>display(...)</code></td>
+</tr>
+<tr>
+<td><a href="../AgentEnvironment/">AgentEnvironment</a></td>
+<td>Environment-info block describes the workspace, not the host</td>
+</tr>
+</tbody>
+</table>
+<h2 id="how-the-two-compose">How the two compose<a class="headerlink" href="#how-the-two-compose" title="Permanent link">&para;</a></h2>
+<p>The file/search tools run <strong>host-side</strong>, confined to the workspace root; shell commands run <strong>in the backend</strong>. With a bind mount connecting the two, both operate on the same files and the model sees one consistent world:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">DockerCliExecBackend</span><span class="w"> </span><span class="n">backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DockerCliExecBackend</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">        </span><span class="p">.</span><span class="na">image</span><span class="p">(</span><span class="s">"alpine:3.20"</span><span class="p">)</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">        </span><span class="p">.</span><span class="na">mount</span><span class="p">(</span><span class="n">hostDir</span><span class="p">,</span><span class="w"> </span><span class="s">"/workspace"</span><span class="p">)</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">        </span><span class="p">.</span><span class="na">build</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="n">Workspace</span><span class="w"> </span><span class="n">workspace</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">backend</span><span class="p">.</span><span class="na">workspace</span><span class="p">();</span><span class="w">   </span><span class="c1">// hostDir root, /workspace display</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="n">ShellTools</span><span class="w"> </span><span class="n">shell</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ShellTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">execBackend</span><span class="p">(</span><span class="n">backend</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="n">FileSystemTools</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileSystemTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">workspace</span><span class="p">(</span><span class="n">workspace</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="n">GrepTool</span><span class="w"> </span><span class="n">grep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrepTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">workspace</span><span class="p">(</span><span class="n">workspace</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">envInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="n">workspace</span><span class="p">);</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>See <a href="../DockerCliExecBackend/">DockerCliExecBackend</a> for the complete recipe and its operational caveats.</p>
+<h2 id="module-map">Module map<a class="headerlink" href="#module-map" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Contents</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>spring-ai-agent-utils-common</code></td>
-<td>Shared subagent SPI (interfaces &amp; records)</td>
+<td>The SPIs: <code>ExecBackend</code>, <code>ExecSpec</code>, <code>ExecResult</code>, <code>ExecHandle</code>, <code>Workspace</code> — the <code>exec</code> and <code>workspace</code> packages are plain JDK, so backend implementations need no Spring on their classpath</td>
 </tr>
 <tr>
 <td><code>spring-ai-agent-utils</code></td>
-<td>Core library (tools, skills, Claude subagents)</td>
+<td>The tools plus <code>LocalExecBackend</code> (host default)</td>
 </tr>
 <tr>
-<td><code>spring-ai-agent-utils-a2a</code></td>
-<td>A2A protocol subagent implementation</td>
-</tr>
-<tr>
-<td><code>spring-ai-agent-utils-bom</code></td>
-<td>Bill of Materials for version management</td>
+<td><code>exec-backends/spring-ai-agent-utils-docker-cli</code></td>
+<td><code>DockerCliExecBackend</code> (Docker sandbox)</td>
 </tr>
 </tbody>
 </table>
-<p>Add <code>spring-ai-agent-utils-common</code> as a transitive dependency (pulled in automatically by the core module). Add <code>spring-ai-agent-utils-a2a</code> only if you use A2A subagents:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">&lt;dependency&gt;</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.springaicommunity<span class="nt">&lt;/groupId&gt;</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>spring-ai-agent-utils-a2a<span class="nt">&lt;/artifactId&gt;</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="nt">&lt;version&gt;</span>0.5.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nt">&lt;/dependency&gt;</span>
-</span></code></pre></div>
-<h2 id="package-relocations">Package Relocations<a class="headerlink" href="#package-relocations" title="Permanent link">&para;</a></h2>
-<p>The subagent SPI types moved from <code>org.springaicommunity.agent.tools.task.subagent</code> to <code>org.springaicommunity.agent.common.task.subagent</code>:</p>
-<table>
-<thead>
-<tr>
-<th>Old Import</th>
-<th>New Import</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>o.s.agent.tools.task.subagent.SubagentDefinition</code></td>
-<td><code>o.s.agent.common.task.subagent.SubagentDefinition</code></td>
-</tr>
-<tr>
-<td><code>o.s.agent.tools.task.subagent.SubagentExecutor</code></td>
-<td><code>o.s.agent.common.task.subagent.SubagentExecutor</code></td>
-</tr>
-<tr>
-<td><code>o.s.agent.tools.task.subagent.SubagentResolver</code></td>
-<td><code>o.s.agent.common.task.subagent.SubagentResolver</code></td>
-</tr>
-<tr>
-<td><code>o.s.agent.tools.task.subagent.SubagentReference</code></td>
-<td><code>o.s.agent.common.task.subagent.SubagentReference</code></td>
-</tr>
-<tr>
-<td><code>o.s.agent.tools.task.subagent.SubagentType</code></td>
-<td><code>o.s.agent.common.task.subagent.SubagentType</code></td>
-</tr>
-<tr>
-<td><code>o.s.agent.tools.task.TaskTool.TaskCall</code></td>
-<td><code>o.s.agent.common.task.subagent.TaskCall</code></td>
-</tr>
-</tbody>
-</table>
-<p>Claude-specific classes moved up one level (the intermediate <code>subagent</code> package was removed):</p>
-<table>
-<thead>
-<tr>
-<th>Old Import</th>
-<th>New Import</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>o.s.agent.tools.task.subagent.claude.ClaudeSubagentDefinition</code></td>
-<td><code>o.s.agent.tools.task.claude.ClaudeSubagentDefinition</code></td>
-</tr>
-<tr>
-<td><code>o.s.agent.tools.task.subagent.claude.ClaudeSubagentExecutor</code></td>
-<td><code>o.s.agent.tools.task.claude.ClaudeSubagentExecutor</code></td>
-</tr>
-<tr>
-<td><code>o.s.agent.tools.task.subagent.claude.ClaudeSubagentReferences</code></td>
-<td><code>o.s.agent.tools.task.claude.ClaudeSubagentReferences</code></td>
-</tr>
-<tr>
-<td><code>o.s.agent.tools.task.subagent.claude.ClaudeSubagentResolver</code></td>
-<td><code>o.s.agent.tools.task.claude.ClaudeSubagentResolver</code></td>
-</tr>
-<tr>
-<td><code>o.s.agent.tools.task.subagent.claude.ClaudeSubagentType</code></td>
-<td><code>o.s.agent.tools.task.claude.ClaudeSubagentType</code></td>
-</tr>
-</tbody>
-</table>
-<p>A2A classes moved from the example package to the new module:</p>
-<table>
-<thead>
-<tr>
-<th>Old Import</th>
-<th>New Import</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>o.s.agent.a2a.A2ASubagentDefinition</code></td>
-<td><code>o.s.agent.subagent.a2a.A2ASubagentDefinition</code></td>
-</tr>
-<tr>
-<td><code>o.s.agent.a2a.A2ASubagentExecutor</code></td>
-<td><code>o.s.agent.subagent.a2a.A2ASubagentExecutor</code></td>
-</tr>
-<tr>
-<td><code>o.s.agent.a2a.A2ASubagentResolver</code></td>
-<td><code>o.s.agent.subagent.a2a.A2ASubagentResolver</code></td>
-</tr>
-</tbody>
-</table>
-<h2 id="api-changes">API Changes<a class="headerlink" href="#api-changes" title="Permanent link">&para;</a></h2>
-<h3 id="tasktoolcallbackprovider-removed"><code>TaskToolCallbackProvider</code> removed<a class="headerlink" href="#tasktoolcallbackprovider-removed" title="Permanent link">&para;</a></h3>
-<p><code>TaskToolCallbackProvider</code> has been deleted. Replace it with <code>TaskTool.builder()</code> plus <code>ClaudeSubagentType.builder()</code>.</p>
-<p><strong>Before:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">var</span><span class="w"> </span><span class="n">taskTools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TaskToolCallbackProvider</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentReferences</span><span class="p">(</span><span class="n">ClaudeSubagentReferences</span><span class="p">.</span><span class="na">fromResources</span><span class="p">(</span><span class="n">agentPaths</span><span class="p">))</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"default"</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">())</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="p">.</span><span class="na">skillsResources</span><span class="p">(</span><span class="n">skillPaths</span><span class="p">)</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p">.</span><span class="na">braveApiKey</span><span class="p">(</span><span class="n">braveApiKey</span><span class="p">)</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="c1">// Used as ToolCallbackProvider</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">defaultToolCallbacks</span><span class="p">(</span><span class="n">taskTools</span><span class="p">);</span>
-</span></code></pre></div>
-<p><strong>After:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">var</span><span class="w"> </span><span class="n">taskTools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TaskTool</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentTypes</span><span class="p">(</span><span class="n">ClaudeSubagentType</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">        </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"default"</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">())</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">        </span><span class="p">.</span><span class="na">skillsResources</span><span class="p">(</span><span class="n">skillPaths</span><span class="p">)</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">        </span><span class="p">.</span><span class="na">braveApiKey</span><span class="p">(</span><span class="n">braveApiKey</span><span class="p">)</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="c1">// Now returns a single ToolCallback (not a provider)</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">defaultToolCallbacks</span><span class="p">(</span><span class="n">taskTools</span><span class="p">);</span>
-</span></code></pre></div>
-<p>Key differences:
-- Claude-specific config (<code>chatClientBuilder</code>, <code>skillsResources</code>, <code>braveApiKey</code>) moves into <code>ClaudeSubagentType.builder()</code>
-- Built-in Claude subagent references are auto-registered when a Claude subagent type is present
-- Custom subagent references are added via <code>TaskTool.builder().subagentReferences(...)</code>
-- <code>TaskTool.builder().build()</code> returns a <code>ToolCallback</code>, not a <code>ToolCallbackProvider</code></p>
-<h3 id="tasktoolbuilder-simplified"><code>TaskTool.Builder</code> simplified<a class="headerlink" href="#tasktoolbuilder-simplified" title="Permanent link">&para;</a></h3>
-<p>The separate <code>subagentResolvers()</code> and <code>subagentExecutors()</code> methods are replaced by <code>subagentTypes()</code>:</p>
-<p><strong>Before:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">TaskTool</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentResolvers</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">MyResolver</span><span class="p">())</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentExecutors</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">MyExecutor</span><span class="p">())</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="p">.</span><span class="na">taskRepository</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span></code></pre></div>
-<p><strong>After:</strong></p>
-<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">TaskTool</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentTypes</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SubagentType</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">MyResolver</span><span class="p">(),</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MyExecutor</span><span class="p">()))</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span></code></pre></div>
-<p>Note: <code>taskRepository</code> now defaults to <code>DefaultTaskRepository</code> and no longer needs to be set explicitly.</p>
-<h3 id="taskcall-is-now-a-top-level-record"><code>TaskCall</code> is now a top-level record<a class="headerlink" href="#taskcall-is-now-a-top-level-record" title="Permanent link">&para;</a></h3>
-<p>If you reference <code>TaskTool.TaskCall</code> directly, change to <code>org.springaicommunity.agent.common.task.subagent.TaskCall</code>.</p>
-<h3 id="a2a-subagents-with-claude-subagents">A2A subagents with Claude subagents<a class="headerlink" href="#a2a-subagents-with-claude-subagents" title="Permanent link">&para;</a></h3>
-<p>When mixing local Claude and remote A2A subagents, register each type separately:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">var</span><span class="w"> </span><span class="n">taskTools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TaskTool</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="c1">// Claude (local)</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentReferences</span><span class="p">(</span><span class="n">ClaudeSubagentReferences</span><span class="p">.</span><span class="na">fromResources</span><span class="p">(</span><span class="n">agentPaths</span><span class="p">))</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentTypes</span><span class="p">(</span><span class="n">ClaudeSubagentType</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">        </span><span class="p">.</span><span class="na">chatClientBuilder</span><span class="p">(</span><span class="s">"default"</span><span class="p">,</span><span class="w"> </span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">())</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">        </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="c1">// A2A (remote)</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentReferences</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SubagentReference</span><span class="p">(</span><span class="s">"http://host:port/path"</span><span class="p">,</span><span class="w"> </span><span class="n">A2ASubagentDefinition</span><span class="p">.</span><span class="na">KIND</span><span class="p">))</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="p">.</span><span class="na">subagentTypes</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">SubagentType</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">A2ASubagentResolver</span><span class="p">(),</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">A2ASubagentExecutor</span><span class="p">()))</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span></code></pre></div>
+<p>The <code>exec-backends/</code> folder is the home for further backend implementations as they land.</p>
 
 
 

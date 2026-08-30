@@ -379,7 +379,29 @@
     
     
       <li class="md-tabs__item">
-        <a href="../migration-0.5/" class="md-tabs__link">
+        <a href="../WorkspaceAndExecSPI/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Execution Backends
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../migration-0.12/" class="md-tabs__link">
           
   
   
@@ -1440,6 +1462,8 @@
       
         
       
+        
+      
     
     
     
@@ -1463,7 +1487,7 @@
   <span class="md-ellipsis">
     
   
-    Migration
+    Execution Backends
   
 
     
@@ -1479,11 +1503,190 @@
             <span class="md-nav__icon md-icon"></span>
             
   
+    Execution Backends
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../WorkspaceAndExecSPI/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workspace & Exec SPI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DockerCliExecBackend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DockerCliExecBackend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
     Migration
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-0.12/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0.11.0 to 0.12.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-0.9/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0.7.x to 0.9.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -1909,7 +2112,8 @@
 <code>spring-ai-agent-utils-common</code>, package <code>org.springaicommunity.agent.common.exec</code>).
 The default <code>LocalExecBackend</code> runs processes on the host JVM; alternative
 implementations can execute inside a container or on a remote worker without any
-tool changes.</p>
+tool changes — see <a href="../DockerCliExecBackend/">DockerCliExecBackend</a> for the
+Docker-based sandbox backend.</p>
 <div class="highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">// Confine local execution to a workspace directory (per session/agent)</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">ShellTools</span><span class="w"> </span><span class="n">tools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ShellTools</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="p">.</span><span class="na">workingDirectory</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">"/workspace/session-42"</span><span class="p">))</span>
