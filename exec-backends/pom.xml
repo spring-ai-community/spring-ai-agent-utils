@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springaicommunity</groupId>
+		<artifactId>spring-ai-agent-utils-parent</artifactId>
+		<version>0.12.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>spring-ai-agent-utils-exec-backends</artifactId>
+	<packaging>pom</packaging>
+	<name>spring-ai-agent-utils-exec-backends</name>
+	<description>Aggregator for ExecBackend implementations (sandbox execution backends)</description>
+
+	<properties>
+		<!-- Aggregator only — the child modules are the published artifacts -->
+		<maven.deploy.skip>true</maven.deploy.skip>
+	</properties>
+
+	<modules>
+		<module>spring-ai-agent-utils-docker-cli</module>
+	</modules>
+
+</project>

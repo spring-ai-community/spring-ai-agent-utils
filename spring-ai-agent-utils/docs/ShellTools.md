@@ -232,7 +232,8 @@ String killResult = shellTools.killShell("shell_1234567890");
 `spring-ai-agent-utils-common`, package `org.springaicommunity.agent.common.exec`).
 The default `LocalExecBackend` runs processes on the host JVM; alternative
 implementations can execute inside a container or on a remote worker without any
-tool changes.
+tool changes — see [DockerCliExecBackend](DockerCliExecBackend.md) for the
+Docker-based sandbox backend.
 
 ```java
 // Confine local execution to a workspace directory (per session/agent)
