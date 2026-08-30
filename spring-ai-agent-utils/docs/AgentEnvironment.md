@@ -78,6 +78,30 @@ System.out.println(gitStatus);
 // ...
 ```
 
+#### Workspace and sandbox-aware overloads
+
+The no-argument methods above describe the **host JVM's current directory**. When the agent's tools operate somewhere else — a dedicated workspace directory, or a sandbox reached through an `ExecBackend` — use the overloads so the rendered context matches what the agent can actually reach:
+
+```java
+Workspace workspace = Workspace.local(Path.of("/data/sessions/session-42"));
+
+// Working-directory line and git-repo check follow the workspace root;
+// the path is rendered via workspace.display(...) (host form for local workspaces,
+// in-sandbox form for a workspace with a custom display mapping)
+String envInfo = AgentEnvironment.info(workspace);
+
+// Git commands run locally at the workspace root
+String gitStatus = AgentEnvironment.gitStatus(workspace);
+
+// Git commands run through an execution backend — inside a sandbox the reported
+// status is the sandbox's view of the repository
+String sandboxGitStatus = AgentEnvironment.gitStatus(myDockerExecBackend);
+```
+
+`gitStatus(ExecBackend)` runs the same git commands (`rev-parse`, `status --short`, `log --oneline`) through the [ExecBackend SPI](ShellTools.md#execution-backend--working-directory) instead of spawning host processes directly, so the backend's working directory and isolation apply.
+
+Note: the platform, OS version, and date lines of `info(...)` always describe the JVM host. If your sandbox runs a different OS, render those lines yourself.
+
 
 ## Basic Usage
 

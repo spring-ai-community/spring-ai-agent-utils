@@ -240,6 +240,11 @@ ShellTools tools = ShellTools.builder()
     .workingDirectory(Path.of("/workspace/session-42"))
     .build();
 
+// Equivalent, sharing one Workspace definition with the file/search tools
+ShellTools tools = ShellTools.builder()
+    .workspace(Workspace.local(Path.of("/workspace/session-42")))
+    .build();
+
 // Or supply a fully configured backend
 ShellTools tools = ShellTools.builder()
     .execBackend(LocalExecBackend.builder()

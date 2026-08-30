@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springaicommunity.agent.common.workspace.Workspace;
 import org.springaicommunity.agent.utils.Skills;
 
 import org.springframework.ai.tool.ToolCallback;
@@ -67,8 +68,15 @@ public class SkillsTool {
 
 		private Map<String, Skill> skillsMap;
 
+		private Workspace workspace;
+
 		public SkillsFunction(Map<String, Skill> skillsMap) {
+			this(skillsMap, null);
+		}
+
+		public SkillsFunction(Map<String, Skill> skillsMap, Workspace workspace) {
 			this.skillsMap = skillsMap;
+			this.workspace = workspace;
 		}
 
 		@Override
@@ -76,7 +84,9 @@ public class SkillsTool {
 			Skill skill = this.skillsMap.get(input.command());
 
 			if (skill != null) {
-				return "Base directory for this skill: %s\n\n%s".formatted(skill.basePath(), skill.content());
+				String basePath = (this.workspace != null) ? this.workspace.display(skill.basePath())
+						: skill.basePath();
+				return "Base directory for this skill: %s\n\n%s".formatted(basePath, skill.content());
 			}
 
 			return "Skill not found: " + input.command();
@@ -94,12 +104,27 @@ public class SkillsTool {
 
 		private String toolDescriptionTemplate = TOOL_DESCRIPTION_TEMPLATE;
 
+		private Workspace workspace;
+
 		protected Builder() {
 
 		}
 
 		public Builder toolDescriptionTemplate(String template) {
 			this.toolDescriptionTemplate = template;
+			return this;
+		}
+
+		/**
+		 * Maps skill base-directory paths through {@link Workspace#display(String)}
+		 * before they reach the model, so the announced base directory is valid in the
+		 * environment where the agent's shell and file tools execute (e.g. an in-sandbox
+		 * path instead of the host path the skills were loaded from).
+		 * @param workspace the workspace whose display mapping to apply
+		 * @return this builder
+		 */
+		public Builder workspace(Workspace workspace) {
+			this.workspace = workspace;
 			return this;
 		}
 
@@ -130,7 +155,7 @@ public class SkillsTool {
 
 			String skillsXml = this.skills.stream().map(s -> s.toXml()).collect(Collectors.joining("\n"));
 
-			return FunctionToolCallback.builder("Skill", new SkillsFunction(toSkillsMap(this.skills)))
+			return FunctionToolCallback.builder("Skill", new SkillsFunction(toSkillsMap(this.skills), this.workspace))
 				.description(this.toolDescriptionTemplate.formatted(skillsXml))
 				.inputType(SkillsInput.class)
 				.build();

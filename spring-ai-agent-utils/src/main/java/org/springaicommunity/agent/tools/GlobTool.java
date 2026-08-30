@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.springaicommunity.agent.common.workspace.Workspace;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.util.Assert;
@@ -254,6 +255,22 @@ public class GlobTool {
 		 */
 		public Builder workingDirectory(String workingDirectory) {
 			this.workingDirectory = workingDirectory != null ? Paths.get(workingDirectory) : null;
+			return this;
+		}
+
+		/**
+		 * Configures this tool for the given workspace — shorthand for
+		 * {@code workingDirectory(workspace.root())} plus
+		 * {@code allowedDirectory(workspace.root())}: searches default to the workspace
+		 * root and are confined to it. A later {@code workingDirectory} call overrides
+		 * the default location while the confinement remains.
+		 * @param workspace the workspace to operate within
+		 * @return this builder
+		 */
+		public Builder workspace(Workspace workspace) {
+			Assert.notNull(workspace, "workspace must not be null");
+			this.workingDirectory = workspace.root();
+			this.allowedDirectories.add(workspace.root());
 			return this;
 		}
 

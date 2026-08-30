@@ -29,8 +29,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springaicommunity.agent.common.workspace.Workspace;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.util.Assert;
 
 /**
  * @author Christian Tzolov
@@ -495,6 +497,18 @@ public class FileSystemTools {
 		 */
 		public Builder allowedDirectories(Path... allowedDirectories) {
 			this.allowedDirectories.addAll(allowedDirectories);
+			return this;
+		}
+
+		/**
+		 * Confines all file operations to the given workspace — shorthand for
+		 * {@code allowedDirectory(workspace.root())}.
+		 * @param workspace the workspace to operate within
+		 * @return this builder
+		 */
+		public Builder workspace(Workspace workspace) {
+			Assert.notNull(workspace, "workspace must not be null");
+			this.allowedDirectories.add(workspace.root());
 			return this;
 		}
 
