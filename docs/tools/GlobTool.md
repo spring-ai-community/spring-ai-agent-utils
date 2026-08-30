@@ -815,3 +815,28 @@ String response = chatClient.prompt()
 - [GrepTool](GrepTool.md) - For searching file contents
 - [FileSystemTools](FileSystemTools.md) - For reading/writing files
 - [ShellTools](ShellTools.md) - For running system commands
+
+## Directory confinement (`allowedDirectory` / `allowedDirectories`)
+
+By itself, `workingDirectory(...)` is only the **default** used when the model omits the
+`path` argument — an explicit `path` is taken as-is. To confine searches to a workspace,
+also configure allowed directories (same semantics and shared implementation with
+`FileSystemTools`; empty = unrestricted):
+
+```java
+GlobTool.builder()
+    .workingDirectory(workspace)     // default when path is omitted
+    .allowedDirectory(workspace)     // jail: explicit paths must stay inside
+    .build();
+```
+
+The resolved search path — whether from the model or the `workingDirectory` fallback —
+is validated before any filesystem access (raw `..` components rejected, normalized
+prefix check, symlink resolution). In addition, when confinement is configured the
+directory traversal does **not** follow symbolic links, so a link inside the workspace
+cannot expose content outside it (unconfined tools keep following links, as before).
+A violation returns:
+
+```
+Error: Access denied. Path is outside the allowed directories: /etc
+```
