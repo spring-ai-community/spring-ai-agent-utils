@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://spring-ai-community.github.io/spring-ai-agent-utils/0.12.0-SNAPSHOT/tools/AutoDreamAdvisor/">
+        <link rel="canonical" href="https://spring-ai-community.github.io/spring-ai-agent-utils/0.12.0-SNAPSHOT/tools/InterruptAdvisor/">
       
       
-        <link rel="prev" href="../AutoDreamService/">
+        <link rel="prev" href="../DockerCliExecBackend/">
       
       
-        <link rel="next" href="../TaskTools/">
+        <link rel="next" href="../ToolCallListener/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>AutoDreamAdvisor - Spring AI Agent Utils</title>
+        <title>InterruptAdvisor - Spring AI Agent Utils</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#autodreamadvisor" class="md-skip">
+        <a href="#interruptadvisor-cancelling-in-flight-turns" class="md-skip">
           Skip to content
         </a>
       
@@ -117,7 +117,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              AutoDreamAdvisor
+              InterruptAdvisor
             
           </span>
         </div>
@@ -329,12 +329,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../AutoMemoryTools/" class="md-tabs__link">
           
   
@@ -397,11 +395,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../InterruptAdvisor/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -1062,10 +1062,8 @@
       
   
   
-    
   
   
-  
     
     
       
@@ -1081,22 +1079,19 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
             
   
   
@@ -1114,7 +1109,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1213,37 +1208,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    AutoDreamAdvisor
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../AutoDreamAdvisor/" class="md-nav__link">
         
   
   
@@ -1259,120 +1227,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#what-it-does" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What it does
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quick Start
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#builder-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Builder Configuration
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Builder Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#useridstring-and-cross-session-recall" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        userId(String) and cross-session recall
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#turn-counting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Turn counting
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#relationship-to-memoryconsolidationtrigger" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Relationship to memoryConsolidationTrigger
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#demo-application" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Demo Application
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See Also
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1631,8 +1485,10 @@
       
   
   
+    
   
   
+  
     
     
       
@@ -1644,19 +1500,22 @@
     
     
       
+        
+        
+      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
         
           
-          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
             
   
   
@@ -1674,7 +1533,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_9">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1689,10 +1548,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../InterruptAdvisor/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    InterruptAdvisor
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1708,6 +1594,81 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#streaming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Streaming
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1926,10 +1887,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-it-does" class="md-nav__link">
+  <a href="#how-it-works" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What it does
+        How it works
       
     </span>
   </a>
@@ -1937,10 +1898,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
+  <a href="#usage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick Start
+        Usage
       
     </span>
   </a>
@@ -1948,38 +1909,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#builder-configuration" class="md-nav__link">
+  <a href="#streaming" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Builder Configuration
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Builder Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#useridstring-and-cross-session-recall" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        userId(String) and cross-session recall
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#turn-counting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Turn counting
+        Streaming
       
     </span>
   </a>
@@ -1987,21 +1920,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#relationship-to-memoryconsolidationtrigger" class="md-nav__link">
+  <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Relationship to memoryConsolidationTrigger
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#demo-application" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Demo Application
+        Configuration
       
     </span>
   </a>
@@ -2012,7 +1934,7 @@
   <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See Also
+        See also
       
     </span>
   </a>
@@ -2062,10 +1984,10 @@
     
     
       <li class="md-path__item">
-        <a href="../AutoMemoryTools/" class="md-path__link">
+        <a href="./" class="md-path__link">
           
   <span class="md-ellipsis">
-    Memory
+    Agent Loop
   </span>
 
         </a>
@@ -2087,103 +2009,68 @@
   
 
 
-<h1 id="autodreamadvisor">AutoDreamAdvisor<a class="headerlink" href="#autodreamadvisor" title="Permanent link">&para;</a></h1>
-<p>A <code>ChatClient</code> advisor that schedules periodic, out-of-band <a href="../AutoDreamService/"><code>AutoDreamService</code></a> memory-consolidation cycles on top of an <a href="../AutoMemoryTools/"><code>AutoMemoryTools</code></a> memory store — the same relationship <a href="../AutoMemoryToolsAdvisor/"><code>AutoMemoryToolsAdvisor</code></a> has to <code>AutoMemoryTools</code>, but for background dreaming instead of live-turn tool injection.</p>
-<h2 id="what-it-does">What it does<a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h2>
-<p>Unlike <code>AutoMemoryToolsAdvisor</code>, which injects tools and augments the system prompt on every request, <code>AutoDreamAdvisor</code> never touches the live request or response:</p>
-<ul>
-<li><strong><code>before()</code> is a no-op.</strong> Dreaming never adds latency or tokens to the turn the user is waiting on.</li>
-<li><strong><code>after()</code></strong> loads the persisted <code>DreamState</code>, increments its turn counter, evaluates the configured <code>DreamTrigger</code>, and — only if it fires — submits the dream cycle to a background task and returns immediately. The dream cycle itself runs off the calling thread.</li>
-</ul>
-<p>Because it fires from <code>after()</code> rather than <code>before()</code>, <code>AutoDreamAdvisor</code> is order-insensitive relative to other advisors in practice: it doesn't depend on what any other advisor did to the response, and nothing downstream depends on it having run yet.</p>
-<h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AutoDreamService</span><span class="w"> </span><span class="n">dreamService</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoDreamService</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">()).</span><span class="na">build</span><span class="p">();</span>
+<h1 id="interruptadvisor-cancelling-in-flight-turns">InterruptAdvisor - Cancelling In-Flight Turns<a class="headerlink" href="#interruptadvisor-cancelling-in-flight-turns" title="Permanent link">&para;</a></h1>
+<p><code>InterruptAdvisor</code> adds cooperative cancellation to the agentic tool-calling loop. Once <code>ChatClient.call()</code> enters the loop, it normally runs to completion — a UI "stop" button, a session-level interrupt event, or a budget guard has no seam to abort it. This advisor is that seam.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The advisor polls an application-supplied <code>BooleanSupplier</code> in its <code>before()</code> hook. Its default order (<code>HIGHEST_PRECEDENCE + 400</code>) places it just <em>inside</em> the auto-registered tool-calling advisor (<code>HIGHEST_PRECEDENCE + 300</code>), so the check re-runs on <strong>every tool-call round</strong>: an interrupt raised while tools execute lands before the next model request, not only between turns.</p>
+<p>When the signal reports true, the turn unwinds with a <code>TurnInterruptedException</code> — the caller catches it and decides what an interrupted turn means (discard, partial save, quiet end-of-turn).</p>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AtomicBoolean</span><span class="w"> </span><span class="n">interrupted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">AtomicBoolean</span><span class="p">();</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">AutoDreamAdvisor</span><span class="w"> </span><span class="n">dreamAdvisor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoDreamAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">"/home/user/.agent/memories"</span><span class="p">)</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="p">.</span><span class="na">dreamService</span><span class="p">(</span><span class="n">dreamService</span><span class="p">)</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="p">.</span><span class="na">dreamTrigger</span><span class="p">(</span><span class="n">DreamTriggers</span><span class="p">.</span><span class="na">hoursAndSessions</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">))</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClientBuilder</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span><span class="n">memoryAdvisor</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">            </span><span class="n">InterruptAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">interruptSignal</span><span class="p">(</span><span class="n">interrupted</span><span class="p">::</span><span class="n">get</span><span class="p">).</span><span class="na">build</span><span class="p">())</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span><span class="n">tools</span><span class="p">)</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ChatClient</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatModel</span><span class="p">)</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">        </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="n">dir</span><span class="p">).</span><span class="na">build</span><span class="p">(),</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">        </span><span class="n">dreamAdvisor</span><span class="p">,</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">        </span><span class="n">MessageChatMemoryAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatMemory</span><span class="p">).</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1">// From another thread (REST handler, UI event, watchdog):</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">interrupted</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="c1">// The worker loop:</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClient</span><span class="p">.</span><span class="na">prompt</span><span class="p">().</span><span class="na">user</span><span class="p">(</span><span class="n">text</span><span class="p">).</span><span class="na">call</span><span class="p">().</span><span class="na">content</span><span class="p">();</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">}</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">TurnInterruptedException</span><span class="w"> </span><span class="n">ex</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="n">interrupted</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span><span class="w">      </span><span class="c1">// re-arm for the next turn</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">    </span><span class="c1">// e.g. end the turn quietly with stop_reason "end_turn"</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Point <code>AutoDreamAdvisor</code> and <code>AutoMemoryToolsAdvisor</code> at the same <code>memoriesRootDirectory</code> — one gives the live agent read/write memory tools, the other schedules the Dreamer that periodically cleans that same store up.</p>
-<h2 id="builder-configuration">Builder Configuration<a class="headerlink" href="#builder-configuration" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">AutoDreamAdvisor</span><span class="w"> </span><span class="n">advisor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoDreamAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">"/path/to/memories"</span><span class="p">)</span><span class="w">          </span><span class="c1">// required</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="p">.</span><span class="na">dreamService</span><span class="p">(</span><span class="n">dreamService</span><span class="p">)</span><span class="w">                           </span><span class="c1">// required</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="p">.</span><span class="na">dreamTrigger</span><span class="p">(</span><span class="n">DreamTriggers</span><span class="p">.</span><span class="na">hoursAndSessions</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">))</span><span class="w">  </span><span class="c1">// optional</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p">.</span><span class="na">userId</span><span class="p">(</span><span class="s">"alice"</span><span class="p">)</span><span class="w">                                      </span><span class="c1">// optional — enables cross-session recall</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="p">.</span><span class="na">taskRepository</span><span class="p">(</span><span class="n">customTaskRepository</span><span class="p">)</span><span class="w">                 </span><span class="c1">// optional</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="p">.</span><span class="na">order</span><span class="p">(</span><span class="n">BaseAdvisor</span><span class="p">.</span><span class="na">HIGHEST_PRECEDENCE</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">150</span><span class="p">)</span><span class="w">          </span><span class="c1">// optional</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<p>The signal isn't limited to a flag — any cheap, thread-safe check works:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// Wall-clock guard: cancel turns that run past a deadline</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">Instant</span><span class="w"> </span><span class="n">deadline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Instant</span><span class="p">.</span><span class="na">now</span><span class="p">().</span><span class="na">plus</span><span class="p">(</span><span class="n">Duration</span><span class="p">.</span><span class="na">ofMinutes</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">InterruptAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">interruptSignal</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Instant</span><span class="p">.</span><span class="na">now</span><span class="p">().</span><span class="na">isAfter</span><span class="p">(</span><span class="n">deadline</span><span class="p">)).</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
+<h2 id="streaming">Streaming<a class="headerlink" href="#streaming" title="Permanent link">&para;</a></h2>
+<p>With <code>stream()</code> the check runs inside the reactive pipeline, so the <code>TurnInterruptedException</code> arrives as the Flux's <strong>error signal</strong> rather than a synchronous throw:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">chatClient</span><span class="p">.</span><span class="na">prompt</span><span class="p">().</span><span class="na">user</span><span class="p">(</span><span class="n">text</span><span class="p">).</span><span class="na">stream</span><span class="p">().</span><span class="na">content</span><span class="p">()</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="p">.</span><span class="na">onErrorResume</span><span class="p">(</span><span class="n">TurnInterruptedException</span><span class="p">.</span><span class="na">class</span><span class="p">,</span><span class="w"> </span><span class="n">ex</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Flux</span><span class="p">.</span><span class="na">empty</span><span class="p">())</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="p">.</span><span class="na">subscribe</span><span class="p">(...);</span>
+</span></code></pre></div>
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Builder method</th>
-<th>Type</th>
+<th>Builder option</th>
 <th>Default</th>
-<th>Description</th>
+<th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>memoriesRootDirectory(String)</code></td>
-<td><code>String</code></td>
-<td>— (<strong>required</strong>)</td>
-<td>Same memory store an <code>AutoMemoryToolsAdvisor</code> is pointed at.</td>
-</tr>
-<tr>
-<td><code>dreamService(AutoDreamService)</code></td>
-<td><code>AutoDreamService</code></td>
-<td>— (<strong>required</strong>)</td>
-<td>The service that actually runs dream cycles.</td>
-</tr>
-<tr>
-<td><code>dreamTrigger(DreamTrigger)</code></td>
-<td><code>DreamTrigger</code></td>
-<td><code>DreamTriggers.manualOnly()</code></td>
-<td>Decides whether a cycle should fire on each turn. See <a href="../AutoDreamService/#dream-triggers">AutoDreamService — Dream Triggers</a>.</td>
-</tr>
-<tr>
-<td><code>userId(String)</code></td>
-<td><code>String</code></td>
-<td>none</td>
-<td>Optional. When set, triggered cycles call the cross-session-aware <code>runDreamCycle(dir, userId)</code> overload instead of the memory-only one — see below.</td>
-</tr>
-<tr>
-<td><code>taskRepository(TaskRepository)</code></td>
-<td><code>TaskRepository</code></td>
-<td>a fresh <code>DefaultTaskRepository</code></td>
-<td>Where the background dream task is submitted. Override to share a <code>TaskRepository</code> with <code>TaskTool</code> or other background work.</td>
+<td><code>interruptSignal(BooleanSupplier)</code></td>
+<td>required</td>
+<td>Polled before each model request; must be cheap and thread-safe</td>
 </tr>
 <tr>
 <td><code>order(int)</code></td>
-<td><code>int</code></td>
-<td><code>HIGHEST_PRECEDENCE + 150</code></td>
-<td>Advisor order — higher precedence than <code>AutoMemoryToolsAdvisor</code>'s default (<code>+200</code>).</td>
+<td><code>HIGHEST_PRECEDENCE + 400</code></td>
+<td>Orders below the tool-calling advisor's <code>+300</code> check only once per turn</td>
 </tr>
 </tbody>
 </table>
-<h3 id="useridstring-and-cross-session-recall"><code>userId(String)</code> and cross-session recall<a class="headerlink" href="#useridstring-and-cross-session-recall" title="Permanent link">&para;</a></h3>
-<p>Setting <code>.userId(...)</code> only has an effect if the advisor's <code>dreamService</code> was itself built with <code>.sessionService(...)</code> configured (see <a href="../AutoDreamService/#cross-session-recall-optional">AutoDreamService — Cross-Session Recall</a>). If the service has no <code>sessionService</code>, <code>userId</code> is passed through but ignored — the Dreamer still only sees the memory store. There's no error in either misconfiguration direction; both degrade gracefully to memory-only dreaming.</p>
-<h2 id="turn-counting">Turn counting<a class="headerlink" href="#turn-counting" title="Permanent link">&para;</a></h2>
-<p><code>DreamState.sessionsSinceLastDream()</code> counts <strong>conversation turns processed by this advisor instance</strong> — every call to <code>after()</code> increments it, regardless of whether the turn involved memory tools at all. This is not the same thing as a <code>spring-ai-session</code> "session": there is no dependency on session-transcript storage for the trigger itself, only (optionally) for what the Dreamer can search once a cycle starts.</p>
-<h2 id="relationship-to-memoryconsolidationtrigger">Relationship to <code>memoryConsolidationTrigger</code><a class="headerlink" href="#relationship-to-memoryconsolidationtrigger" title="Permanent link">&para;</a></h2>
-<p><code>AutoDreamAdvisor</code> and <code>AutoMemoryToolsAdvisor</code>'s <code>memoryConsolidationTrigger</code> are complementary, not alternatives — see the comparison table in <a href="../AutoDreamService/#in-band-nudge-vs-out-of-band-dreaming">AutoDreamService</a>. A typical setup uses both: the in-band nudge for cheap, frequent tidy-ups, and <code>AutoDreamAdvisor</code> for periodic, deeper background cleanup.</p>
-<h2 id="demo-application">Demo Application<a class="headerlink" href="#demo-application" title="Permanent link">&para;</a></h2>
-<p>See <a href="https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-dream-demo">memory-tools-dream-demo</a> — combines <code>AutoMemoryToolsAdvisor</code>, <code>AutoDreamAdvisor</code>, and <code>SessionMemoryAdvisor</code> in one runnable example.</p>
-<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../AutoDreamService/">AutoDreamService</a> — the service this advisor schedules; dream cycle mechanics, <code>DreamTrigger</code>/<code>DreamMode</code>, cross-session recall</li>
-<li><a href="../AutoMemoryToolsAdvisor/">AutoMemoryToolsAdvisor</a> — the live-turn counterpart this advisor complements</li>
-<li><a href="../AutoMemoryTools/">AutoMemoryTools</a> — the memory store both advisors operate on</li>
+<li><a href="../ToolCallListener/">ToolCallListener</a> — observe the tool calls of the same loop</li>
 </ul>
 
 
