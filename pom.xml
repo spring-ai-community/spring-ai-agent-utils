@@ -84,6 +84,7 @@
         <module>spring-ai-agent-utils-common</module>
         <module>spring-ai-agent-utils</module>
         <module>spring-ai-agent-utils-a2a</module>
+        <module>exec-backends</module>
         <module>spring-ai-agent-utils-bom</module>
         <module>examples</module>
     </modules>
@@ -273,7 +274,7 @@
                         <configuration>
                             <publishingServerId>central</publishingServerId>
                             <excludeArtifacts>
-                                spring-ai-agent-utils-parent,examples-parent,travel-planner-demo-parent
+                                spring-ai-agent-utils-parent,spring-ai-agent-utils-exec-backends,examples-parent,travel-planner-demo-parent
                             </excludeArtifacts>
                             <autoPublish>true</autoPublish>
                         </configuration>
