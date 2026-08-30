@@ -677,6 +677,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#workspace-and-sandbox-aware-overloads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workspace and sandbox-aware overloads
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1725,6 +1736,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#workspace-and-sandbox-aware-overloads" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workspace and sandbox-aware overloads
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1979,83 +2001,101 @@
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1">// M README.md</span>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c1">// ...</span>
 </span></code></pre></div></p>
+<h4 id="workspace-and-sandbox-aware-overloads">Workspace and sandbox-aware overloads<a class="headerlink" href="#workspace-and-sandbox-aware-overloads" title="Permanent link">&para;</a></h4>
+<p>The no-argument methods above describe the <strong>host JVM's current directory</strong>. When the agent's tools operate somewhere else — a dedicated workspace directory, or a sandbox reached through an <code>ExecBackend</code> — use the overloads so the rendered context matches what the agent can actually reach:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Workspace</span><span class="w"> </span><span class="n">workspace</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Workspace</span><span class="p">.</span><span class="na">local</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">"/data/sessions/session-42"</span><span class="p">));</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1">// Working-directory line and git-repo check follow the workspace root;</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1">// the path is rendered via workspace.display(...) (host form for local workspaces,</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1">// in-sandbox form for a workspace with a custom display mapping)</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">String</span><span class="w"> </span><span class="n">envInfo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="n">workspace</span><span class="p">);</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1">// Git commands run locally at the workspace root</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="n">String</span><span class="w"> </span><span class="n">gitStatus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">gitStatus</span><span class="p">(</span><span class="n">workspace</span><span class="p">);</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1">// Git commands run through an execution backend — inside a sandbox the reported</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="c1">// status is the sandbox's view of the repository</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="n">String</span><span class="w"> </span><span class="n">sandboxGitStatus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">gitStatus</span><span class="p">(</span><span class="n">myDockerExecBackend</span><span class="p">);</span>
+</span></code></pre></div>
+<p><code>gitStatus(ExecBackend)</code> runs the same git commands (<code>rev-parse</code>, <code>status --short</code>, <code>log --oneline</code>) through the <a href="../ShellTools/#execution-backend--working-directory">ExecBackend SPI</a> instead of spawning host processes directly, so the backend's working directory and isolation apply.</p>
+<p>Note: the platform, OS version, and date lines of <code>info(...)</code> always describe the JVM host. If your sandbox runs a different OS, render those lines yourself.</p>
 <h2 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h2>
 <h3 id="1-configure-agent-properties">1. Configure Agent Properties<a class="headerlink" href="#1-configure-agent-properties" title="Permanent link">&para;</a></h3>
 <p>Add agent configuration to your <code>application.properties</code>:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># AGENT CONFIGURATION</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1">## Model info (Must match the configured model above)</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="na">agent.model</span><span class="o">=</span><span class="s">claude-sonnet-4-5-20250929</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="na">agent.model.knowledge.cutoff</span><span class="o">=</span><span class="s">2025-01</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># For GPT models</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1"># agent.model=gpt-5-mini-2025-08-07</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="c1"># agent.model.knowledge.cutoff=2025-08-07</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="c1"># For Gemini models</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="c1"># agent.model=gemini-3.1-pro-preview</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="c1"># agent.model.knowledge.cutoff=Unknown</span>
+<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># AGENT CONFIGURATION</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="c1">## Model info (Must match the configured model above)</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="na">agent.model</span><span class="o">=</span><span class="s">claude-sonnet-4-5-20250929</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="na">agent.model.knowledge.cutoff</span><span class="o">=</span><span class="s">2025-01</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># For GPT models</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="c1"># agent.model=gpt-5-mini-2025-08-07</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1"># agent.model.knowledge.cutoff=2025-08-07</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="c1"># For Gemini models</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="c1"># agent.model=gemini-3.1-pro-preview</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="c1"># agent.model.knowledge.cutoff=Unknown</span>
 </span></code></pre></div>
 <h3 id="2-inject-configuration-values">2. Inject Configuration Values<a class="headerlink" href="#2-inject-configuration-values" title="Permanent link">&para;</a></h3>
 <p>Use <code>@Value</code> annotations to inject the configuration:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">"${agent.model:Unknown}"</span><span class="p">)</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">String</span><span class="w"> </span><span class="n">agentModel</span><span class="p">;</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">"${agent.model.knowledge.cutoff:Unknown}"</span><span class="p">)</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">String</span><span class="w"> </span><span class="n">agentModelKnowledgeCutoff</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">"${agent.model:Unknown}"</span><span class="p">)</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">String</span><span class="w"> </span><span class="n">agentModel</span><span class="p">;</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">"${agent.model.knowledge.cutoff:Unknown}"</span><span class="p">)</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">String</span><span class="w"> </span><span class="n">agentModelKnowledgeCutoff</span><span class="p">;</span>
 </span></code></pre></div>
 <h3 id="3-configure-system-prompt-with-parameters">3. Configure System Prompt with Parameters<a class="headerlink" href="#3-configure-system-prompt-with-parameters" title="Permanent link">&para;</a></h3>
 <p>Use the <code>AgentEnvironment</code> utility to provide dynamic context to your system prompt:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.springaicommunity.agent.utils.AgentEnvironment</span><span class="p">;</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClientBuilder</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultSystem</span><span class="p">(</span><span class="n">p</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="na">text</span><span class="p">(</span><span class="n">systemPrompt</span><span class="p">)</span><span class="w"> </span><span class="c1">// Load system prompt from classpath</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">        </span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">ENVIRONMENT_INFO_KEY</span><span class="p">,</span><span class="w"> </span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">info</span><span class="p">())</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">        </span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">GIT_STATUS_KEY</span><span class="p">,</span><span class="w"> </span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">gitStatus</span><span class="p">())</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">        </span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">AGENT_MODEL_KEY</span><span class="p">,</span><span class="w"> </span><span class="n">agentModel</span><span class="p">)</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">        </span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY</span><span class="p">,</span><span class="w"> </span><span class="n">agentModelKnowledgeCutoff</span><span class="p">))</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="c1">// ... rest of configuration</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+<div class="highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">org.springaicommunity.agent.utils.AgentEnvironment</span><span class="p">;</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClientBuilder</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultSystem</span><span class="p">(</span><span class="n">p</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="na">text</span><span class="p">(</span><span class="n">systemPrompt</span><span class="p">)</span><span class="w"> </span><span class="c1">// Load system prompt from classpath</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">        </span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">ENVIRONMENT_INFO_KEY</span><span class="p">,</span><span class="w"> </span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">info</span><span class="p">())</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">        </span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">GIT_STATUS_KEY</span><span class="p">,</span><span class="w"> </span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">gitStatus</span><span class="p">())</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">        </span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">AGENT_MODEL_KEY</span><span class="p">,</span><span class="w"> </span><span class="n">agentModel</span><span class="p">)</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">        </span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="n">AgentEnvironment</span><span class="p">.</span><span class="na">AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY</span><span class="p">,</span><span class="w"> </span><span class="n">agentModelKnowledgeCutoff</span><span class="p">))</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="c1">// ... rest of configuration</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
 <h3 id="4-reference-parameters-in-system-prompt">4. Reference Parameters in System Prompt<a class="headerlink" href="#4-reference-parameters-in-system-prompt" title="Permanent link">&para;</a></h3>
 <p>Create a system prompt template that references the parameters:</p>
 <p><strong>File:</strong> <code>src/main/resources/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md</code></p>
-<div class="highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Here is useful information about the environment you are running in:
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>&lt;env&gt;
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>{ENVIRONMENT_INFO}
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>&lt;/env&gt;
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>You are powered by the model: {AGENT_MODEL}
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>Assistant knowledge cutoff is {AGENT_MODEL_KNOWLEDGE_CUTOFF}.
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>{GIT_STATUS}
+<div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Here is useful information about the environment you are running in:
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>&lt;env&gt;
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>{ENVIRONMENT_INFO}
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>&lt;/env&gt;
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>You are powered by the model: {AGENT_MODEL}
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>Assistant knowledge cutoff is {AGENT_MODEL_KNOWLEDGE_CUTOFF}.
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>{GIT_STATUS}
 </span></code></pre></div>
 <h2 id="environment-information-output">Environment Information Output<a class="headerlink" href="#environment-information-output" title="Permanent link">&para;</a></h2>
 <p>The <code>AgentEnvironment.info()</code> method returns a formatted string with:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>Working directory: /Users/username/projects/myapp
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>Is directory a git repo: Yes
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>Platform: mac os x
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>OS Version: Mac OS X 14.5.0
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>Today's date: 2026-01-10
+<div class="highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Working directory: /Users/username/projects/myapp
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Is directory a git repo: Yes
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>Platform: mac os x
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>OS Version: Mac OS X 14.5.0
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>Today's date: 2026-01-10
 </span></code></pre></div>
 <h2 id="git-status-output">Git Status Output<a class="headerlink" href="#git-status-output" title="Permanent link">&para;</a></h2>
 <p>The <code>AgentEnvironment.gitStatus()</code> method returns a detailed git repository snapshot:</p>
-<div class="highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>gitStatus: This is the git status at the start of the conversation. Note that this status is a snapshot in time, and will not update during the conversation.
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Current branch: feature-branch
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>Main branch (you will usually use this for PRs): main
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>Status:
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>M README.md
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>M src/main/java/com/example/Application.java
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>?? src/main/java/com/example/NewFeature.java
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>Recent commits:
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>a1b2c3d Add new feature implementation
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>e4f5g6h Fix bug in authentication flow
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>h7i8j9k Update documentation
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>k0l1m2n Refactor service layer
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>n3o4p5q Initial commit
+<div class="highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>gitStatus: This is the git status at the start of the conversation. Note that this status is a snapshot in time, and will not update during the conversation.
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>Current branch: feature-branch
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>Main branch (you will usually use this for PRs): main
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>Status:
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>M README.md
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>M src/main/java/com/example/Application.java
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>?? src/main/java/com/example/NewFeature.java
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>Recent commits:
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>a1b2c3d Add new feature implementation
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>e4f5g6h Fix bug in authentication flow
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>h7i8j9k Update documentation
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>k0l1m2n Refactor service layer
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>n3o4p5q Initial commit
 </span></code></pre></div>
 <h2 id="cross-platform-support">Cross-Platform Support<a class="headerlink" href="#cross-platform-support" title="Permanent link">&para;</a></h2>
 <p>The <code>AgentEnvironment</code> class handles platform differences automatically:</p>
