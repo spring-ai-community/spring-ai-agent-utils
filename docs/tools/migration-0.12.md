@@ -1,6 +1,6 @@
 # Migration Guide: 0.11.0 to 0.12.0
 
-This release introduces the sandboxing foundation: the `ExecBackend` and `Workspace` SPIs, directory confinement for the search tools, and the `spring-ai-agent-utils-docker-cli` module. **There are no breaking API changes** — all existing code compiles and runs unchanged. There is **one behavioral change** to review (background shells) and a few output-level changes worth knowing about.
+This release introduces the sandboxing foundation: the `ExecBackend` and `Workspace` SPIs, directory confinement for the search tools, and the `spring-ai-agent-utils-docker-cli` module. It also adds two agent-loop utilities: `InterruptAdvisor` (cooperative cancellation of in-flight turns) and `ToolCallListener` (tool invocation observability). **There are no breaking API changes** — all existing code compiles and runs unchanged. There is **one behavioral change** to review (background shells) and a few output-level changes worth knowing about.
 
 ## Dependency Version
 
@@ -66,5 +66,7 @@ These change what the model (or a log reader) sees, not any API:
 - **`Workspace` SPI** (`org.springaicommunity.agent.common.workspace`) — root directory + host-to-model path display; one-call `workspace(...)` option on the tool builders, `SkillsTool` base-path mapping, `AgentEnvironment.info(Workspace)`.
 - **Directory confinement for search tools** — `allowedDirectory(...)` on `GrepTool`, `GlobTool` and `ListDirectoryTool`, sharing the FileSystemTools jail semantics. Note: when confinement is configured, directory traversal does **not** follow symbolic links (unconfined behavior is unchanged).
 - **`spring-ai-agent-utils-docker-cli`** — a Docker `ExecBackend` running commands in a sandbox container (new `exec-backends/` module group, managed by the BOM).
+- **`InterruptAdvisor`** (`org.springaicommunity.agent.advisors`) — cooperative cancellation of in-flight agentic turns. Polls an application-supplied `BooleanSupplier` before each model request; its default order (`HIGHEST_PRECEDENCE + 400`) sits just inside the tool-calling advisor so the check re-runs on every tool-call round. When the signal fires, the turn unwinds with the new `TurnInterruptedException` (with `stream()`, it arrives as the Flux error signal). Replaces hand-rolled cancellation flags checked inside tools.
+- **`ToolCallListener` + `ToolCallListeners.wrap/wrapAll`** (`org.springaicommunity.agent.tools`) — observe every tool invocation (audit logs, SSE progress, metrics) without writing a `ToolCallback` decorator. `beforeCall` returns an opaque correlation context handed back to `afterCall`/`onError`; `onError` returns an error string to report to the model or `null` to rethrow. Definition and metadata are delegated untouched, so wrapping composes with any callback source. If you had your own `ToolCallback` decorators for logging, these can be replaced with a listener.
 
-See [Workspace & Exec SPI](WorkspaceAndExecSPI.md) for the overview and [DockerCliExecBackend](DockerCliExecBackend.md) for the full sandbox recipe.
+See [Workspace & Exec SPI](WorkspaceAndExecSPI.md) for the overview and [DockerCliExecBackend](DockerCliExecBackend.md) for the full sandbox recipe. For the agent-loop utilities, see [InterruptAdvisor](InterruptAdvisor.md) and [ToolCallListener](ToolCallListener.md).
