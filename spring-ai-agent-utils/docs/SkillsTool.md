@@ -482,7 +482,7 @@ ChatClient chatClient = chatClientBuilder
     .defaultTools(FileSystemTools.builder().build())
 
     // Required for skills to execute scripts
-    .defaultTools(new ShellTools())
+    .defaultTools(ShellTools.builder().build())
 
     .build();
 ```
@@ -619,7 +619,7 @@ public class SkillsConfig {
                 .addSkillsDirectory("examples/.claude/skills")
                 .build())
             .defaultTools(FileSystemTools.builder().build())
-            .defaultTools(new ShellTools())
+            .defaultTools(ShellTools.builder().build())
             .defaultTools(GrepTool.builder().build())
             .build();
     }
@@ -742,7 +742,7 @@ public class SkillsConfiguration {
         return chatClientBuilder
             .defaultToolCallbacks(skillsTool)
             .defaultTools(FileSystemTools.builder().build())
-            .defaultTools(new ShellTools())
+            .defaultTools(ShellTools.builder().build())
             .build();
     }
 }
@@ -785,7 +785,7 @@ ChatClient chatClient = chatClientBuilder
 ```java
 ChatClient chatClient = chatClientBuilder
     .defaultToolCallbacks(skillsTool)
-    .defaultTools(new ShellTools())  // Add this
+    .defaultTools(ShellTools.builder().build())  // Add this
     .build();
 ```
 
