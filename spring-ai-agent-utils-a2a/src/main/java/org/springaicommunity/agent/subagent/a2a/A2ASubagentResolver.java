@@ -17,8 +17,8 @@ package org.springaicommunity.agent.subagent.a2a;
 
 import java.net.URI;
 
-import io.a2a.A2A;
-import io.a2a.spec.AgentCard;
+import org.a2aproject.sdk.A2A;
+import org.a2aproject.sdk.spec.AgentCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springaicommunity.agent.common.task.subagent.SubagentReference;
@@ -29,7 +29,7 @@ import org.springaicommunity.agent.common.task.subagent.SubagentResolver;
  * Demonstrates how to implement {@link SubagentResolver} for remote agent discovery.
  *
  * @author Christian Tzolov
- * @see <a href="https://google.github.io/A2A/">A2A Protocol Specification</a>
+ * @see <a href="https://a2a-protocol.org">A2A Protocol Specification</a>
  */
 public class A2ASubagentResolver implements SubagentResolver {
 
