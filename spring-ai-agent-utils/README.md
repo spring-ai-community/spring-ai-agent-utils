@@ -19,6 +19,7 @@ These are the agent tools needed to implement any agentic behavior
 - **[GlobTool](docs/GlobTool.md)** - Fast file pattern matching tool for finding files by name patterns with glob syntax
 - **[SmartWebFetchTool](docs/SmartWebFetchTool.md)** - AI-powered web content summarization with caching
 - **[BraveWebSearchTool](docs/BraveWebSearchTool.md)** - Web search with domain filtering
+- **[DiffTool](docs/DiffTool.md)** - Pure Java unified-diff tool for comparing strings or files using Myers' O(ND) algorithm; output is compatible with `patch` and `git apply`
 
 #### User feedback
 
@@ -332,6 +333,40 @@ String results = searchTool.webSearch(
 
 // Or use search operators for efficiency
 String results2 = searchTool.webSearch("Spring AI site:spring.io", null, null);
+```
+
+### DiffTool
+
+Pure Java unified-diff tool for comparing two text blocks or two files on disk. Uses Eugene W. Myers' O(ND) difference algorithm and emits output compatible with the `patch` utility and `git apply`. Includes a lightweight summary mode for insertion/deletion/hunk counts and whitespace-insensitive comparison modes.
+
+[**View Full Documentation →**](../docs/tools/DiffTool.md)
+
+**Quick Example:**
+```java
+DiffTool diffTool = DiffTool.builder().build();
+
+// Compare two strings
+String unified = diffTool.diff(
+    "hello\nworld\n",   // before
+    "hello\njava\n",    // after
+    "a/file.txt",       // beforeLabel
+    "b/file.txt",       // afterLabel
+    null,               // contextLines (default 3, max 10)
+    null                // whitespaceMode (default STRICT)
+);
+
+// Compare two files on disk
+String fileDiff = diffTool.diffFiles(
+    "src/main/resources/application.yml",
+    "src/main/resources/application-new.yml",
+    null,
+    DiffTool.WhitespaceMode.IGNORE_TRAILING
+);
+
+// Get aggregate counts without rendering the full diff
+DiffTool.DiffSummary summary = diffTool.summarize(before, after, null, null);
+System.out.println(summary.insertions() + " +, " + summary.deletions() + " -, "
+    + summary.hunks() + " hunks");
 ```
 ---
 
