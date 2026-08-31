@@ -12,7 +12,9 @@ Demonstrates the `TodoWriteTool` for structured task management in Spring AI age
 ## Running the Demo
 
 ```bash
-# Set API key for your chosen model provider
+# To use another AI provider, swap the model starter in pom.xml first,
+# then set API key for your chosen model provider
+
 export GOOGLE_CLOUD_PROJECT=your-project-id
 # or: export ANTHROPIC_API_KEY=your-key
 # or: export OPENAI_API_KEY=your-key
