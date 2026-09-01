@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
+import org.springframework.ai.tool.annotation.Tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,6 +52,18 @@ class FileSystemToolsTest {
 	@Nested
 	@DisplayName("Read Tool Tests")
 	class ReadToolTests {
+
+		@Test
+		@DisplayName("Should describe read as UTF-8 text only")
+		void shouldDescribeReadAsUtf8TextOnly() throws NoSuchMethodException {
+			Tool tool = FileSystemTools.class.getMethod("read", String.class, Integer.class, Integer.class)
+				.getAnnotation(Tool.class);
+
+			assertThat(tool.description()).contains("Reads a UTF-8 text file");
+			assertThat(tool.description()).contains("binary files, including PDFs, images, and office documents, are not decoded");
+			assertThat(tool.description()).doesNotContain("Claude Code");
+			assertThat(tool.description()).doesNotContain("Jupyter notebooks");
+		}
 
 		@Test
 		@DisplayName("Should read simple file content")
