@@ -24,6 +24,7 @@ import org.springframework.aot.hint.RuntimeHintsRegistrar;
  * {@link RuntimeHintsRegistrar} for GraalVM native image support.
  *
  * @author Christian Tzolov
+ * @author kezhenxu94
  */
 public class AgentUtilsRuntimeHints implements RuntimeHintsRegistrar {
 
@@ -38,8 +39,7 @@ public class AgentUtilsRuntimeHints implements RuntimeHintsRegistrar {
 		hints.resources().registerPattern("META-INF/skills/**/*.md");
 
 		// Reflection for SkillsTool inner types used via tool invocation
-		hints.reflection().registerType(SkillsTool.SkillsInput.class, MemberCategory.values());
-		hints.reflection().registerType(SkillsTool.SkillsFunction.class, MemberCategory.values());
+		hints.reflection().registerType(SkillsTool.SkillFunction.class, MemberCategory.values());
 	}
 
 }
