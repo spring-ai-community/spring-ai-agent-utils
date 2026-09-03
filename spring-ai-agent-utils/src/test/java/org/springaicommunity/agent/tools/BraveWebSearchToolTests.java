@@ -15,16 +15,27 @@
  */
 package org.springaicommunity.agent.tools;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.ai.util.json.JsonParser;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 /**
  * Unit tests for {@link BraveWebSearchTool}.
@@ -99,34 +110,105 @@ class BraveWebSearchToolTests {
 	@DisplayName("Domain Filtering Tests")
 	class DomainFilteringTests {
 
-		@Test
-		@DisplayName("Should handle null allowed domains")
-		void shouldHandleNullAllowedDomains() {
-			BraveWebSearchTool tool = BraveWebSearchTool.builder("test-api-key").build();
+		private static final String BRAVE_RESPONSE = """
+				{
+				  "web": {
+				    "results": [
+				      {
+				        "title": "Spring AI",
+				        "url": "https://spring.io/projects/spring-ai",
+				        "description": "Spring AI project"
+				      },
+				      {
+				        "title": "Spring AI Reference",
+				        "url": "https://docs.spring.io/spring-ai/reference/",
+				        "description": "Spring AI documentation"
+				      },
+				      {
+				        "title": "Example",
+				        "url": "https://example.com/spring-ai",
+				        "description": "Unrelated result"
+				      }
+				    ]
+				  }
+				}
+				""";
 
-			// This should not throw an exception
-			String result = tool.webSearch("test query", null, Collections.emptyList());
-			assertThat(result).isNotNull();
+		private MockRestServiceServer server;
+
+		private BraveWebSearchTool tool;
+
+		@BeforeEach
+		void setUp() {
+			RestClient.Builder restClientBuilder = RestClient.builder();
+			this.server = MockRestServiceServer.bindTo(restClientBuilder).build();
+			this.tool = new BraveWebSearchTool("test-api-key", 10, restClientBuilder);
+		}
+
+		@AfterEach
+		void verifyServer() {
+			this.server.verify();
 		}
 
 		@Test
-		@DisplayName("Should handle null blocked domains")
-		void shouldHandleNullBlockedDomains() {
-			BraveWebSearchTool tool = BraveWebSearchTool.builder("test-api-key").build();
+		@DisplayName("Should keep only results from allowed domains")
+		void shouldKeepOnlyResultsFromAllowedDomains() {
+			this.expectSearchRequest();
 
-			// This should not throw an exception
-			String result = tool.webSearch("test query", Collections.emptyList(), null);
-			assertThat(result).isNotNull();
+			String result = this.tool.webSearch("test query", List.of("spring.io"), null);
+
+			assertThat(result).isEqualTo(JsonParser.toJson(List.of(
+				new BraveWebSearchTool.SearchResult("Spring AI", "https://spring.io/projects/spring-ai",
+					"Spring AI project"),
+				new BraveWebSearchTool.SearchResult("Spring AI Reference",
+					"https://docs.spring.io/spring-ai/reference/", "Spring AI documentation"))));
+		}
+
+		@Test
+		@DisplayName("Should remove results from blocked domains")
+		void shouldRemoveResultsFromBlockedDomains() {
+			this.expectSearchRequest();
+
+			String result = this.tool.webSearch("test query", null, List.of("example.com"));
+
+			assertThat(result).isEqualTo(JsonParser.toJson(List.of(
+				new BraveWebSearchTool.SearchResult("Spring AI", "https://spring.io/projects/spring-ai",
+					"Spring AI project"),
+				new BraveWebSearchTool.SearchResult("Spring AI Reference",
+					"https://docs.spring.io/spring-ai/reference/", "Spring AI documentation"))));
 		}
 
 		@Test
 		@DisplayName("Should handle empty domain lists")
 		void shouldHandleEmptyDomainLists() {
-			BraveWebSearchTool tool = BraveWebSearchTool.builder("test-api-key").build();
+			this.expectSearchRequest();
 
-			// This should not throw an exception
-			String result = tool.webSearch("test query", Collections.emptyList(), Collections.emptyList());
-			assertThat(result).isNotNull();
+			String result = this.tool.webSearch("test query", Collections.emptyList(), Collections.emptyList());
+
+			assertThat(result).isEqualTo(JsonParser.toJson(List.of(
+				new BraveWebSearchTool.SearchResult("Spring AI", "https://spring.io/projects/spring-ai",
+					"Spring AI project"),
+				new BraveWebSearchTool.SearchResult("Spring AI Reference",
+					"https://docs.spring.io/spring-ai/reference/", "Spring AI documentation"),
+				new BraveWebSearchTool.SearchResult("Example", "https://example.com/spring-ai",
+					"Unrelated result"))));
+		}
+
+		private void expectSearchRequest() {
+			this.server.expect(request -> {
+				assertThat(request.getMethod()).isEqualTo(HttpMethod.GET);
+				assertThat(request.getHeaders().getFirst("X-Subscription-Token")).isEqualTo("test-api-key");
+				assertThat(request.getHeaders().getAccept()).contains(MediaType.APPLICATION_JSON);
+				assertThat(request.getURI().getScheme()).isEqualTo("https");
+				assertThat(request.getURI().getHost()).isEqualTo("api.search.brave.com");
+				assertThat(request.getURI().getPath()).isEqualTo("/res/v1/web/search");
+
+				var queryParams = UriComponentsBuilder.fromUri(request.getURI()).build().getQueryParams();
+				assertThat(UriUtils.decode(queryParams.getFirst("q"), StandardCharsets.UTF_8))
+					.isEqualTo("test query");
+				assertThat(queryParams.getFirst("count")).isEqualTo("10");
+			})
+				.andRespond(withSuccess(BRAVE_RESPONSE, MediaType.APPLICATION_JSON));
 		}
 
 	}
