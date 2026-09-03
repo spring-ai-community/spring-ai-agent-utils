@@ -143,8 +143,13 @@ public class BraveWebSearchTool {
 	 * @param resultCount the number of results to return per search
 	 */
 	private BraveWebSearchTool(String apiKey, int resultCount) {
+		this(apiKey, resultCount, RestClient.builder());
+	}
+
+	BraveWebSearchTool(String apiKey, int resultCount, RestClient.Builder restClientBuilder) {
 		Assert.hasText(apiKey, "API key must not be null or empty");
-		this.restClient = RestClient.builder()
+		Assert.notNull(restClientBuilder, "RestClient.Builder must not be null");
+		this.restClient = restClientBuilder
 			.baseUrl(BRAVE_API_BASE_URL)
 			.defaultHeader("Accept", MediaType.APPLICATION_JSON_VALUE)
 			.defaultHeader("Accept-Encoding", "gzip")
