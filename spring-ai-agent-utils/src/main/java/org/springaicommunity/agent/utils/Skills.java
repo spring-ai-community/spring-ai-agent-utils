@@ -15,7 +15,6 @@
 */
 package org.springaicommunity.agent.utils;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
@@ -144,30 +143,26 @@ public class Skills {
 	/**
 	 * Loads skills from a non-filesystem resource. Handles two cases:
 	 * <ul>
-	 * <li>Resources with resolvable {@code jar:} URLs (e.g.,
-	 * {@link org.springframework.core.io.UrlResource}) — uses
-	 * {@link JarURLConnection}</li>
-	 * <li>{@link ClassPathResource} where the directory lacks an explicit JAR entry —
-	 * uses Spring's {@link ResourcePatternResolver} with a manual JAR scan fallback</li>
+	 * <li>{@link ClassPathResource} — always resolved via {@link #loadFromClasspath},
+	 * which scans every matching classpath entry. {@code ClassPathResource.getURL()}
+	 * resolves through {@code ClassLoader.getResource()} (singular), which only ever
+	 * returns the first classpath entry matching the path; if two SkillsJars publish
+	 * skills under the same prefix (e.g. the shared {@code META-INF/skills} root),
+	 * resolving to a single URL would silently drop every skill but the first JAR's.
+	 * <li>Other resources with resolvable {@code jar:} URLs (e.g.,
+	 * {@link org.springframework.core.io.UrlResource}) — these refer to one specific,
+	 * unambiguous JAR, so a direct {@link JarURLConnection} scan is correct.</li>
 	 * </ul>
 	 * @param resource the resource pointing to a skills directory
 	 * @return a list of Skill objects parsed from SKILL.md files
 	 * @throws IOException if an I/O error occurs while reading
 	 */
 	private static List<Skill> loadJarResource(Resource resource) throws IOException {
-		URL resourceUrl;
-		try {
-			resourceUrl = resource.getURL();
-		}
-		catch (FileNotFoundException ex) {
-			// ClassPathResource for a JAR directory without an explicit directory entry
-			// cannot resolve to a URL. Fall back to classpath scanning.
-			if (resource instanceof ClassPathResource classPathResource) {
-				return loadFromClasspath(classPathResource.getPath());
-			}
-			throw ex;
+		if (resource instanceof ClassPathResource classPathResource) {
+			return loadFromClasspath(classPathResource.getPath());
 		}
 
+		URL resourceUrl = resource.getURL();
 		String protocol = resourceUrl.getProtocol();
 
 		if (!"jar".equals(protocol)) {
