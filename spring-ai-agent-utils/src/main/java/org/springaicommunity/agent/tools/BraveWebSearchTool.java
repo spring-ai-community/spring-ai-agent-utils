@@ -155,6 +155,20 @@ public class BraveWebSearchTool {
 	}
 
 	/**
+	 * Package-private constructor for testing. Accepts a pre-configured
+	 * {@link RestClient.Builder} so tests can bind a {@code MockRestServiceServer} to it
+	 * before the tool is built, enabling deterministic, offline unit tests.
+	 * <p>
+	 * Production code should always use {@link #builder(String)}.
+	 * @param restClientBuilder a pre-configured builder (e.g. bound to a mock server)
+	 * @param resultCount the number of results to return per search
+	 */
+	BraveWebSearchTool(RestClient.Builder restClientBuilder, int resultCount) {
+		this.restClient = restClientBuilder.build();
+		this.resultCount = resultCount;
+	}
+
+	/**
 	 * Performs a web search using the Brave Search API.
 	 * <p>
 	 * <b>Note on Domain Filtering:</b> The Brave Search API does not support native
