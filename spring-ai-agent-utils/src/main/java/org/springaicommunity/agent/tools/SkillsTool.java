@@ -84,6 +84,9 @@ public class SkillsTool {
 			Skill skill = this.skillsMap.get(input.command());
 
 			if (skill != null) {
+				if (skill.basePath() == null || skill.basePath().isEmpty()) {
+					return skill.content();
+				}
 				String basePath = (this.workspace != null) ? this.workspace.display(skill.basePath())
 						: skill.basePath();
 				return "Base directory for this skill: %s\n\n%s".formatted(basePath, skill.content());
@@ -147,6 +150,24 @@ public class SkillsTool {
 			for (String skillsRootDirectory : skillsRootDirectories) {
 				this.skills.addAll(Skills.loadDirectory(skillsRootDirectory));
 			}
+			return this;
+		}
+
+		/**
+		 * Registers a skill programmatically, bypassing filesystem and classpath
+		 * resource resolution. Useful in environments where the built-in scanners
+		 * cannot reach the SKILL.md files (for example Spring Boot executable jars
+		 * using the {@code jar:nested:} protocol, or GraalVM native images).
+		 * @param name the skill name (the invocation key used by the model)
+		 * @param description a short description of the skill
+		 * @param content the skill instructions
+		 * @return this builder
+		 */
+		public Builder addSkill(String name, String description, String content) {
+			Assert.hasText(name, "name must not be empty");
+			Assert.hasText(description, "description must not be empty");
+			Assert.hasText(content, "content must not be empty");
+			this.skills.add(new Skill("", Map.of("name", name, "description", description), content));
 			return this;
 		}
 

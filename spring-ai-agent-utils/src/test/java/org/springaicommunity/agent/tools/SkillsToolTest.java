@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
@@ -305,4 +306,36 @@ class SkillsToolTest {
 
 	}
 
+	@Nested
+	@DisplayName("Programmatic Skills")
+	class ProgrammaticSkillsTests {
+
+		@Test
+		@DisplayName("should register a skill programmatically via addSkill")
+		void shouldRegisterSkillProgrammatically() {
+			ToolCallback callback = SkillsTool.builder()
+				.addSkill("my-skill", "A programmatic skill", "This is the skill content.")
+				.build();
+
+			assertThat(callback).isNotNull();
+			assertThat(callback.getToolDefinition().description()).contains("my-skill");
+			assertThat(callback.getToolDefinition().description()).contains("A programmatic skill");
+		}
+
+		@Test
+		@DisplayName("should return content without base directory for programmatic skill")
+		void shouldReturnContentWithoutBaseDirectory() {
+			SkillsTool.Skill skill = new SkillsTool.Skill("",
+					Map.of("name", "my-skill", "description", "A programmatic skill"),
+					"This is the skill content.");
+
+			SkillsTool.SkillsFunction function = new SkillsTool.SkillsFunction(Map.of("my-skill", skill));
+
+			String result = function.apply(new SkillsTool.SkillsInput("my-skill"));
+
+			assertThat(result).isEqualTo("This is the skill content.");
+			assertThat(result).doesNotContain("Base directory for this skill:");
+		}
+
+	}
 }
