@@ -73,6 +73,11 @@ class ToolCallListenersTest {
 			return this.errorReport;
 		}
 
+		@Override
+		public void afterCompletion(Object context, String toolName, String toolInput) {
+			this.log.add("completion:" + toolName + ":" + context);
+		}
+
 	}
 
 	@Test
@@ -83,7 +88,8 @@ class ToolCallListenersTest {
 		String result = wrapped.call("{\"text\":\"hi\"}");
 
 		assertThat(result).isEqualTo("\"echo: hi\"");
-		assertThat(listener.log).containsExactly("before:Echo", "after:Echo:ctx-Echo:\"echo: hi\"");
+		assertThat(listener.log).containsExactly("before:Echo", "after:Echo:ctx-Echo:\"echo: hi\"",
+				"completion:Echo:ctx-Echo");
 	}
 
 	@Test
@@ -95,7 +101,8 @@ class ToolCallListenersTest {
 		String result = wrapped.call("{\"text\":\"x\"}");
 
 		assertThat(result).isEqualTo("Tool 'Boom' failed: kaboom");
-		assertThat(listener.log).contains("error:Boom:ctx-Boom:kaboom");
+		assertThat(listener.log).containsExactly("before:Boom", "error:Boom:ctx-Boom:kaboom",
+				"completion:Boom:ctx-Boom");
 	}
 
 	@Test
@@ -104,7 +111,8 @@ class ToolCallListenersTest {
 		ToolCallback wrapped = ToolCallListeners.wrap(failingTool(), listener);
 
 		assertThatThrownBy(() -> wrapped.call("{\"text\":\"x\"}")).hasMessageContaining("kaboom");
-		assertThat(listener.log).contains("error:Boom:ctx-Boom:kaboom");
+		assertThat(listener.log).containsExactly("before:Boom", "error:Boom:ctx-Boom:kaboom",
+				"completion:Boom:ctx-Boom");
 	}
 
 	@Test

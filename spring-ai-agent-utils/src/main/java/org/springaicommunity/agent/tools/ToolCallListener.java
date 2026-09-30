@@ -76,4 +76,15 @@ public interface ToolCallListener {
 		return null;
 	}
 
+	/**
+	 * Called once after the invocation completes, whether it returned normally or failed.
+	 * Use this for unconditional cleanup of resources associated with the invocation.
+	 * This method is not called if {@link #beforeCall} throws.
+	 * @param context the value returned by {@link #beforeCall} (may be null)
+	 * @param toolName the tool's definition name
+	 * @param toolInput the raw JSON input
+	 */
+	default void afterCompletion(Object context, String toolName, String toolInput) {
+	}
+
 }
