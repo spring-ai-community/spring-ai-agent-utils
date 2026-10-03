@@ -20,20 +20,20 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
-import io.a2a.client.Client;
-import io.a2a.client.ClientEvent;
-import io.a2a.client.TaskEvent;
-import io.a2a.client.TaskUpdateEvent;
-import io.a2a.client.config.ClientConfig;
-import io.a2a.client.transport.jsonrpc.JSONRPCTransport;
-import io.a2a.client.transport.jsonrpc.JSONRPCTransportConfig;
-import io.a2a.spec.AgentCard;
-import io.a2a.spec.Artifact;
-import io.a2a.spec.Message;
-import io.a2a.spec.Part;
-import io.a2a.spec.Task;
-import io.a2a.spec.TextPart;
-import io.a2a.spec.TaskState;
+import org.a2aproject.sdk.client.Client;
+import org.a2aproject.sdk.client.ClientEvent;
+import org.a2aproject.sdk.client.TaskEvent;
+import org.a2aproject.sdk.client.TaskUpdateEvent;
+import org.a2aproject.sdk.client.config.ClientConfig;
+import org.a2aproject.sdk.client.transport.jsonrpc.JSONRPCTransport;
+import org.a2aproject.sdk.client.transport.jsonrpc.JSONRPCTransportConfig;
+import org.a2aproject.sdk.spec.AgentCard;
+import org.a2aproject.sdk.spec.Artifact;
+import org.a2aproject.sdk.spec.Message;
+import org.a2aproject.sdk.spec.Part;
+import org.a2aproject.sdk.spec.Task;
+import org.a2aproject.sdk.spec.TaskState;
+import org.a2aproject.sdk.spec.TextPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springaicommunity.agent.common.task.subagent.SubagentDefinition;
@@ -45,7 +45,7 @@ import org.springaicommunity.agent.common.task.subagent.TaskCall;
  * Demonstrates how to implement {@link SubagentExecutor} for remote agent communication.
  *
  * @author Christian Tzolov
- * @see <a href="https://google.github.io/A2A/">A2A Protocol Specification</a>
+ * @see <a href="https://a2a-protocol.org">A2A Protocol Specification</a>
  */
 public class A2ASubagentExecutor implements SubagentExecutor {
 
@@ -63,7 +63,7 @@ public class A2ASubagentExecutor implements SubagentExecutor {
 
 		try {
 			// Create the message
-			Message message = new Message.Builder().role(Message.Role.USER)
+			Message message = Message.builder().role(Message.Role.ROLE_USER)
 				.parts(List.of(new TextPart(taskCall.prompt(), null)))
 				.build();
 
@@ -82,17 +82,17 @@ public class A2ASubagentExecutor implements SubagentExecutor {
 					return;
 				}
 
-				TaskState taskState = task.getStatus().state();
+				TaskState taskState = task.status().state();
 				logger.info("Received task response: status={}", taskState);
 
 				// Extract text from artifacts
-				if (task.getArtifacts() != null) {
+				if (task.artifacts() != null) {
 					StringBuilder sb = new StringBuilder();
-					for (Artifact artifact : task.getArtifacts()) {
+					for (Artifact artifact : task.artifacts()) {
 						if (artifact.parts() != null) {
 							for (Part<?> part : artifact.parts()) {
 								if (part instanceof TextPart textPart) {
-									sb.append(textPart.getText());
+									sb.append(textPart.text());
 								}
 							}
 						}
