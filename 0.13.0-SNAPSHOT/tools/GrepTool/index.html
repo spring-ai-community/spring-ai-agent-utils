@@ -4377,9 +4377,11 @@
 <li><a href="../SkillsTool/">SkillsTool</a> - For creating code analysis skills</li>
 </ul>
 <h2 id="directory-confinement-alloweddirectory-alloweddirectories">Directory confinement (<code>allowedDirectory</code> / <code>allowedDirectories</code>)<a class="headerlink" href="#directory-confinement-alloweddirectory-alloweddirectories" title="Permanent link">&para;</a></h2>
-<p>By itself, <code>workingDirectory(...)</code> is only the <strong>default</strong> used when the model omits the
-<code>path</code> argument — an explicit <code>path</code> is taken as-is. To confine searches to a workspace,
-also configure allowed directories (same semantics and shared implementation with
+<p><code>workingDirectory(...)</code> is the <strong>default</strong> used when the model omits the <code>path</code> argument,
+and the base a <strong>relative</strong> <code>path</code> is resolved against (an absolute <code>path</code> is taken as-is;
+without a working directory, relative paths resolve against the JVM working directory).
+By itself it does not confine searches. To confine searches to a workspace, also configure
+allowed directories (same semantics and shared implementation with
 <code>FileSystemTools</code>; empty = unrestricted):</p>
 <div class="highlight"><pre><span></span><code><span id="__span-70-1"><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a><span class="n">GrepTool</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-70-2"><a id="__codelineno-70-2" name="__codelineno-70-2" href="#__codelineno-70-2"></a><span class="w">    </span><span class="p">.</span><span class="na">workingDirectory</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span><span class="w">     </span><span class="c1">// default when path is omitted</span>

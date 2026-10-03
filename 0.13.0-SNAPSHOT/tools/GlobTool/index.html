@@ -3935,9 +3935,10 @@
 </span></code></pre></div></p>
 </li>
 <li>
-<p><strong>Use relative path from current directory:</strong>
-   <div class="highlight"><pre><span></span><code><span id="__span-47-1"><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="c1">// Relative to current working directory</span>
-</span><span id="__span-47-2"><a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a><span class="n">globTool</span><span class="p">.</span><span class="na">glob</span><span class="p">(</span><span class="s">"*.java"</span><span class="p">,</span><span class="w"> </span><span class="s">"./src"</span><span class="p">);</span>
+<p><strong>Use relative path from the working directory:</strong>
+   <div class="highlight"><pre><span></span><code><span id="__span-47-1"><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="c1">// Relative to the configured working directory (or workspace root);</span>
+</span><span id="__span-47-2"><a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a><span class="c1">// the JVM working directory if none is configured</span>
+</span><span id="__span-47-3"><a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a><span class="n">globTool</span><span class="p">.</span><span class="na">glob</span><span class="p">(</span><span class="s">"*.java"</span><span class="p">,</span><span class="w"> </span><span class="s">"./src"</span><span class="p">);</span>
 </span></code></pre></div></p>
 </li>
 <li>
@@ -4120,9 +4121,11 @@
 <li><a href="../ShellTools/">ShellTools</a> - For running system commands</li>
 </ul>
 <h2 id="directory-confinement-alloweddirectory-alloweddirectories">Directory confinement (<code>allowedDirectory</code> / <code>allowedDirectories</code>)<a class="headerlink" href="#directory-confinement-alloweddirectory-alloweddirectories" title="Permanent link">&para;</a></h2>
-<p>By itself, <code>workingDirectory(...)</code> is only the <strong>default</strong> used when the model omits the
-<code>path</code> argument — an explicit <code>path</code> is taken as-is. To confine searches to a workspace,
-also configure allowed directories (same semantics and shared implementation with
+<p><code>workingDirectory(...)</code> is the <strong>default</strong> used when the model omits the <code>path</code> argument,
+and the base a <strong>relative</strong> <code>path</code> is resolved against (an absolute <code>path</code> is taken as-is;
+without a working directory, relative paths resolve against the JVM working directory).
+By itself it does not confine searches. To confine searches to a workspace, also configure
+allowed directories (same semantics and shared implementation with
 <code>FileSystemTools</code>; empty = unrestricted):</p>
 <div class="highlight"><pre><span></span><code><span id="__span-59-1"><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a><span class="n">GlobTool</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-59-2"><a id="__codelineno-59-2" name="__codelineno-59-2" href="#__codelineno-59-2"></a><span class="w">    </span><span class="p">.</span><span class="na">workingDirectory</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span><span class="w">     </span><span class="c1">// default when path is omitted</span>
