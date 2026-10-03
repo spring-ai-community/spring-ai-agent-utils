@@ -35,7 +35,7 @@ ChatClient chatClient = chatClientBuilder.defaultTools(observed).build();
 
 ## Semantics
 
-- **Correlation context** — `beforeCall` may return any opaque object; the decorator hands it back to `afterCall`/`onError` for the same invocation. Use it for use/result correlation ids or duration measurement (store a start timestamp). All listener methods have no-op defaults.
+- **Correlation context** — `beforeCall` may return any opaque object; the decorator hands it back to `afterCall`/`onError`/`afterCompletion` for the same invocation. Use it for use/result correlation ids, duration measurement, or resources that need cleanup after the tool invocation. `afterCompletion` runs once after success or failure handling; it is not called if `beforeCall` throws. All listener methods have no-op defaults.
 - **Error policy is yours** — `onError` returning a non-null string reports the failure to the model as the tool result (report-and-continue, letting the agent adapt); returning `null` propagates the exception (fail-fast).
 - **Transparent decoration** — `getToolDefinition()`/`getToolMetadata()` are delegated untouched, so wrapping composes with `ToolCallbacks.from(...)`, `FunctionToolCallback`, the skills tool, and any other callback source.
 - **Listener methods must not throw** — the decorator deliberately doesn't guard listener calls (observability failures stay loud instead of leaving silent audit gaps). A throwing `beforeCall` prevents the tool from running; a throwing `afterCall` discards a result whose side effects have already happened (and the model may retry the tool); a throwing `onError` replaces the original tool exception. Handle your own failures inside the listener.

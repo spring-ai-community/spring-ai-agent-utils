@@ -95,7 +95,8 @@ public final class ToolCallListeners {
 					return reported;
 				}
 				throw ex;
-			} finally {
+			}
+			finally {
 				this.listener.afterCompletion(context, toolName, toolInput);
 			}
 		}

@@ -137,6 +137,40 @@ class ToolCallListenersTest {
 	}
 
 	@Test
+	void afterCompletionRunsEvenWhenTheToolThrowsAnError() {
+		RecordingListener listener = new RecordingListener();
+		ToolCallback erroring = FunctionToolCallback.builder("Fatal", (Function<EchoInput, String>) input -> {
+			throw new StackOverflowError("fatal");
+		}).description("Always errors").inputType(EchoInput.class).build();
+		ToolCallback wrapped = ToolCallListeners.wrap(erroring, listener);
+
+		assertThatThrownBy(() -> wrapped.call("{\"text\":\"x\"}")).isInstanceOf(StackOverflowError.class);
+		// onError only handles RuntimeException; cleanup still runs
+		assertThat(listener.log).containsExactly("before:Fatal", "completion:Fatal:ctx-Fatal");
+	}
+
+	@Test
+	void afterCompletionIsNotCalledWhenBeforeCallThrows() {
+		List<String> log = new ArrayList<>();
+		ToolCallback wrapped = ToolCallListeners.wrap(echoTool(), new ToolCallListener() {
+
+			@Override
+			public Object beforeCall(String toolName, String toolInput) {
+				throw new IllegalStateException("not allowed");
+			}
+
+			@Override
+			public void afterCompletion(Object context, String toolName, String toolInput) {
+				log.add("completion");
+			}
+
+		});
+
+		assertThatThrownBy(() -> wrapped.call("{\"text\":\"hi\"}")).hasMessageContaining("not allowed");
+		assertThat(log).isEmpty();
+	}
+
+	@Test
 	void noOpListenerLeavesBehaviorUnchanged() {
 		ToolCallback wrapped = ToolCallListeners.wrap(echoTool(), new ToolCallListener() {
 		});
