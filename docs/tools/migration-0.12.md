@@ -8,7 +8,7 @@ This release introduces the sandboxing foundation: the `ExecBackend` and `Worksp
 <dependency>
     <groupId>org.springaicommunity</groupId>
     <artifactId>spring-ai-agent-utils</artifactId>
-    <version>0.12.0</version>
+    <version>0.13.0</version>
 </dependency>
 ```
 
