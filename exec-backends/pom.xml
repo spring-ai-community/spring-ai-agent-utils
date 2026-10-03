@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.springaicommunity</groupId>
 		<artifactId>spring-ai-agent-utils-parent</artifactId>
-		<version>0.13.0</version>
+		<version>0.13.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>spring-ai-agent-utils-exec-backends</artifactId>
