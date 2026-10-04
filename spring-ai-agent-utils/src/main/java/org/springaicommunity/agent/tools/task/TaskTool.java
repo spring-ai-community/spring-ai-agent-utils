@@ -189,6 +189,8 @@ public class TaskTool {
 
 		private List<SubagentReference> subagentReferences = new ArrayList<>();
 
+		private final List<SubagentDefinition> programmaticSubagents = new ArrayList<>();
+
 		private List<SubagentType> subagentTypes = new ArrayList<>();
 
 		private String taskDescriptionTemplate = TASK_DESCRIPTION_TEMPLATE;
@@ -196,6 +198,12 @@ public class TaskTool {
 		private TaskRepository taskRepository = new DefaultTaskRepository();
 
 		private Builder() {
+		}
+
+		public Builder addSubagent(SubagentDefinition definition) {
+			Assert.notNull(definition, "subagent definition must not be null");
+			this.programmaticSubagents.add(definition);
+			return this;
 		}
 
 		public Builder subagentReferences(List<SubagentReference> subagentReferences) {
@@ -259,9 +267,8 @@ public class TaskTool {
 
 			Assert.notEmpty(this.subagentTypes, "At least one subagentTypes must be provided");
 
-			List<SubagentDefinition> subagentDefinitions = this.subagentReferences.stream()
-				.map(sr -> this.resolve(sr))
-				.toList();
+			List<SubagentDefinition> subagentDefinitions = new ArrayList<>(this.programmaticSubagents);
+			subagentDefinitions.addAll(this.subagentReferences.stream().map(sr -> this.resolve(sr)).toList());
 
 			String subagentRegistrations = subagentDefinitions.stream()
 				.map(sa -> sa.toSubagentRegistrations())
