@@ -21,6 +21,7 @@ This project demonstrates how to reverse-engineer and reimplement Claude Code's 
 spring-ai-agent-utils/
 ├── spring-ai-agent-utils-common/        # Shared subagent SPI (interfaces & records)
 ├── spring-ai-agent-utils/               # Core library (tools, advisors, skills, Claude subagents)
+├── spring-ai-agent-utils-test/          # Test fixtures for agent loops (add with scope=test)
 ├── spring-ai-agent-utils-a2a/           # A2A protocol subagent implementation
 ├── spring-ai-agent-utils-bom/           # Bill of Materials for version management
 │
@@ -82,6 +83,7 @@ While these tools can be used standalone, truly agentic behavior emerges when th
 |--------|-------------|
 | [**spring-ai-agent-utils**](spring-ai-agent-utils/README.md) | Core library - tools, skills, Claude subagents, and full API reference |
 | [**spring-ai-agent-utils-common**](spring-ai-agent-utils-common/README.md) | Shared subagent SPI (SubagentDefinition, SubagentResolver, SubagentExecutor, SubagentType) |
+| [**spring-ai-agent-utils-test**](spring-ai-agent-utils-test/README.md) | Test fixtures for building agent loops, e.g. `ScriptedChatModel` (add with `scope=test`) |
 | [**spring-ai-agent-utils-a2a**](spring-ai-agent-utils-a2a/README.md) | A2A protocol subagent for remote agent orchestration |
 | [**spring-ai-agent-utils-docker-cli**](docs/tools/DockerCliExecBackend.md) | Docker ExecBackend - run agent shell commands inside a sandbox container (in `exec-backends/`) |
 | [**spring-ai-agent-utils-bom**](spring-ai-agent-utils-bom/pom.xml) | Bill of Materials for consistent version management across all modules |
