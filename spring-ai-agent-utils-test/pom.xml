@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springaicommunity</groupId>
+		<artifactId>spring-ai-agent-utils-parent</artifactId>
+		<version>0.14.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>spring-ai-agent-utils-test</artifactId>
+	<version>0.14.0-SNAPSHOT</version>
+	<name>spring-ai-agent-utils-test</name>
+	<description>Test fixtures for building agent loops on Spring AI Agent Utilities. Add with
+		scope=test; it is not meant to ship on an application's runtime classpath.</description>
+
+	<url>https://github.com/spring-ai-community/spring-ai-agent-utils</url>
+
+	<scm>
+		<url>https://github.com/spring-ai-community/spring-ai-agent-utils</url>
+		<connection>git://github.com/spring-ai-community/spring-ai-agent-utils.git</connection>
+		<developerConnection>git@github.com:spring-ai-community/spring-ai-agent-utils.git</developerConnection>
+	</scm>
+
+	<organization>
+		<name>Spring AI Community</name>
+		<url>https://github.com/spring-ai-community</url>
+	</organization>
+
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Christian Tzolov</name>
+		</developer>
+	</developers>
+
+	<issueManagement>
+		<system>Github Issues</system>
+		<url>https://github.com/spring-ai-community/spring-ai-agent-utils/issues</url>
+	</issueManagement>
+	<ciManagement>
+		<system>Github Actions</system>
+		<url>https://github.com/spring-ai-community/spring-ai-agent-utils/actions</url>
+	</ciManagement>
+
+	<properties>
+		<maven.compiler.target>17</maven.compiler.target>
+		<maven.compiler.source>17</maven.compiler.source>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-client-chat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.10.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.25.3</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.ai</groupId>
+				<artifactId>spring-ai-bom</artifactId>
+				<version>${spring-ai.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+</project>
