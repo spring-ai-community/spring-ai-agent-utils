@@ -17,6 +17,8 @@ package org.springaicommunity.agent.utils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Parser for Markdown documents with optional YAML front matter.
@@ -51,6 +53,8 @@ import java.util.Map;
  */
 public class MarkdownParser {
 
+	private static final Pattern FRONT_MATTER_DELIMITER = Pattern.compile("(?m)^---[\\t ]*\\r?$");
+
 	/**
 	 * Map containing the parsed front matter key-value pairs.
 	 */
@@ -80,19 +84,19 @@ public class MarkdownParser {
 			return;
 		}
 
-		// Check if document starts with front-matter delimiter (---)
-		if (markdown.startsWith("---")) {
+		// Front-matter delimiters must occupy an entire line.
+		Matcher delimiterMatcher = FRONT_MATTER_DELIMITER.matcher(markdown);
+		if (delimiterMatcher.lookingAt()) {
+			int startIndex = delimiterMatcher.end();
 			// Find the closing delimiter
-			int endIndex = markdown.indexOf("---", 3);
-
-			if (endIndex != -1) {
+			if (delimiterMatcher.find()) {
 				// Extract front-matter section
-				String frontMatterSection = markdown.substring(3, endIndex).trim();
+				String frontMatterSection = markdown.substring(startIndex, delimiterMatcher.start()).trim();
 				parseFrontMatter(frontMatterSection);
 
 				// Extract remaining content (skip the closing --- and any following
 				// newlines)
-				content = markdown.substring(endIndex + 3).trim();
+				content = markdown.substring(delimiterMatcher.end()).trim();
 			}
 			else {
 				// No closing delimiter found, treat entire document as content
@@ -162,4 +166,5 @@ public class MarkdownParser {
 	public String getContent() {
 		return content;
 	}
+
 }

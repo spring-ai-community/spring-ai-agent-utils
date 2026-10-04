@@ -44,6 +44,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SkillsTest {
 
 	@Test
+	@DisplayName("loadDirectory preserves triple dashes in skill metadata")
+	void loadDirectoryPreservesDashesInSkillMetadata(@TempDir Path tempDir) throws IOException {
+		Files.writeString(tempDir.resolve("SKILL.md"), """
+				---
+				name: diff-skill
+				description: "Compare before---after"
+				---
+
+				# Instructions
+				""");
+
+		List<Skill> skills = Skills.loadDirectory(tempDir.toString());
+
+		assertThat(skills).singleElement().satisfies(skill -> {
+			assertThat(skill.frontMatter()).containsEntry("name", "diff-skill")
+				.containsEntry("description", "Compare before---after");
+			assertThat(skill.content()).isEqualTo("# Instructions");
+		});
+	}
+
+	@Test
 	@DisplayName("loadResource aggregates skills across multiple JARs sharing the same classpath prefix")
 	void loadResourceAggregatesSkillsAcrossMultipleJarsSharingSamePrefix(@TempDir Path tempDir) throws IOException {
 		// Two "SkillsJars" that both publish under the shared META-INF/skills root, as
