@@ -257,7 +257,7 @@ public SkillsTool skillsTool() {
 Skills that are not packaged as `SKILL.md` files (for example generated at runtime, or loaded from a database or configuration service) can be registered directly with `addSkill(name, description, content)`. They can be combined with skills loaded from directories and resources:
 
 ```java
-SkillsTool skillsTool = SkillsTool.builder()
+ToolCallback skillsTool = SkillsTool.builder()
     .addSkillsResource(new ClassPathResource("META-INF/skills"))
     .addSkill("release-notes", "Drafts release notes from merged pull requests",
             releaseNotesInstructions)
@@ -265,6 +265,58 @@ SkillsTool skillsTool = SkillsTool.builder()
 ```
 
 Programmatic skills have no base directory, so when the model invokes one, the skill content is returned as is.
+
+The names and descriptions are advertised in the tool definition; the instructions are
+returned when the model calls `Skill` with `{"command":"release-notes"}`. Registering a
+skill does not execute it or grant access to file or shell tools. Build a new callback
+when the application's catalogue changes.
+
+The instruction content is already supplied to the builder; disclosure to the model is
+deferred until activation. Deferring package downloads is a separate application optimization.
+
+#### Preparing Supporting Files on Activation
+
+`addSkill(name, description, content)` registers the skill's metadata and instructions.
+For a complete skill ZIP containing `scripts/`, `references/`, and `assets/`, use
+`beforeCall` to download and extract the selected package when the model activates it:
+
+```java
+import org.springaicommunity.agent.tools.ToolCallListener;
+import org.springaicommunity.agent.tools.ToolCallListeners;
+import tools.jackson.databind.json.JsonMapper;
+
+JsonMapper mapper = JsonMapper.builder().build();
+
+ToolCallback skillCallback = SkillsTool.builder()
+    .workspace(workspace)
+    .addSkill(skill.name(), skill.description(), skill.content())
+    .build();
+
+ToolCallback observedSkill = ToolCallListeners.wrap(
+    skillCallback,
+    new ToolCallListener() {
+        @Override
+        public Object beforeCall(String toolName, String toolInput) {
+            // toolName is "Skill"; toolInput example: {"command":"pdf"}
+            var input = mapper.readValue(toolInput, SkillsTool.SkillsInput.class);
+            if (input != null && skill.name().equals(input.command())) {
+                downloadSkillsZip(input.command(), workspace);
+            }
+            return null;
+        }
+    }
+);
+
+ChatClient chatClient = chatClientBuilder
+    .defaultTools(observedSkill)
+    .build();
+```
+
+`downloadSkillsZip(...)` is your application method: look up the registered package in
+the database, download and unzip it into the workspace before returning, or reuse cached
+files. Ensure `skill.content()` identifies the extracted resource directory;
+`.workspace(...)` does not add that path for programmatic skills. File/shell tools must
+be configured separately. See [ToolCallListener](ToolCallListener.md) for failure handling.
 
 ### Loading from Classpath JARs (SkillsJars)
 
