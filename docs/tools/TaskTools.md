@@ -248,6 +248,36 @@ ToolCallback taskTool = TaskTool.builder()
     .build();
 ```
 
+### Registering Subagents Programmatically
+
+When a definition already exists in memory (for example from request JSON, a database,
+or a configuration service), register it with `addSubagent(SubagentDefinition)` instead
+of writing a Markdown file or implementing a resolver for that definition:
+
+```java
+var reviewer = new ClaudeSubagentDefinition(
+    new SubagentReference("in-memory:code-reviewer", ClaudeSubagentDefinition.KIND),
+    Map.of(
+        "name", "code-reviewer",
+        "description", "Reviews code and reports findings with file references.",
+        "tools", "Read,Grep,Glob",
+        "disallowedTools", "Write,Edit,Bash"
+    ),
+    "Review the requested code. Explain each finding and cite its location."
+);
+
+ToolCallback taskTool = TaskTool.builder()
+    .subagentTypes(claudeType)
+    .addSubagent(reviewer)
+    .build();
+```
+
+The definition's reference identifies it; it is not resolved or read by the builder.
+Register a matching `SubagentType` to supply the executor for its kind. Direct definitions
+can be combined with `subagentReferences(...)`, and registering a Claude type continues
+to include the official built-in subagents. Names must be unique across all sources.
+Build a new callback for each catalogue snapshot when request or database configuration changes.
+
 ### Combining Claude and A2A Subagents
 
 ```java

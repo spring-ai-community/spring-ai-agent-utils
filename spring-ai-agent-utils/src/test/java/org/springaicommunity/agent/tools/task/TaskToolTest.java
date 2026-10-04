@@ -15,10 +15,13 @@
  */
 package org.springaicommunity.agent.tools.task;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springaicommunity.agent.common.task.subagent.SubagentDefinition;
 import org.springaicommunity.agent.common.task.subagent.SubagentExecutor;
+import org.springaicommunity.agent.common.task.subagent.SubagentReference;
 import org.springaicommunity.agent.common.task.subagent.SubagentType;
 import org.springaicommunity.agent.common.task.subagent.TaskCall;
 import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentDefinition;
@@ -89,6 +92,39 @@ class TaskToolTest {
 		String description = tool.getToolDefinition().description();
 		assertThat(description).contains("general-purpose");
 		assertThat(description).contains("Explore");
+	}
+
+	@Test
+	void shouldRegisterAndInvokeSubagentProgrammatically() {
+		String description = "Review code with \"quoted\" descriptions\nand file references.";
+		var definition = new ClaudeSubagentDefinition(
+				new SubagentReference("in-memory:code-reviewer", ClaudeSubagentDefinition.KIND),
+				Map.of("name", "code-reviewer", "description", description),
+				"Review the code.\n---\nPreserve these instructions without parsing Markdown.");
+		SubagentExecutor executor = new SubagentExecutor() {
+			@Override
+			public String getKind() {
+				return ClaudeSubagentDefinition.KIND;
+			}
+
+			@Override
+			public String execute(TaskCall taskCall, SubagentDefinition subagent) {
+				assertThat(subagent).isSameAs(definition);
+				assertThat(taskCall.prompt()).isEqualTo("Review the code");
+				return "Review completed";
+			}
+		};
+		ToolCallback tool = TaskTool.builder()
+			.addSubagent(definition)
+			.subagentTypes(new SubagentType(new ClaudeSubagentResolver(), executor))
+			.taskRepository(taskRepository)
+			.build();
+
+		assertThat(tool.getToolDefinition().description()).contains("code-reviewer", description, "general-purpose",
+				"Explore");
+		assertThat(tool.call("""
+				{"description":"Review code","prompt":"Review the code","subagent_type":"code-reviewer"}
+				""")).contains("Review completed");
 	}
 
 	@Test
