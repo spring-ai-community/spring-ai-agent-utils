@@ -21,11 +21,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+
+import org.springframework.ai.support.ToolCallbacks;
+
+import tools.jackson.databind.json.JsonMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -314,13 +319,12 @@ class GrepToolTest {
 		}
 
 		@Test
-		@Disabled("File type filtering has PathMatcher implementation limitations - needs fix in GrepToolPureJava")
 		@DisplayName("Should filter by file type")
 		void shouldFilterByFileType() throws IOException {
 			// Given
 			Path javaFile = tempDir.resolve("Test.java");
 			Path pyFile = tempDir.resolve("test.py");
-			Files.writeString(javaFile, "public class Test {}", StandardCharsets.UTF_8);
+			Files.writeString(javaFile, "def test():", StandardCharsets.UTF_8);
 			Files.writeString(pyFile, "def test():", StandardCharsets.UTF_8);
 
 			// When
@@ -333,14 +337,13 @@ class GrepToolTest {
 		}
 
 		@Test
-		@Disabled("File type filtering has PathMatcher implementation limitations - needs fix in GrepToolPureJava")
 		@DisplayName("Should filter by Java file type")
 		void shouldFilterByJavaType() throws IOException {
 			// Given
 			Path javaFile = tempDir.resolve("Test.java");
 			Path txtFile = tempDir.resolve("test.txt");
 			Files.writeString(javaFile, "public class Test", StandardCharsets.UTF_8);
-			Files.writeString(txtFile, "some text", StandardCharsets.UTF_8);
+			Files.writeString(txtFile, "public class Test", StandardCharsets.UTF_8);
 
 			// When
 			String result = grepTool.grep("public", tempDir.toString(), null, null, null, null, null, null, null,
@@ -362,16 +365,58 @@ class GrepToolTest {
 			Path jsFile = subDir.resolve("test.js");
 			Files.writeString(tsFile, "interface Test {}", StandardCharsets.UTF_8);
 			Files.writeString(tsxFile, "const Component = () => {}", StandardCharsets.UTF_8);
-			Files.writeString(jsFile, "function test() {}", StandardCharsets.UTF_8);
+			Files.writeString(jsFile, "const Component = () => {}", StandardCharsets.UTF_8);
 
-			// When - Use glob instead of type for more reliable matching
-			String result = grepTool.grep("interface|Component", tempDir.toString(), "*.{ts,tsx}", null, null, null,
-					null, null, null, null, null, null, null);
+			// When
+			String result = grepTool.grep("interface|Component", tempDir.toString(), null, null, null, null, null,
+					null, null, "ts", null, null, null);
 
 			// Then
 			assertThat(result).contains(tsFile.toString());
 			assertThat(result).contains(tsxFile.toString());
 			assertThat(result).doesNotContain(jsFile.toString());
+		}
+
+		@ParameterizedTest
+		@EnumSource(GrepTool.OutputMode.class)
+		void shouldFilterRootAndNestedFilesByTypeThroughToolCallback(GrepTool.OutputMode mode) throws IOException {
+			Path rootFile = tempDir.resolve("Root.java");
+			Path nestedDirectory = Files.createDirectories(tempDir.resolve("src"));
+			Path nestedFile = nestedDirectory.resolve("Nested.java");
+			Path otherFile = nestedDirectory.resolve("Other.txt");
+			Files.writeString(rootFile, "needle\nneedle\n", StandardCharsets.UTF_8);
+			Files.writeString(nestedFile, "needle\nneedle\n", StandardCharsets.UTF_8);
+			Files.writeString(otherFile, "needle\nneedle\n", StandardCharsets.UTF_8);
+			GrepTool tool = GrepTool.builder().workingDirectory(tempDir).allowedDirectory(tempDir).build();
+
+			String response = ToolCallbacks.from(tool)[0]
+				.call("{\"pattern\":\"needle\",\"type\":\"java\",\"outputMode\":\"" + mode.name() + "\"}");
+			String result = JsonMapper.shared().readValue(response, String.class);
+
+			assertThat(result).contains(rootFile.toString(), nestedFile.toString()).doesNotContain(otherFile.toString());
+			if (mode == GrepTool.OutputMode.count) {
+				assertThat(result).contains(rootFile + ":2", nestedFile + ":2");
+			}
+			else if (mode == GrepTool.OutputMode.content) {
+				assertThat(result).contains("1:  needle", "2:  needle");
+			}
+		}
+
+		@ParameterizedTest
+		@EnumSource(GrepTool.OutputMode.class)
+		void shouldFilterSingleFileByType(GrepTool.OutputMode mode) throws IOException {
+			Path javaFile = tempDir.resolve("Test.java");
+			Path otherFile = tempDir.resolve("test.txt");
+			Files.writeString(javaFile, "needle\n", StandardCharsets.UTF_8);
+			Files.writeString(otherFile, "needle\n", StandardCharsets.UTF_8);
+
+			String matched = grepTool.grep("needle", javaFile.toString(), null, mode, null, null, null, null, null,
+					"java", null, null, null);
+			String excluded = grepTool.grep("needle", otherFile.toString(), null, mode, null, null, null, null, null,
+					"java", null, null, null);
+
+			assertThat(matched).contains(javaFile.toString());
+			assertThat(excluded).isEqualTo("No matches found for pattern: needle");
 		}
 
 	}

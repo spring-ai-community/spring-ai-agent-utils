@@ -249,7 +249,9 @@ public class GrepTool {
 			String[] extensions = FILE_TYPE_EXTENSIONS.get(type.toLowerCase());
 			if (extensions != null) {
 				for (String ext : extensions) {
-					matchers.add(FileSystems.getDefault().getPathMatcher("glob:" + ext));
+					// Type extensions describe file names, not their parent directories.
+					PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + ext);
+					matchers.add(file -> matcher.matches(file.getFileName()));
 				}
 			}
 		}
