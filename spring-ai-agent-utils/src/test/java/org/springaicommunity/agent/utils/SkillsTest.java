@@ -34,6 +34,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.springaicommunity.agent.tools.SkillsTool.Skill;
 
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.UrlResource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -121,7 +122,40 @@ class SkillsTest {
 		}
 	}
 
+	@Test
+	@DisplayName("loadResource releases JAR handles for a direct JAR URL")
+	void loadResourceReleasesDirectJarHandle(@TempDir Path tempDir) throws IOException {
+		Path jar = createSkillJar(tempDir.resolve("direct.jar"), "direct-skill");
+		UrlResource resource = new UrlResource("jar:" + jar.toUri() + "!/META-INF/skills/");
+
+		List<Skill> skills = Skills.loadResource(resource);
+
+		assertThat(skills.stream().map(skill -> skill.frontMatter().get("name")))
+			.containsExactly("direct-skill");
+		Files.delete(jar);
+		assertThat(jar).doesNotExist();
+	}
+
+	@Test
+	@DisplayName("loadResource releases JAR handles when directory entries are absent")
+	void loadResourceReleasesFallbackJarHandle(@TempDir Path tempDir) throws IOException {
+		Path jar = createSkillJar(tempDir.resolve("fallback.jar"), "fallback-skill", false);
+
+		try (URLClassLoader classLoader = new URLClassLoader(new URL[] { jar.toUri().toURL() }, null)) {
+			List<Skill> skills = Skills.loadResource(new ClassPathResource("META-INF/skills", classLoader));
+
+			assertThat(skills.stream().map(skill -> skill.frontMatter().get("name")))
+				.containsExactly("fallback-skill");
+		}
+		Files.delete(jar);
+		assertThat(jar).doesNotExist();
+	}
+
 	private static Path createSkillJar(Path jarPath, String skillName) throws IOException {
+		return createSkillJar(jarPath, skillName, true);
+	}
+
+	private static Path createSkillJar(Path jarPath, String skillName, boolean directoryEntries) throws IOException {
 		// A real MANIFEST.MF is required: both the classpath*: resolution strategy and
 		// the manual JAR scan fallback in Skills discover JAR roots by enumerating
 		// ClassLoader.getResources("META-INF/MANIFEST.MF") across the classpath, which
@@ -129,10 +163,12 @@ class SkillsTest {
 		Manifest manifest = new Manifest();
 		manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
 		try (JarOutputStream jos = new JarOutputStream(Files.newOutputStream(jarPath), manifest)) {
-			jos.putNextEntry(new JarEntry("META-INF/skills/"));
-			jos.closeEntry();
-			jos.putNextEntry(new JarEntry("META-INF/skills/" + skillName + "/"));
-			jos.closeEntry();
+			if (directoryEntries) {
+				jos.putNextEntry(new JarEntry("META-INF/skills/"));
+				jos.closeEntry();
+				jos.putNextEntry(new JarEntry("META-INF/skills/" + skillName + "/"));
+				jos.closeEntry();
+			}
 			jos.putNextEntry(new JarEntry("META-INF/skills/" + skillName + "/SKILL.md"));
 			jos.write(("""
 					---
