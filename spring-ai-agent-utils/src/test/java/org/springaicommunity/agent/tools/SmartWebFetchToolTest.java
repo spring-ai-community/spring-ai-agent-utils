@@ -16,10 +16,18 @@
 package org.springaicommunity.agent.tools;
 
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -314,30 +322,44 @@ class SmartWebFetchToolTest {
 
 		@Test
 		@DisplayName("Should handle concurrent cache access safely")
-		void shouldHandleConcurrentCacheAccessSafely() throws InterruptedException {
+		void shouldHandleConcurrentCacheAccessSafely() throws Exception {
 			int threadCount = 10;
-			CountDownLatch latch = new CountDownLatch(threadCount);
-			AtomicInteger successCount = new AtomicInteger(0);
+			AtomicInteger httpRequests = new AtomicInteger();
+			byte[] body = "<html><body>Concurrent cache fixture.</body></html>".getBytes(StandardCharsets.UTF_8);
+			HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+			server.createContext("/", exchange -> {
+				httpRequests.incrementAndGet();
+				exchange.getResponseHeaders().set("Content-Type", "text/html; charset=utf-8");
+				exchange.sendResponseHeaders(200, body.length);
+				try (var response = exchange.getResponseBody()) {
+					response.write(body);
+				}
+			});
+			server.start();
+			ExecutorService clients = Executors.newFixedThreadPool(threadCount);
+			String baseUrl = "http://127.0.0.1:" + server.getAddress().getPort();
+			try {
+				List<Callable<String>> fetches = new ArrayList<>();
+				for (int i = 0; i < threadCount; i++) {
+					String url = baseUrl + "/page/" + i;
+					fetches.add(() -> tool.webFetch(url, "test"));
+				}
+				for (Future<String> result : clients.invokeAll(fetches, 10, TimeUnit.SECONDS)) {
+					assertThat(result.get()).isEqualTo("Mocked AI response");
+				}
+				assertThat(httpRequests.get()).isEqualTo(threadCount);
 
-			for (int i = 0; i < threadCount; i++) {
-				new Thread(() -> {
-					try {
-						// This will fail with network errors, but tests thread safety
-						tool.webFetch("https://this-wont-work-" + Math.random() + ".com",
-								"test");
-					}
-					catch (Exception e) {
-						// Expected
-					}
-					finally {
-						successCount.incrementAndGet();
-						latch.countDown();
-					}
-				}).start();
+				// Each concurrent fetch populated its cache entry; repeated reads must
+				// return the cached summary without fetching the page again.
+				for (int i = 0; i < threadCount; i++) {
+					assertThat(tool.webFetch(baseUrl + "/page/" + i, "test")).isEqualTo("Mocked AI response");
+				}
+				assertThat(httpRequests.get()).isEqualTo(threadCount);
 			}
-
-			assertThat(latch.await(10, TimeUnit.SECONDS)).isTrue();
-			assertThat(successCount.get()).isEqualTo(threadCount);
+			finally {
+				clients.shutdownNow();
+				server.stop(0);
+			}
 		}
 
 	}
