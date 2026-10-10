@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.Scanner;
 
 import org.springaicommunity.agent.advisors.AutoMemoryToolsAdvisor;
+import org.springaicommunity.agent.tools.AgentToolset;
 import org.springaicommunity.agent.utils.AgentEnvironment;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -38,16 +39,19 @@ public class Application {
 
 		return args -> {
 
+			Tools tools = new Tools();
+
 			ChatClient chatClient = chatClientBuilder // @formatter:off
 				
-				.defaultTools(new Tools()) // workaround for https://github.com/spring-projects/spring-ai/issues/6325
+				.defaultTools(tools) // workaround for https://github.com/spring-projects/spring-ai/issues/6325
 
 				// system prompt
 				.defaultSystem(p -> p.text(systemPrompt) // system prompt
 					.param(AgentEnvironment.ENVIRONMENT_INFO_KEY, AgentEnvironment.info())
 					.param(AgentEnvironment.GIT_STATUS_KEY, AgentEnvironment.gitStatus())
 					.param(AgentEnvironment.AGENT_MODEL_KEY, agentModel)
-					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, agentModelKnowledgeCutoff))
+					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, agentModelKnowledgeCutoff)
+					.params(AgentToolset.promptVariables(tools)))
 				
 				.defaultAdvisors(
 					// Long-term memory advisor

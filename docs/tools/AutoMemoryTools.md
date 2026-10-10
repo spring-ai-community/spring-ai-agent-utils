@@ -317,10 +317,13 @@ The companion system prompt `AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md` is bundled in t
 
 The prompt contains one template placeholder: `{MEMORIES_ROOT_DIERCTORY}` (note the intentional spelling), which should be filled with the configured memories directory path so the agent can reference it in responses.
 
+When `mainPrompt` is `MAIN_AGENT_SYSTEM_PROMPT_V2.md`, also pass the [AgentEnvironment](AgentEnvironment.md) placeholders and [`AgentToolset.promptVariables(...)`](AgentToolset.md#system-prompt). That template's `{if(FLAG)}` sections are required variables; a memory-only agent (no Bash, Write, or WebFetch) should pass those flags as `false` so the model is not told to call tools it does not have.
+
 ```java
 chatClientBuilder.defaultSystem(p -> p
     .text(mainPrompt + "\n\n" + memoryToolsPrompt)
-    .param("MEMORIES_ROOT_DIERCTORY", memoryDir));
+    .param("MEMORIES_ROOT_DIERCTORY", memoryDir)
+    .params(AgentToolset.promptVariables(autoMemoryTools, todoWriteTool)));
 ```
 
 ## Demo Application

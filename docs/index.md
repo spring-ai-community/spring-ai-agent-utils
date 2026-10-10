@@ -8,6 +8,8 @@ Spring AI Agent Utils reimplements core Claude Code capabilities as Spring AI to
 
 This project demonstrates how to reverse-engineer and reimplement Claude Code's powerful features within the Spring AI ecosystem, making them available to Java developers building AI agents.
 
+[`AgentToolset`](tools/AgentToolset.md) builds the standard shell, file, and search callbacks from an `ExecBackend` and `Workspace`, so that assembly does not have to be copied at every call site.
+
 ## Project Structure
 
 ```
@@ -101,7 +103,12 @@ public class Application {
                     .param(AgentEnvironment.ENVIRONMENT_INFO_KEY, AgentEnvironment.info())
                     .param(AgentEnvironment.GIT_STATUS_KEY, AgentEnvironment.gitStatus())
                     .param(AgentEnvironment.AGENT_MODEL_KEY, "claude-sonnet-4-5-20250929")
-                    .param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, "2025-01-01"))
+                    .param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, "2025-01-01")
+                    .params(AgentToolset.promptVariables(taskTool,
+                        ShellTools.builder().build(),
+                        FileSystemTools.builder().build(),
+                        SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build(),
+                        TodoWriteTool.builder().build())))
 
                 .defaultTools(
                     // Sub-Agents

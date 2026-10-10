@@ -15,6 +15,7 @@ Use these placeholders in your system prompt markdown files:
 | `{AGENT_MODEL}` | Model identifier | `agent.model` property |
 | `{AGENT_MODEL_KNOWLEDGE_CUTOFF}` | Knowledge cutoff date | `agent.model.knowledge.cutoff` property |
 
+Tool instructions in the same prompt are gated with `{if(FLAG)}` … `{endif}` (StringTemplate, which Spring AI uses for `{ENVIRONMENT_INFO}` and the other placeholders). Those flags are not produced here. [AgentToolset.promptVariables](AgentToolset.md#system-prompt) derives them from the callbacks you register, so a `READ` tier does not keep the Bash / Write sections. The default renderer throws when a flag used by the template is missing.
 
 ## API Reference
 
@@ -142,14 +143,19 @@ String agentModelKnowledgeCutoff;
 Use the `AgentEnvironment` utility to provide dynamic context to your system prompt:
 
 ```java
+import org.springaicommunity.agent.tools.AgentToolset;
 import org.springaicommunity.agent.utils.AgentEnvironment;
+
+List<ToolCallback> tools = AgentToolset.builder().build();
 
 ChatClient chatClient = chatClientBuilder
     .defaultSystem(p -> p.text(systemPrompt) // Load system prompt from classpath
         .param(AgentEnvironment.ENVIRONMENT_INFO_KEY, AgentEnvironment.info())
         .param(AgentEnvironment.GIT_STATUS_KEY, AgentEnvironment.gitStatus())
         .param(AgentEnvironment.AGENT_MODEL_KEY, agentModel)
-        .param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, agentModelKnowledgeCutoff))
+        .param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, agentModelKnowledgeCutoff)
+        .params(AgentToolset.promptVariables(tools)))
+    .defaultTools(tools)
     // ... rest of configuration
     .build();
 ```

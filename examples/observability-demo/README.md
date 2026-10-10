@@ -8,7 +8,7 @@ Shows how to observe and interrupt the agent's tool-calling loop. A `ChatClient.
 - **[InterruptAdvisor](../../docs/tools/InterruptAdvisor.md)**: the turn stops when you type `/stop`, or when it has made `agent.max-tool-calls-per-turn` tool calls. Both conditions are combined in one `interruptSignal`.
 - **Composition**: the listener's per-turn counter drives the advisor's budget check.
 
-Tools: `ShellTools`, `FileSystemTools`, `GlobTool`, `GrepTool`, `ListDirectoryTool`.
+Tools: the default [`AgentToolset`](../../docs/tools/AgentToolset.md) (`Bash` / `BashOutput` / `KillShell`, `Read` / `Write` / `Edit`, `Grep`, `Glob`, `ListDirectory`), with the demo's `ToolCallListener` attached by the builder.
 
 ## Running the Demo
 
@@ -47,8 +47,10 @@ Illustrative output (the exact tool calls depend on the model):
 AtomicBoolean stopRequested = new AtomicBoolean();
 AtomicInteger toolCalls = new AtomicInteger();
 
-// Trace and count every tool call
-List<ToolCallback> tools = ToolCallListeners.wrapAll(toolCallbacks, listener);
+// Trace and count every tool call of the default toolset
+List<ToolCallback> tools = AgentToolset.builder()
+    .listener(listener)
+    .build();
 
 ChatClient chatClient = chatClientBuilder
     .defaultTools(tools)

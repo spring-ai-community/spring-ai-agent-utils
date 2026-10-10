@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Scanner;
 
+import org.springaicommunity.agent.tools.AgentToolset;
 import org.springaicommunity.agent.tools.AutoMemoryTools;
 import org.springaicommunity.agent.tools.TodoWriteTool;
 import org.springaicommunity.agent.utils.AgentEnvironment;
@@ -43,6 +44,8 @@ public class Application {
 		return args -> {
 
 			var systemMessage = toString(systemPrompt) + "\n\n" + toString(memorySystemPrompt);
+			var memoryTools = AutoMemoryTools.builder().memoriesDir(memoryDir).build();
+			var todoWrite = TodoWriteTool.builder().build();
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off
 				// system prompt
@@ -51,13 +54,11 @@ public class Application {
 					.param(AgentEnvironment.GIT_STATUS_KEY, AgentEnvironment.gitStatus())
 					.param(AgentEnvironment.AGENT_MODEL_KEY, agentModel)
 					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, agentModelKnowledgeCutoff)
-					.param("MEMORIES_ROOT_DIERCTORY", memoryDir))
+					.param("MEMORIES_ROOT_DIERCTORY", memoryDir)
+					.params(AgentToolset.promptVariables(memoryTools, todoWrite)))
 
 				// Built-in tools
-				.defaultTools(
-					AutoMemoryTools.builder().memoriesDir(memoryDir).build(),
-					TodoWriteTool.builder().build()
-				)
+				.defaultTools(memoryTools, todoWrite)
 				
 				.defaultAdvisors(
 					// Custom logging advisor

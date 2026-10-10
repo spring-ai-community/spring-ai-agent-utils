@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.springaicommunity.agent.advisors.InterruptAdvisor;
 import org.springaicommunity.agent.advisors.TurnInterruptedException;
+import org.springaicommunity.agent.tools.AgentToolset;
 import org.springaicommunity.agent.tools.AskUserQuestionTool;
 import org.springaicommunity.agent.tools.BraveWebSearchTool;
 import org.springaicommunity.agent.tools.FileSystemTools;
@@ -96,7 +97,8 @@ public class Application {
 					.param(AgentEnvironment.ENVIRONMENT_INFO_KEY, AgentEnvironment.info())
 					.param(AgentEnvironment.GIT_STATUS_KEY, AgentEnvironment.gitStatus())
 					.param(AgentEnvironment.AGENT_MODEL_KEY, agentModel)
-					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, agentModelKnowledgeCutoff))
+					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, agentModelKnowledgeCutoff)
+					.params(AgentToolset.promptVariables(tools)))
 
 				// All tools, wrapped with the console listener
 				.defaultTools(observedTools)

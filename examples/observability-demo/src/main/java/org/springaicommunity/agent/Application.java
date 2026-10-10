@@ -1,7 +1,6 @@
 package org.springaicommunity.agent;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
@@ -13,19 +12,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springaicommunity.agent.advisors.InterruptAdvisor;
 import org.springaicommunity.agent.advisors.TurnInterruptedException;
-import org.springaicommunity.agent.tools.FileSystemTools;
-import org.springaicommunity.agent.tools.GlobTool;
-import org.springaicommunity.agent.tools.GrepTool;
-import org.springaicommunity.agent.tools.ListDirectoryTool;
-import org.springaicommunity.agent.tools.ShellTools;
+import org.springaicommunity.agent.tools.AgentToolset;
 import org.springaicommunity.agent.tools.ToolCallListener;
-import org.springaicommunity.agent.tools.ToolCallListeners;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -83,9 +76,7 @@ public class Application {
 
 			};
 
-			List<ToolCallback> tools = ToolCallListeners.wrapAll(Arrays.asList(ToolCallbacks.from(
-					ShellTools.builder().build(), FileSystemTools.builder().build(), GlobTool.builder().build(),
-					GrepTool.builder().build(), ListDirectoryTool.builder().build())), listener);
+			List<ToolCallback> tools = AgentToolset.builder().listener(listener).build();
 
 			// @formatter:off
 			ChatClient chatClient = chatClientBuilder

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Scanner;
 
+import org.springaicommunity.agent.tools.AgentToolset;
 import org.springaicommunity.agent.tools.FileSystemTools;
 import org.springaicommunity.agent.tools.ShellTools;
 import org.springaicommunity.agent.utils.AgentEnvironment;
@@ -43,6 +44,8 @@ public class Application {
 		return args -> {
 
 			var systemMessage = toString(systemPrompt) + "\n\n" + toString(memorySystemPrompt);
+			var shellTools = ShellTools.builder().build();
+			var fileSystemTools = FileSystemTools.builder().build();
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off
 				// system prompt
@@ -51,14 +54,15 @@ public class Application {
 					.param(AgentEnvironment.GIT_STATUS_KEY, AgentEnvironment.gitStatus())
 					.param(AgentEnvironment.AGENT_MODEL_KEY, agentModel)
 					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, agentModelKnowledgeCutoff)
-					.param("MEMORIES_ROOT_DIERCTORY", memoryDir))
+					.param("MEMORIES_ROOT_DIERCTORY", memoryDir)
+					.params(AgentToolset.promptVariables(shellTools, fileSystemTools)))
 
 				// Built-in tools
 				.defaultTools(
 					//Bash execution tool
-					ShellTools.builder().build(),// built-in shell tools
+					shellTools,// built-in shell tools
 					// Read, Write and Edit files tool
-					FileSystemTools.builder().build())
+					fileSystemTools)
 				
 				.defaultAdvisors(
 					// Custom logging advisor
