@@ -18,6 +18,10 @@ package org.springaicommunity.agent.utils;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
+
 /**
  * Parser for Markdown documents with optional YAML front matter.
  * <p>
@@ -43,6 +47,8 @@ import java.util.Map;
  * <ul>
  * <li>Front matter with key-value pairs separated by colons</li>
  * <li>Values with or without quotes (both single and double quotes are supported)</li>
+ * <li>Folded ({@code >}) and literal ({@code |}) block scalars, with optional {@code -}
+ * or {@code +} chomping indicators</li>
  * <li>Documents without front matter (entire content is treated as body)</li>
  * <li>Empty or null markdown input</li>
  * </ul>
@@ -87,7 +93,7 @@ public class MarkdownParser {
 
 			if (endIndex != -1) {
 				// Extract front-matter section
-				String frontMatterSection = markdown.substring(3, endIndex).trim();
+				String frontMatterSection = markdown.substring(3, endIndex);
 				parseFrontMatter(frontMatterSection);
 
 				// Extract remaining content (skip the closing --- and any following
@@ -107,10 +113,10 @@ public class MarkdownParser {
 	}
 
 	private void parseFrontMatter(String frontMatterSection) {
-		String[] lines = frontMatterSection.split("\n");
+		String[] lines = frontMatterSection.split("\n", -1);
 
-		for (String line : lines) {
-			line = line.trim();
+		for (int i = 0; i < lines.length; i++) {
+			String line = lines[i].trim();
 
 			if (line.isEmpty()) {
 				continue;
@@ -122,8 +128,29 @@ public class MarkdownParser {
 				String key = line.substring(0, colonIndex).trim();
 				String value = line.substring(colonIndex + 1).trim();
 
-				// Removes surrounding quotes from a value string if present.
-				value = removeQuotes(value);
+				if (value.matches("[>|][+-]?")) {
+					int keyIndent = lines[i].length() - lines[i].stripLeading().length();
+					StringBuilder block = new StringBuilder("value: ").append(value).append('\n');
+					while (i + 1 < lines.length) {
+						String nextLine = lines[i + 1];
+						int indent = nextLine.length() - nextLine.stripLeading().length();
+						if (!nextLine.isBlank() && indent <= keyIndent) {
+							break;
+						}
+						i++;
+						block.append(nextLine.substring(Math.min(keyIndent, nextLine.length())));
+						if (i < lines.length - 1) {
+							block.append('\n');
+						}
+					}
+					Map<String, String> scalar = new Yaml(new SafeConstructor(new LoaderOptions()))
+						.load(block.toString());
+					value = scalar.get("value");
+				}
+				else {
+					// Removes surrounding quotes from a value string if present.
+					value = removeQuotes(value);
+				}
 
 				frontMatter.put(key, value);
 			}
@@ -162,4 +189,5 @@ public class MarkdownParser {
 	public String getContent() {
 		return content;
 	}
+
 }
