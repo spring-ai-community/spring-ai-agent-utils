@@ -93,7 +93,8 @@ examples/.claude/skills/
 ```markdown
 ---
 name: my-skill
-description: Comprehensive description including what the skill does,
+description: >-
+  Comprehensive description including what the skill does,
   when to use it, and trigger keywords users might mention.
 allowed-tools: Read, Grep, Bash
 model: claude-sonnet-4-5-20250929
@@ -114,6 +115,10 @@ Concrete examples demonstrating skill usage.
 - For complete details, see [reference.md](reference.md)
 - For usage examples, see [examples.md](examples.md)
 ```
+
+Use `>-` to fold a multiline description into one string without a trailing newline.
+Literal blocks (`|`) preserve line breaks; both forms support YAML's `-` (strip) and `+` (keep) chomping indicators.
+Single-line frontmatter values keep their existing parsing behavior.
 
 ## Frontmatter Fields
 
