@@ -275,6 +275,58 @@ class FileSystemToolsTest {
 	class EditToolTests {
 
 		@Test
+		@DisplayName("Should reject an empty old_string for every replace_all mode")
+		void shouldRejectEmptyOldString() throws IOException {
+			Path file = tempDir.resolve("edit.txt");
+			String original = "Line 1\nLine 2";
+			Files.writeString(file, original, StandardCharsets.UTF_8);
+
+			for (Boolean replaceAll : new Boolean[] { null, false, true }) {
+				String result = tools.edit(file.toString(), "", "replacement", replaceAll);
+
+				assertThat(result).isEqualTo("Error: old_string must not be empty");
+				assertThat(file).hasContent(original);
+			}
+		}
+
+		@Test
+		@DisplayName("Should reject a null old_string without changing the file")
+		void shouldRejectNullOldString() throws IOException {
+			Path file = tempDir.resolve("edit.txt");
+			String original = "Line 1\nLine 2";
+			Files.writeString(file, original, StandardCharsets.UTF_8);
+
+			String result = tools.edit(file.toString(), null, "replacement", null);
+
+			assertThat(result).isEqualTo("Error: old_string must not be empty");
+			assertThat(file).hasContent(original);
+		}
+
+		@Test
+		@DisplayName("Should allow whitespace as old_string")
+		void shouldReplaceWhitespaceOldString() throws IOException {
+			Path file = tempDir.resolve("edit.txt");
+			Files.writeString(file, "left right", StandardCharsets.UTF_8);
+
+			String result = tools.edit(file.toString(), " ", "-", null);
+
+			assertThat(result).contains("has been updated");
+			assertThat(file).hasContent("left-right");
+		}
+
+		@Test
+		@DisplayName("Should allow an empty new_string to delete a match")
+		void shouldDeleteMatchedString() throws IOException {
+			Path file = tempDir.resolve("edit.txt");
+			Files.writeString(file, "left-middle-right", StandardCharsets.UTF_8);
+
+			String result = tools.edit(file.toString(), "-middle", "", null);
+
+			assertThat(result).contains("has been updated");
+			assertThat(file).hasContent("left-right");
+		}
+
+		@Test
 		@DisplayName("Should edit file by replacing unique string")
 		void shouldEditFileByReplacingUniqueString() throws IOException {
 			// Given
