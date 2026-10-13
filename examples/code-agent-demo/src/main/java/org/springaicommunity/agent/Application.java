@@ -60,8 +60,8 @@ public class Application {
 			// AirBnb MCP Tools
 			tools.addAll(Arrays.asList(mcpToolCallbackProvider.getToolCallbacks()));
 
-			// Skills tool
-			tools.add(SkillsTool.builder().addSkillsResources(skillPaths).build());
+			// Skills tool (one tool callback per skill)
+			tools.addAll(Arrays.asList(SkillsTool.builder().addSkillsResources(skillPaths).build().getToolCallbacks()));
 
 			tools.addAll(Arrays.asList(ToolCallbacks.from(
 				// Todo management tool

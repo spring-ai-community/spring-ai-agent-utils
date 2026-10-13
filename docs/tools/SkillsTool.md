@@ -4,6 +4,7 @@ Extend AI agent capabilities with reusable, composable knowledge modules defined
 
 **Features:**
 - Define skills as Markdown files with YAML frontmatter
+- Every skill is registered as its own tool, named after the skill
 - Automatic skill invocation through semantic matching
 - Support for reference files and helper scripts
 - Progressive disclosure of detailed information
@@ -16,9 +17,9 @@ Extend AI agent capabilities with reusable, composable knowledge modules defined
 Skills are markdown files that teach the AI agent how to perform specific tasks. Unlike traditional tools that execute code, skills provide **knowledge and instructions** to the AI, enabling it to handle specialized domains effectively.
 
 **How Skills Work:**
-1. **Discovery**: At startup, SkillsTool loads skill names and descriptions
-2. **Semantic Matching**: When a user request matches a skill's description, the AI invokes it
-3. **Execution**: The full skill content is loaded and the AI follows its instructions
+1. **Discovery**: At startup, SkillsTool loads every `SKILL.md` and registers **one tool per skill**, named after the skill and described by the skill's front-matter
+2. **Semantic Matching**: When a user request matches a skill's description, the AI calls that skill's tool (no arguments)
+3. **Execution**: The full skill content is returned and the AI follows its instructions
 
 Extend agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter:
 
@@ -193,7 +194,7 @@ Skills can come from multiple sources — filesystem directories, classpath reso
 ### Loading from Directories
 
 ```java
-SkillsTool skillsTool = SkillsTool.builder()
+ToolCallbackProvider skillsTool = SkillsTool.builder()
     .addSkillsDirectory(".claude/skills")           // Project skills
     .addSkillsDirectory(System.getenv("HOME") + "/.claude/skills")  // Personal skills
     .build();
@@ -202,7 +203,7 @@ SkillsTool skillsTool = SkillsTool.builder()
 Alternative using `addSkillsDirectories`:
 
 ```java
-SkillsTool skillsTool = SkillsTool.builder()
+ToolCallbackProvider skillsTool = SkillsTool.builder()
     .addSkillsDirectories(List.of(
         ".claude/skills",
         System.getenv("HOME") + "/.claude/skills"
@@ -226,7 +227,7 @@ public class SkillsConfig {
     private ResourceLoader resourceLoader;
 
     @Bean
-    public SkillsTool skillsTool() {
+    public ToolCallbackProvider skillsTool() {
         Resource skillsResource = resourceLoader.getResource("classpath:.claude/skills");
 
         return SkillsTool.builder()
@@ -240,7 +241,7 @@ Loading multiple resources:
 
 ```java
 @Bean
-public SkillsTool skillsTool() {
+public ToolCallbackProvider skillsTool() {
     List<Resource> skillResources = List.of(
         resourceLoader.getResource("classpath:.claude/skills"),
         resourceLoader.getResource("file:${user.home}/.claude/skills")
@@ -293,7 +294,7 @@ Add the JAR as a dependency, then point `SkillsTool` at the classpath prefix:
 ```
 
 ```java
-SkillsTool skillsTool = SkillsTool.builder()
+ToolCallbackProvider skillsTool = SkillsTool.builder()
     .addSkillsResource(new ClassPathResource("META-INF/resources/skills/anthropics/skills"))
     .build();
 ```
@@ -301,7 +302,7 @@ SkillsTool skillsTool = SkillsTool.builder()
 You can mix sources freely — filesystem directories, classpath JARs, and explicit JAR URLs:
 
 ```java
-SkillsTool skillsTool = SkillsTool.builder()
+ToolCallbackProvider skillsTool = SkillsTool.builder()
     .addSkillsDirectory(".claude/skills")                                         // Local filesystem
     .addSkillsResource(new ClassPathResource("META-INF/skills/my-org/my-skills")) // From a dependency JAR
     .addSkillsResource(new UrlResource("jar:file:/opt/skills.jar!/skills"))       // Explicit JAR URL
@@ -361,13 +362,17 @@ Skills loaded from JAR/classpath resources keep their synthetic base path unchan
 
 ### Custom Tool Description Template
 
+The template is applied **per skill**. It must contain a single `%s` placeholder, which is
+replaced by that skill's rendered front-matter (its `description`, followed by any remaining
+fields such as `allowed-tools` and `model`).
+
 ```java
 String customTemplate = """
-    Execute a custom skill...
+    Execute this skill within the main conversation.
 
-    <available_skills>
     %s
-    </available_skills>
+
+    The response starts with the skill base directory, followed by the skill instructions.
     """;
 
 SkillsTool.builder()
@@ -392,7 +397,7 @@ SkillsTool.builder()
 import org.springframework.core.io.Resource;
 
 @Bean
-public SkillsTool skillsTool(ResourceLoader resourceLoader) {
+public ToolCallbackProvider skillsTool(ResourceLoader resourceLoader) {
     Resource projectSkills = resourceLoader.getResource("classpath:.claude/skills");
     Resource userSkills = resourceLoader.getResource("file:${user.home}/.claude/skills");
 
@@ -410,7 +415,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.UrlResource;
 
 @Bean
-public SkillsTool skillsTool() {
+public ToolCallbackProvider skillsTool() {
     return SkillsTool.builder()
         .addSkillsDirectory(".claude/skills")                                         // Local filesystem
         .addSkillsResource(new ClassPathResource("META-INF/skills/my-org/my-skills")) // From a dependency JAR
@@ -541,18 +546,21 @@ ChatClient chatClient = chatClientBuilder
 
 1. **Discovery** (at startup):
    - SkillsTool scans `.claude/skills/` directories
-   - Loads `name` and `description` from each `SKILL.md`
-   - Creates lightweight skill registry
+   - Loads each `SKILL.md` and registers one `ToolCallback` per skill, named after the skill's
+     `name` front-matter and described by its `description`
+   - Each skill tool takes **no arguments**
 
 2. **Activation** (on user request):
    - User: "Help me extract data from this PDF"
-   - AI matches request to skill descriptions
-   - AI invokes skill: `Skill(command="pdf-processor")`
+   - AI matches the request against the skill tool descriptions
+   - AI calls the skill's own tool: `pdf-processor()`
 
 3. **Execution**:
-   - SkillsTool loads full `SKILL.md` content
-   - Returns content + base directory to AI
+   - The skill's `SKILL.md` content is returned, prefixed with the skill base directory
    - AI follows skill instructions
+
+Because each skill is a first-class tool, per-skill allow/deny lists work out of the box — e.g. a
+Claude subagent definition can list `pdf` in its `tools` or `disallowedTools`.
 
 ### Invocation Example
 
@@ -561,7 +569,7 @@ ChatClient chatClient = chatClientBuilder
 "I need to process a PDF file and extract tables"
 
 // AI recognizes "pdf" skill matches
-// AI calls: Skill(command="pdf")
+// AI calls: pdf()
 
 // SkillsTool returns:
 "Base directory for this skill: /project/.claude/skills/pdf
@@ -741,13 +749,34 @@ python scripts/visualize.py data.csv --type bar --output chart.png
 
 ### Namespace Collision Handling
 
-If multiple skills have the same name:
+If multiple skills have the same name, scope them with a fully qualified name:
 
-```java
-// Use fully qualified names: directory:skill-name
-Skill(command="project-a:pdf")
-Skill(command="project-b:pdf")
+```yaml
+# .claude/skills/project-a/pdf/SKILL.md
+name: project-a:pdf
 ```
+
+```yaml
+# .claude/skills/project-b/pdf/SKILL.md
+name: project-b:pdf
+```
+
+The model providers do not accept `:` in a **tool** name, so `SkillsTool` derives the tool name
+from the skill name by replacing every character outside `[a-zA-Z0-9_-]` with `_` — the two skills
+above are registered as the tools `project-a_pdf` and `project-b_pdf`. The skill name itself stays
+as written, so `SKILL.md` files and subagent `skills:` lists keep using `project-a:pdf`.
+
+Tool names still have to be at most 64 characters, enforced at `build()` time. When two skills
+derive the **same** tool name — common when a classpath location is aggregated across several JARs
+and directories — the first one registered is kept and a warning is logged for each later
+duplicate, so the model is never shown a tool it can never reach:
+
+```text
+Ignoring duplicate skill 'project-a_pdf' from '/other/.claude/skills/pdf': tool name
+'project-a_pdf' already registered from skill 'project-a:pdf' in '/project-a/.claude/skills/pdf'
+```
+
+Scope colliding skills with fully qualified names (as above) if you need both to be reachable.
 
 ## Spring Boot Integration
 
@@ -772,7 +801,7 @@ public class SkillsConfiguration {
     private String userSkillsDir;
 
     @Bean
-    public SkillsTool skillsTool() {
+    public ToolCallbackProvider skillsTool() {
         return SkillsTool.builder()
             .addSkillsDirectory(projectSkillsDir)
             .addSkillsDirectory(userSkillsDir)
@@ -782,7 +811,7 @@ public class SkillsConfiguration {
     @Bean
     public ChatClient chatClient(
             ChatClient.Builder chatClientBuilder,
-            SkillsTool skillsTool) {
+            ToolCallbackProvider skillsTool) {
 
         return chatClientBuilder
             .defaultToolCallbacks(skillsTool)
@@ -853,7 +882,12 @@ new ClassPathResource("META-INF/skills/my-org/my-skills")
 
 ### Multiple Skills with Same Name
 
-**Problem:** Naming collision between skills
+**Problem:** A skill is missing and the log shows `Ignoring duplicate skill '…': tool name '…'
+already registered from skill '…'`
+
+**Cause:** Each skill is registered as its own tool. When two skills derive the same tool name,
+only the first registered one is kept; the rest are dropped with a warning so the model is never
+shown a tool it can never reach.
 
 **Solution:** Use fully qualified names
 ```markdown
@@ -861,11 +895,14 @@ new ClassPathResource("META-INF/skills/my-org/my-skills")
 name: project-name:skill-name
 ---
 ```
+The `:` is replaced by `_` when deriving the tool name, so the two skills no longer collide.
 
 ## Limitations
 
 - Skill descriptions limited to 1024 characters
-- Skill names limited to 64 characters
+- Skill names limited to 64 characters — the derived tool name must fit the provider limit
+- Characters outside `[a-zA-Z0-9_-]` are replaced by `_` in the derived tool name (e.g. `project-a:pdf` → `project-a_pdf`)
+- When derived tool names collide across sources, the first skill wins and the rest are dropped with a warning
 - Only `SKILL.md` files are recognized (exact name)
 - YAML frontmatter must be valid
 - Semantic matching depends on AI's understanding
@@ -883,6 +920,43 @@ name: project-name:skill-name
 9. **Document well**: Clear instructions for AI to follow
 10. **Maintain skills**: Update as requirements change
 11. **Share via JARs**: Package reusable skills as Maven/Gradle dependencies (SkillsJars) for cross-project sharing
+
+## Migration to 0.12.0
+
+`SkillsTool` used to register a **single** tool named `Skill`, whose description carried an
+`<available_skills>` catalog and which was invoked with the skill name as an argument
+(`Skill(command="pdf")`). Each skill is now its own tool.
+
+| Before (≤ 0.11) | After (0.12) |
+|---|---|
+| `ToolCallback build()` | `ToolCallbackProvider build()` |
+| One tool, `Skill` | One tool per skill, named after the skill |
+| `Skill(command="pdf")` | `pdf()` — no arguments |
+| `SkillsTool.SkillsInput`, `SkillsTool.SkillsFunction` | `SkillsTool.SkillFunction` |
+| `toolDescriptionTemplate` `%s` = the whole skill catalog | `%s` = a single skill's front-matter |
+| Duplicate skill names silently shadowed each other (last one won) | Colliding tool names keep the first skill and log a warning for the rest |
+| Skill name used as-is | Scoped names still supported; the tool name replaces illegal characters (`project-a:pdf` → `project-a_pdf`) |
+
+Registration is unchanged — `ChatClient.Builder.defaultTools(...)` and `defaultToolCallbacks(...)`
+both accept a `ToolCallbackProvider`:
+
+```java
+ChatClient chatClient = chatClientBuilder
+    .defaultToolCallbacks(SkillsTool.builder()
+        .addSkillsDirectory(".claude/skills")
+        .build())
+    .build();
+```
+
+Only code that stored the result in a `ToolCallback` variable needs updating:
+
+```java
+// Before
+ToolCallback skillsTool = SkillsTool.builder().addSkillsDirectory(".claude/skills").build();
+
+// After
+ToolCallbackProvider skillsTool = SkillsTool.builder().addSkillsDirectory(".claude/skills").build();
+```
 
 ## See Also
 
