@@ -220,7 +220,10 @@ public class SmartWebFetchTool implements AutoCloseable {
 			}
 		}
 		catch (WebFetchException e) {
-			logger.error("Failed to fetch URL: {}", url, e);
+			// A URL that cannot be fetched is a normal tool result reported back to the
+			// model, not an application fault, so keep it out of ERROR-level logs.
+			logger.warn("Failed to fetch URL: {}: {}", url, e.getMessage());
+			logger.debug("Fetch failure details for URL: {}", url, e);
 			return "Error fetching URL: " + e.getMessage();
 		}
 
@@ -292,17 +295,13 @@ public class SmartWebFetchTool implements AutoCloseable {
 			}
 		}
 
-		// All retries exhausted
+		// All retries exhausted: keep the last cause in the message so the model can tell
+		// a dead host from a transient server error.
+		String message = "Failed after " + (this.maxRetries + 1) + " attempts";
 		if (lastException == null) {
-			throw new WebFetchException("Failed after " + (this.maxRetries + 1) + " attempts", null);
+			throw new WebFetchException(message, null);
 		}
-		else if (lastException instanceof WebFetchException) {
-			throw new WebFetchException("Failed after " + (this.maxRetries + 1) + " attempts", lastException);
-		}
-		else {
-			throw new WebFetchException("Failed after " + (this.maxRetries + 1) + " attempts: "
-					+ lastException.getMessage(), lastException);
-		}
+		throw new WebFetchException(message + ": " + lastException.getMessage(), lastException);
 	}
 
 	private HttpResponse<String> fetchHtml(String url) {

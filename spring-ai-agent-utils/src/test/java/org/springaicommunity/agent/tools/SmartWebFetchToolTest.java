@@ -16,6 +16,9 @@
 package org.springaicommunity.agent.tools;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,6 +28,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import com.sun.net.httpserver.HttpServer;
 
 import org.springframework.ai.chat.client.ChatClient;
 
@@ -196,6 +201,39 @@ class SmartWebFetchToolTest {
 			String result = tool.webFetch("https://this-domain-does-not-exist-12345.com",
 					"test prompt");
 			assertThat(result).contains("Error fetching URL");
+		}
+
+		@Test
+		@DisplayName("Should keep the server error status when retries are exhausted")
+		void shouldKeepServerErrorStatusWhenRetriesAreExhausted() throws IOException {
+			HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0),
+					0);
+			server.createContext("/", exchange -> {
+				exchange.sendResponseHeaders(503, -1);
+				exchange.close();
+			});
+			server.start();
+			try {
+				String result = tool.webFetch("http://127.0.0.1:" + server.getAddress().getPort() + "/",
+						"test prompt");
+				assertThat(result).isEqualTo("Error fetching URL: Failed after 1 attempts: Server error: HTTP 503");
+			}
+			finally {
+				server.stop(0);
+			}
+		}
+
+		@Test
+		@DisplayName("Should keep the network error cause when retries are exhausted")
+		void shouldKeepNetworkErrorCauseWhenRetriesAreExhausted() throws IOException {
+			int closedPort;
+			try (ServerSocket socket = new ServerSocket(0, 1, InetAddress.getLoopbackAddress())) {
+				closedPort = socket.getLocalPort();
+			}
+
+			String result = tool.webFetch("http://127.0.0.1:" + closedPort + "/", "test prompt");
+			assertThat(result)
+				.startsWith("Error fetching URL: Failed after 1 attempts: Network error while fetching URL");
 		}
 
 		@Test
