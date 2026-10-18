@@ -15,6 +15,7 @@
 */
 package org.springaicommunity.agent.tools;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +53,14 @@ import org.springframework.util.Assert;
  * <code>spring.ai.tools.throw-exception-on-error=org.springaicommunity.agent.tools.AskUserQuestionTool$InvalidUserAnswerException</code>
  * has to be set for this behavior.
  *
+ * <p>
+ * When the {@link QuestionHandler} blocks waiting for a human answer, the tool can emit
+ * a <strong>heartbeat</strong> — a transport-agnostic liveness signal fired immediately
+ * when the wait begins and periodically while it lasts — via
+ * {@link Builder#heartbeat(Duration, Runnable)}. This keeps the interactive event from
+ * stalling in proxy buffers, which would otherwise deadlock the turn until the wait
+ * times out. See {@link Heartbeat} for details.
+ *
  * @author Christian Tzolov
  * @see <a href=
  * "https://platform.claude.com/docs/en/agent-sdk/user-input#question-format"> Claude
@@ -80,13 +89,24 @@ public class AskUserQuestionTool {
 
 	private final QuestionHandler questionHandler;
 
-
 	private final boolean answersValidation;
+
+	/**
+	 * Optional liveness signal emitted while the handler blocks waiting for a human
+	 * answer. {@code null} disables heartbeats.
+	 */
+	private final Heartbeat heartbeat;
 
 	protected AskUserQuestionTool(QuestionHandler questionHandler,
 			boolean answersValidation) {
+		this(questionHandler, answersValidation, null);
+	}
+
+	protected AskUserQuestionTool(QuestionHandler questionHandler,
+			boolean answersValidation, Heartbeat heartbeat) {
 		this.questionHandler = questionHandler;
 		this.answersValidation = answersValidation;
+		this.heartbeat = heartbeat;
 	}
 
 	/**
@@ -201,7 +221,9 @@ public class AskUserQuestionTool {
 			questions.forEach(q -> logger.trace("Question: {}", q.question()));
 		}
 
-		Map<String, String> result = this.questionHandler.handle(questions);
+		Map<String, String> result = (this.heartbeat != null)
+				? this.heartbeat.await(() -> this.questionHandler.handle(questions))
+				: this.questionHandler.handle(questions);
 
 		// Validate the answer map
 		if (this.answersValidation) {
@@ -308,6 +330,8 @@ public class AskUserQuestionTool {
 
 		private boolean answersValidation = true;
 
+		private Heartbeat heartbeat;
+
 		public Builder answersValidation(boolean answersValidation) {
 			this.answersValidation = answersValidation;
 			return this;
@@ -319,9 +343,28 @@ public class AskUserQuestionTool {
 			return this;
 		}
 
+		/**
+		 * Emit a liveness signal while the {@link #questionHandler(QuestionHandler)
+		 * question handler} blocks waiting for a human answer: once immediately when the
+		 * wait begins, and then every {@code interval} until it completes. Beats are
+		 * transport-agnostic — the callback decides what to do with the signal (flush an
+		 * SSE heartbeat frame, WebSocket ping, metric, log line).
+		 *
+		 * <p>
+		 * Without this option the tool blocks silently, which deadlocks the turn whenever
+		 * a proxy buffers the frame carrying the interactive event. See {@link Heartbeat}.
+		 * @param interval the delay between beats; must be positive
+		 * @param onBeat invoked on each beat; must not be null
+		 * @return this builder
+		 */
+		public Builder heartbeat(Duration interval, Runnable onBeat) {
+			this.heartbeat = new Heartbeat(interval, onBeat);
+			return this;
+		}
+
 		public AskUserQuestionTool build() {
 			Assert.notNull(questionHandler, "questionHandler must be provided");
-			return new AskUserQuestionTool(questionHandler, answersValidation);
+			return new AskUserQuestionTool(questionHandler, answersValidation, heartbeat);
 		}
 
 	}

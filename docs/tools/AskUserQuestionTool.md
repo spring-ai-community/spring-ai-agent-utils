@@ -9,6 +9,7 @@ A tool for asking users clarifying questions during AI agent execution. Enables 
 - 1-10 questions per interaction
 - Custom `QuestionHandler` callbacks for UI integration
 - Optional answer validation with configurable behavior
+- Optional heartbeat while waiting for human input, to keep interactive events from stalling in proxy buffers
 - Enhanced AI model integration with @JsonPropertyDescription annotations
 
 ## Overview
@@ -195,6 +196,51 @@ public class WebQuestionHandler {
     }
 }
 ```
+
+## Keeping the Connection Alive (Heartbeats)
+
+The blocking pattern above has a nasty failure mode in real deployments: SSE responses are frequently buffered by CDNs and reverse proxies (nginx without `X-Accel-Buffering: no`, Cloudflare, AWS ALB, ...). If the frame carrying the interactive event sits in a proxy buffer:
+
+- the client never receives the event and never learns the request id,
+- the client therefore never submits an answer,
+- the future blocks until its timeout — from the user's perspective the turn is **deadlocked**.
+
+The established mitigation is to publish a heartbeat immediately after the interactive event, plus periodic heartbeats while the future is pending, which push the buffered frames through the proxy. The `heartbeat()` builder option makes that a framework concern instead of application boilerplate:
+
+```java
+@RestController
+public class WebQuestionHandler {
+
+    private final SseEmitter emitter = ...;
+
+    public AskUserQuestionTool createTool() {
+        return AskUserQuestionTool.builder()
+            .questionHandler(this::handleQuestions)
+            .heartbeat(Duration.ofSeconds(15), () -> {
+                try {
+                    this.emitter.send(SseEmitter.event().comment("heartbeat"));
+                }
+                catch (IOException ex) {
+                    // transport is gone; there is nothing left to flush
+                }
+            })
+            .build();
+    }
+
+    // handleQuestions / submitAnswers stay exactly as before
+}
+```
+
+The heartbeat is **transport-agnostic**: the framework only invokes the callback; the application decides what to do with the signal — flush an SSE comment frame, send a WebSocket ping, emit a metric, write a log line.
+
+Semantics:
+
+- One beat fires immediately when the wait begins, then one every `interval` until the handler returns.
+- Beats are emitted on a dedicated daemon thread, so a slow beat callback can never block the wait, and a pending wait never holds back JVM shutdown.
+- The handler's result — or exception — passes through untouched, and beats stop as soon as it completes, successfully or not.
+- A failing periodic beat is logged and heartbeats continue — a broken beat transport is exactly the condition heartbeats exist to surface. The immediate beat runs on the calling thread, and its exceptions propagate.
+
+> **Tip:** the immediate beat fires just before the handler is invoked, so an event published *inside* the handler is flushed by the next periodic beat. If you need zero added latency, invoke the beat callback yourself right after publishing.
 
 ## Demo Application
 
