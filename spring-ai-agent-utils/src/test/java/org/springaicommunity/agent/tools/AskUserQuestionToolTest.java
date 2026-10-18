@@ -15,6 +15,7 @@
  */
 package org.springaicommunity.agent.tools;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,10 +23,13 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -602,6 +606,167 @@ class AskUserQuestionToolTest {
 			assertThat(callCount.get()).isEqualTo(threadCount);
 		}
 
+	}
+
+	@Nested
+	@DisplayName("Heartbeat Tests")
+	class HeartbeatTests {
+
+		private static final Duration INTERVAL = Duration.ofMillis(50);
+
+		private final ExecutorService executor = Executors.newCachedThreadPool();
+
+		@AfterEach
+		void tearDown() {
+			this.executor.shutdownNow();
+		}
+
+		@Test
+		@DisplayName("Should emit heartbeats while the handler blocks and stop once answers arrive")
+		void shouldEmitHeartbeatsWhileHandlerBlocks() throws Exception {
+			AtomicInteger beats = new AtomicInteger();
+			CountDownLatch releaseHandler = new CountDownLatch(1);
+
+			AskUserQuestionTool heartbeatTool = AskUserQuestionTool.builder()
+				.questionHandler(questions -> {
+					try {
+						releaseHandler.await(5, TimeUnit.SECONDS);
+					}
+					catch (InterruptedException ex) {
+						Thread.currentThread().interrupt();
+					}
+					Map<String, String> answers = new HashMap<>();
+					for (Question q : questions) {
+						answers.put(q.question(), q.options().get(0).label());
+					}
+					return answers;
+				})
+				.heartbeat(INTERVAL, beats::incrementAndGet)
+				.build();
+
+			List<Option> options = List.of(new Option("A", "First"), new Option("B", "Second"));
+			List<Question> questions = List.of(new Question("Question?", "Header", options, false));
+
+			Future<String> result = this.executor
+				.submit(() -> heartbeatTool.askUserQuestion(questions, null));
+
+			// 1 immediate beat + periodic beats while the handler is pending
+			awaitUntil(() -> beats.get() >= 3, 5, TimeUnit.SECONDS);
+			assertThat(beats.get()).isGreaterThanOrEqualTo(3);
+
+			releaseHandler.countDown();
+			assertThat(result.get(5, TimeUnit.SECONDS)).contains("User has answered your questions");
+
+			int beatsAfterAnswer = beats.get();
+			Thread.sleep(5 * INTERVAL.toMillis());
+			assertThat(beats.get()).isEqualTo(beatsAfterAnswer);
+		}
+
+		@Test
+		@DisplayName("Should not beat when no heartbeat is configured")
+		void shouldNotBeatByDefault() throws Exception {
+			AtomicInteger handlerCalls = new AtomicInteger();
+			AskUserQuestionTool plainTool = AskUserQuestionTool.builder()
+				.questionHandler(questions -> {
+					handlerCalls.incrementAndGet();
+					Map<String, String> answers = new HashMap<>();
+					for (Question q : questions) {
+						answers.put(q.question(), q.options().get(0).label());
+					}
+					return answers;
+				})
+				.build();
+
+			List<Option> options = List.of(new Option("A", "First"), new Option("B", "Second"));
+			List<Question> questions = List.of(new Question("Question?", "Header", options, false));
+
+			assertThat(plainTool.askUserQuestion(questions, null))
+				.contains("User has answered your questions");
+			assertThat(handlerCalls.get()).isEqualTo(1);
+			assertThat(hasLiveHeartbeatThread()).isFalse();
+		}
+
+		@Test
+		@DisplayName("Should stop heartbeats when the handler fails")
+		void shouldStopHeartbeatsWhenHandlerFails() {
+			AtomicInteger beats = new AtomicInteger();
+			RuntimeException handlerFailure = new IllegalStateException("user input failed");
+
+			AskUserQuestionTool heartbeatTool = AskUserQuestionTool.builder()
+				.questionHandler(questions -> {
+					throw handlerFailure;
+				})
+				.heartbeat(INTERVAL, beats::incrementAndGet)
+				.build();
+
+			List<Option> options = List.of(new Option("A", "First"), new Option("B", "Second"));
+			List<Question> questions = List.of(new Question("Question?", "Header", options, false));
+
+			assertThatThrownBy(() -> heartbeatTool.askUserQuestion(questions, null))
+				.isSameAs(handlerFailure);
+
+			assertThat(beats.get()).isEqualTo(1);
+			awaitUntil(() -> !hasLiveHeartbeatThread(), 5, TimeUnit.SECONDS);
+		}
+
+		@Test
+		@DisplayName("Should work together with answer validation")
+		void shouldWorkTogetherWithAnswerValidation() {
+			AtomicInteger beats = new AtomicInteger();
+			AskUserQuestionTool heartbeatTool = AskUserQuestionTool.builder()
+				.questionHandler(questions -> {
+					Map<String, String> answers = new HashMap<>();
+					for (Question q : questions) {
+						answers.put(q.question(), q.options().get(0).label());
+					}
+					return answers;
+				})
+				.heartbeat(INTERVAL, beats::incrementAndGet)
+				.build();
+
+			List<Option> options = List.of(new Option("A", "First"), new Option("B", "Second"));
+			List<Question> questions = List.of(new Question("Question?", "Header", options, false));
+
+			assertThat(heartbeatTool.askUserQuestion(questions, null))
+				.contains("User has answered your questions");
+			assertThat(beats.get()).isEqualTo(1);
+		}
+
+		@Test
+		@DisplayName("Should reject invalid heartbeat arguments in the builder")
+		void shouldRejectInvalidHeartbeatArguments() {
+			AskUserQuestionTool.Builder builder = AskUserQuestionTool.builder()
+				.questionHandler(questions -> Map.of());
+
+			assertThatThrownBy(() -> builder.heartbeat(null, () -> {
+			})).isInstanceOf(IllegalArgumentException.class);
+			assertThatThrownBy(() -> builder.heartbeat(Duration.ZERO, () -> {
+			})).isInstanceOf(IllegalArgumentException.class);
+			assertThatThrownBy(() -> builder.heartbeat(INTERVAL, null))
+				.isInstanceOf(IllegalArgumentException.class);
+		}
+
+	}
+
+	private static boolean hasLiveHeartbeatThread() {
+		return Thread.getAllStackTraces().keySet().stream()
+			.anyMatch(thread -> thread.getName().equals(Heartbeat.THREAD_NAME) && thread.isAlive());
+	}
+
+	private static void awaitUntil(BooleanSupplier condition, long timeout, TimeUnit unit) {
+		long deadline = System.nanoTime() + unit.toNanos(timeout);
+		while (System.nanoTime() < deadline) {
+			if (condition.getAsBoolean()) {
+				return;
+			}
+			try {
+				Thread.sleep(10);
+			}
+			catch (InterruptedException ex) {
+				Thread.currentThread().interrupt();
+				return;
+			}
+		}
 	}
 
 }
