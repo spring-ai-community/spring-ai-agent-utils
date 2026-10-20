@@ -21,6 +21,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
@@ -29,8 +32,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.springaicommunity.agent.common.workspace.Workspace;
 
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.execution.ToolExecutionException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.UrlResource;
@@ -364,6 +370,164 @@ class SkillsToolTest {
 			assertThat(callback.call("{\"command\":\"my-skill\"}")).isEqualTo("\"This is the skill content.\"");
 			assertThat(callback.call("{\"command\":\"spring-boot-skill\"}"))
 				.startsWith("\"Base directory for this skill: META-INF/skills/");
+		}
+
+	}
+
+	@Nested
+	@DisplayName("Skill Observation Tests")
+	class SkillObservationTests {
+
+		@Test
+		@DisplayName("should notify listener when skill is loaded with ToolContext")
+		void shouldNotifyListenerWhenSkillIsLoadedWithToolContext() {
+			AtomicReference<SkillsTool.Skill> loadedSkill = new AtomicReference<>();
+			AtomicReference<ToolContext> loadedContext = new AtomicReference<>();
+
+			ToolCallback callback = SkillsTool.builder()
+				.addSkill("my-skill", "My description", "My instructions content")
+				.onSkillLoaded((skill, toolContext) -> {
+					loadedSkill.set(skill);
+					loadedContext.set(toolContext);
+				})
+				.build();
+
+			ToolContext toolContext = new ToolContext(Map.of("sessionKey", "sessionVal"));
+			String result = callback.call("{\"command\":\"my-skill\"}", toolContext);
+
+			assertThat(result).isEqualTo("\"My instructions content\"");
+			assertThat(loadedSkill.get()).isNotNull();
+			assertThat(loadedSkill.get().name()).isEqualTo("my-skill");
+			assertThat(loadedSkill.get().content()).isEqualTo("My instructions content");
+			assertThat(loadedSkill.get().frontMatter()).containsEntry("description", "My description");
+			assertThat(loadedContext.get()).isSameAs(toolContext);
+		}
+
+		@Test
+		@DisplayName("should pass null ToolContext when called without context")
+		void shouldPassNullToolContextWhenCalledWithoutContext() {
+			AtomicReference<ToolContext> loadedContext = new AtomicReference<>();
+			AtomicReference<SkillsTool.Skill> loadedSkill = new AtomicReference<>();
+
+			ToolCallback callback = SkillsTool.builder()
+				.addSkill("my-skill", "Desc", "Content")
+				.onSkillLoaded((skill, toolContext) -> {
+					loadedSkill.set(skill);
+					loadedContext.set(toolContext);
+				})
+				.build();
+
+			callback.call("{\"command\":\"my-skill\"}");
+
+			assertThat(loadedSkill.get()).isNotNull();
+			assertThat(loadedContext.get()).isNull();
+		}
+
+		@Test
+		@DisplayName("should not notify listener when skill is not found")
+		void shouldNotNotifyListenerWhenSkillIsNotFound() {
+			AtomicInteger calls = new AtomicInteger();
+
+			ToolCallback callback = SkillsTool.builder()
+				.addSkill("my-skill", "Desc", "Content")
+				.onSkillLoaded((skill, toolContext) -> calls.incrementAndGet())
+				.build();
+
+			String result = callback.call("{\"command\":\"unknown-skill\"}");
+
+			assertThat(result).isEqualTo("\"Skill not found: unknown-skill\"");
+			assertThat(calls.get()).isZero();
+		}
+
+		@Test
+		@DisplayName("should support multiple listeners")
+		void shouldSupportMultipleListeners() {
+			AtomicInteger firstCalls = new AtomicInteger();
+			AtomicInteger secondCalls = new AtomicInteger();
+
+			ToolCallback callback = SkillsTool.builder()
+				.addSkill("my-skill", "Desc", "Content")
+				.onSkillLoaded((skill, toolContext) -> firstCalls.incrementAndGet())
+				.onSkillLoaded((skill, toolContext) -> secondCalls.incrementAndGet())
+				.build();
+
+			callback.call("{\"command\":\"my-skill\"}");
+
+			assertThat(firstCalls.get()).isEqualTo(1);
+			assertThat(secondCalls.get()).isEqualTo(1);
+		}
+
+		@Test
+		@DisplayName("should preserve SkillsFunction implements Function type contract")
+		void shouldPreserveSkillsFunctionImplementsFunctionContract() {
+			SkillsTool.Skill skill = new SkillsTool.Skill("", Map.of("name", "skill1"), "content");
+			SkillsTool.SkillsFunction function = new SkillsTool.SkillsFunction(Map.of("skill1", skill));
+
+			// Verify assignment to java.util.function.Function (prevents IncompatibleClassChangeError)
+			Function<SkillsTool.SkillsInput, String> fn = function;
+			String result = fn.apply(new SkillsTool.SkillsInput("skill1"));
+			assertThat(result).isEqualTo("content");
+		}
+
+		@Test
+		@DisplayName("should snapshot listeners at build time and not share mutable builder list")
+		void shouldSnapshotListenersAtBuildTime() {
+			AtomicInteger calls = new AtomicInteger();
+			SkillsTool.Builder builder = SkillsTool.builder().addSkill("my-skill", "Desc", "Content");
+
+			ToolCallback callback = builder.build();
+
+			// Adding listener to builder after build() must not affect the already-built callback
+			builder.onSkillLoaded((skill, toolContext) -> calls.incrementAndGet());
+
+			callback.call("{\"command\":\"my-skill\"}");
+			assertThat(calls.get()).isZero();
+		}
+
+		@Test
+		@DisplayName("should not notify listener if preparing result fails (e.g. workspace throws)")
+		void shouldNotNotifyListenerIfPreparingResultFails(@TempDir Path tempDir) throws IOException {
+			Files.writeString(tempDir.resolve("SKILL.md"), SKILL_MD_CONTENT, StandardCharsets.UTF_8);
+			AtomicInteger calls = new AtomicInteger();
+			IllegalStateException failure = new IllegalStateException("workspace translation failed");
+			Workspace failingWorkspace = new Workspace() {
+				@Override
+				public Path root() {
+					return tempDir;
+				}
+
+				@Override
+				public String display(String path) {
+					throw failure;
+				}
+			};
+
+			ToolCallback callback = SkillsTool.builder()
+				.addSkillsDirectory(tempDir.toString())
+				.workspace(failingWorkspace)
+				.onSkillLoaded((skill, toolContext) -> calls.incrementAndGet())
+				.build();
+
+			assertThatThrownBy(() -> callback.call("{\"command\":\"test-skill\"}"))
+				.isInstanceOf(ToolExecutionException.class)
+				.hasCause(failure);
+
+			assertThat(calls.get()).isZero();
+		}
+
+		@Test
+		@DisplayName("should propagate exception when listener throws")
+		void shouldPropagateExceptionWhenListenerThrows() {
+			ToolCallback callback = SkillsTool.builder()
+				.addSkill("my-skill", "Desc", "Content")
+				.onSkillLoaded((skill, toolContext) -> {
+					throw new RuntimeException("listener failed");
+				})
+				.build();
+
+			assertThatThrownBy(() -> callback.call("{\"command\":\"my-skill\"}"))
+				.isInstanceOf(RuntimeException.class)
+				.hasMessage("listener failed");
 		}
 
 	}

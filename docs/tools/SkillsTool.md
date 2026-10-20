@@ -328,6 +328,29 @@ SkillsTool.builder()
     .build();
 ```
 
+### Observing Skill Activation
+
+Attach a `SkillLoadedListener` via `.onSkillLoaded(...)` to observe when skills are loaded and triggered by the model. The listener receives the strongly typed `Skill` definition and the invocation's `ToolContext` (which can carry session state, user identifiers, or SSE streaming channels):
+
+```java
+ToolCallback skillsCallback = SkillsTool.builder()
+    .addSkillsDirectory(".claude/skills")
+    .onSkillLoaded((skill, toolContext) -> {
+        logger.info("Skill loaded: {}", skill.name());
+
+        if (toolContext != null) {
+            // Access session context, publish SSE events, or dynamically activate capabilities
+            var eventPublisher = (Consumer<Object>) toolContext.getContext().get("eventPublisher");
+            if (eventPublisher != null) {
+                eventPublisher.accept(new SkillActivatedEvent(skill.name()));
+            }
+        }
+    })
+    .build();
+```
+
+Multiple listeners may be registered and are invoked in registration order. The listener is called synchronously only *after* the skill content and any workspace path mappings have been successfully prepared. Any exception thrown by a listener aborts the tool invocation and propagates to the caller.
+
 ### Workspace path mapping
 
 When a skill is invoked, the tool response starts with the skill's base directory so the

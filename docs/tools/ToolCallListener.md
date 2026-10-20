@@ -35,6 +35,7 @@ ChatClient chatClient = chatClientBuilder.defaultTools(observed).build();
 
 ## Semantics
 
+- **ToolContext support** — Overloads taking `ToolContext` (`beforeCall(toolName, input, toolContext)`, `afterCall(context, toolName, input, toolContext, result)`, `onError(context, toolName, input, toolContext, ex)`, `afterCompletion(context, toolName, input, toolContext)`) receive the execution context supplied to the tool invocation. This allows listeners to look up user identifiers, session IDs, or streaming channels (e.g. SSE emitters) via `toolContext.getContext()`. Methods without `ToolContext` are retained for backward compatibility.
 - **Correlation context** — `beforeCall` may return any opaque object; the decorator hands it back to `afterCall`/`onError`/`afterCompletion` for the same invocation. Use it for use/result correlation ids, duration measurement, or resources that need cleanup after the tool invocation. `afterCompletion` runs once after success or failure handling; it is not called if `beforeCall` throws. All listener methods have no-op defaults.
 - **Error policy is yours** — `onError` returning a non-null string reports the failure to the model as the tool result (report-and-continue, letting the agent adapt); returning `null` propagates the exception (fail-fast).
 - **Transparent decoration** — `getToolDefinition()`/`getToolMetadata()` are delegated untouched, so wrapping composes with `ToolCallbacks.from(...)`, `FunctionToolCallback`, the skills tool, and any other callback source.

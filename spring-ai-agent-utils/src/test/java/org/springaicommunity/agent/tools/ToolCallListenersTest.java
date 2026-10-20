@@ -17,10 +17,13 @@ package org.springaicommunity.agent.tools;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 
@@ -178,6 +181,92 @@ class ToolCallListenersTest {
 		assertThat(wrapped.call("{\"text\":\"hi\"}")).isEqualTo("\"echo: hi\"");
 		assertThatThrownBy(() -> ToolCallListeners.wrap(failingTool(), new ToolCallListener() {
 		}).call("{}")).hasMessageContaining("kaboom");
+	}
+
+	@Test
+	void toolContextPassedToAllListenerMethods() {
+		AtomicReference<ToolContext> beforeContext = new AtomicReference<>();
+		AtomicReference<ToolContext> afterContext = new AtomicReference<>();
+		AtomicReference<ToolContext> completionContext = new AtomicReference<>();
+
+		ToolCallListener listener = new ToolCallListener() {
+			@Override
+			public Object beforeCall(String toolName, String toolInput, ToolContext toolContext) {
+				beforeContext.set(toolContext);
+				return "ctx";
+			}
+
+			@Override
+			public void afterCall(Object context, String toolName, String toolInput, ToolContext toolContext,
+					String result) {
+				afterContext.set(toolContext);
+			}
+
+			@Override
+			public void afterCompletion(Object context, String toolName, String toolInput, ToolContext toolContext) {
+				completionContext.set(toolContext);
+			}
+		};
+
+		ToolCallback wrapped = ToolCallListeners.wrap(echoTool(), listener);
+		ToolContext toolContext = new ToolContext(Map.of("sessionId", "session-123"));
+
+		wrapped.call("{\"text\":\"hi\"}", toolContext);
+
+		assertThat(beforeContext.get()).isSameAs(toolContext);
+		assertThat(afterContext.get()).isSameAs(toolContext);
+		assertThat(completionContext.get()).isSameAs(toolContext);
+	}
+
+	@Test
+	void toolContextPassedToOnError() {
+		AtomicReference<ToolContext> errorContext = new AtomicReference<>();
+		ToolCallListener listener = new ToolCallListener() {
+			@Override
+			public String onError(Object context, String toolName, String toolInput, ToolContext toolContext,
+					RuntimeException exception) {
+				errorContext.set(toolContext);
+				return "handled";
+			}
+		};
+
+		ToolCallback wrapped = ToolCallListeners.wrap(failingTool(), listener);
+		ToolContext toolContext = new ToolContext(Map.of("userId", "u-456"));
+
+		String result = wrapped.call("{}", toolContext);
+
+		assertThat(result).isEqualTo("handled");
+		assertThat(errorContext.get()).isSameAs(toolContext);
+	}
+
+	@Test
+	void legacyListenerWithoutToolContextStillWorksWhenContextIsSupplied() {
+		RecordingListener listener = new RecordingListener();
+		ToolCallback wrapped = ToolCallListeners.wrap(echoTool(), listener);
+		ToolContext toolContext = new ToolContext(Map.of("key", "val"));
+
+		String result = wrapped.call("{\"text\":\"hi\"}", toolContext);
+
+		assertThat(result).isEqualTo("\"echo: hi\"");
+		assertThat(listener.log).containsExactly("before:Echo", "after:Echo:ctx-Echo:\"echo: hi\"",
+				"completion:Echo:ctx-Echo");
+	}
+
+	@Test
+	void toolContextIsNullWhenCallingWithoutContext() {
+		AtomicReference<ToolContext> beforeContext = new AtomicReference<>();
+		ToolCallListener listener = new ToolCallListener() {
+			@Override
+			public Object beforeCall(String toolName, String toolInput, ToolContext toolContext) {
+				beforeContext.set(toolContext);
+				return null;
+			}
+		};
+
+		ToolCallback wrapped = ToolCallListeners.wrap(echoTool(), listener);
+		wrapped.call("{\"text\":\"hi\"}");
+
+		assertThat(beforeContext.get()).isNull();
 	}
 
 }

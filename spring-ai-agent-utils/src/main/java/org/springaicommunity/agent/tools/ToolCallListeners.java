@@ -83,21 +83,21 @@ public final class ToolCallListeners {
 		@Override
 		public String call(String toolInput, ToolContext toolContext) {
 			String toolName = getToolDefinition().name();
-			Object context = this.listener.beforeCall(toolName, toolInput);
+			Object context = this.listener.beforeCall(toolName, toolInput, toolContext);
 			try {
 				String result = this.delegate.call(toolInput, toolContext);
-				this.listener.afterCall(context, toolName, toolInput, result);
+				this.listener.afterCall(context, toolName, toolInput, toolContext, result);
 				return result;
 			}
 			catch (RuntimeException ex) {
-				String reported = this.listener.onError(context, toolName, toolInput, ex);
+				String reported = this.listener.onError(context, toolName, toolInput, toolContext, ex);
 				if (reported != null) {
 					return reported;
 				}
 				throw ex;
 			}
 			finally {
-				this.listener.afterCompletion(context, toolName, toolInput);
+				this.listener.afterCompletion(context, toolName, toolInput, toolContext);
 			}
 		}
 
