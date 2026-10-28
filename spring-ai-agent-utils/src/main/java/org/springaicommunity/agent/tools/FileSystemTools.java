@@ -39,9 +39,18 @@ import org.springframework.util.Assert;
  */
 public class FileSystemTools {
 
+	private final Path workingDirectory;
+
 	private final AllowedDirectories allowedDirectories;
 
 	protected FileSystemTools(List<Path> allowedDirectories) {
+		this(null, allowedDirectories);
+	}
+
+	protected FileSystemTools(Path workingDirectory, List<Path> allowedDirectories) {
+		// Operator-supplied config: normalize so the model-input '..' defense in the
+		// confinement check does not reject the tool's own working directory.
+		this.workingDirectory = (workingDirectory != null) ? workingDirectory.toAbsolutePath().normalize() : null;
 		this.allowedDirectories = new AllowedDirectories(allowedDirectories);
 	}
 
@@ -54,6 +63,20 @@ public class FileSystemTools {
 	 */
 	private String validateAllowedAccess(String filePath) {
 		return this.allowedDirectories.validate(filePath);
+	}
+
+	/**
+	 * Resolves a model-supplied {@code filePath} the same way Grep/Glob/ListDirectory
+	 * resolve {@code path}: a relative path is resolved against the configured working
+	 * directory (for example the workspace root) instead of the JVM working directory.
+	 * Absolute paths, and relative paths when no working directory is configured, are
+	 * returned unchanged. {@code ..} is kept so {@link #validateAllowedAccess(String)}
+	 * can still reject traversal.
+	 * @param filePath the path supplied by the model
+	 * @return the path to validate and use
+	 */
+	private String resolveFilePath(String filePath) {
+		return AllowedDirectories.resolve(this.workingDirectory, filePath).toString();
 	}
 
 	/**
@@ -84,7 +107,7 @@ public class FileSystemTools {
 
 	// @formatter:off
 	@Tool(name = "Read", description = """
-		Reads a UTF-8 text file from the local filesystem. The path must be absolute and, when allowed directories are configured, must be within one of them. It is okay to read a file that does not exist; an error will be returned.
+		Reads a UTF-8 text file from the local filesystem. The path is absolute or relative to the working directory and, when allowed directories are configured, must be within one of them. It is okay to read a file that does not exist; an error will be returned.
 		Results are returned using cat -n format, with line numbers starting at 1. Text only: binary files, including PDFs, images, and office documents, are not decoded.
 
 		Usage:
@@ -95,12 +118,21 @@ public class FileSystemTools {
 		- If the file exists but is empty, a "File is empty" message is returned instead of contents
 		""")
 	public String read(
-		@ToolParam(description = "The absolute path to the file to read") String filePath,
+		@ToolParam(description = "The path to the file to read, absolute or relative to the working directory") String filePath,
 		@ToolParam(description = "The line number to start reading from. Only provide if the file is too large to read at once", required = false) Integer offset,
 		@ToolParam(description = "The number of lines to read. Only provide if the file is too large to read at once.", required = false) Integer limit) { // @formatter:on
 
 		if (filePath == null || filePath.isBlank()) {
 			return "Error: file_path must not be empty";
+		}
+
+		try {
+			// A relative path is relative to the working directory (e.g. the workspace
+			// root), not the JVM's; '..' is kept for the confinement check below.
+			filePath = resolveFilePath(filePath);
+		}
+		catch (InvalidPathException e) {
+			return "Error: Invalid path: " + e.getMessage();
 		}
 
 		String accessError = validateAllowedAccess(filePath);
@@ -194,7 +226,7 @@ public class FileSystemTools {
 
 	// @formatter:off
 	@Tool(name = "Write", description = """
-		Writes a file to the local filesystem.
+		Writes a file to the local filesystem. The path is absolute or relative to the working directory.
 
 		Usage:
 		- This tool will overwrite the existing file if there is one at the provided path.
@@ -204,11 +236,20 @@ public class FileSystemTools {
 		- Only use emojis if the user explicitly requests it. Avoid writing emojis to files unless asked.	
 		""")
 	public String write(
-		@ToolParam(description = "The absolute path to the file to write (must be absolute, not relative)") String filePath,
+		@ToolParam(description = "The path to the file to write, absolute or relative to the working directory") String filePath,
 		@ToolParam(description = "The content to write to the file") String content) { // @formatter:on
 
 		if (filePath == null || filePath.isBlank()) {
 			return "Error: file_path must not be empty";
+		}
+
+		try {
+			// A relative path is relative to the working directory (e.g. the workspace
+			// root), not the JVM's; '..' is kept for the confinement check below.
+			filePath = resolveFilePath(filePath);
+		}
+		catch (InvalidPathException e) {
+			return "Error: Invalid path: " + e.getMessage();
 		}
 
 		String accessError = validateAllowedAccess(filePath);
@@ -267,13 +308,22 @@ public class FileSystemTools {
 		- Use `replace_all` for replacing and renaming strings across the file. This parameter is useful if you want to rename a variable for instance.	
 		""")
 	public String edit(
-		@ToolParam(description = "The absolute path to the file to modify") String filePath,
+		@ToolParam(description = "The path to the file to modify, absolute or relative to the working directory") String filePath,
 		@ToolParam(description = "The text to replace") String old_string,
 		@ToolParam(description = "The text to replace it with (must be different from old_string)") String new_string,
 		@ToolParam(description = "Replace all occurences of old_string (default false)", required = false) Boolean replace_all) { // @formatter:on
 
 		if (filePath == null || filePath.isBlank()) {
 			return "Error: file_path must not be empty";
+		}
+
+		try {
+			// A relative path is relative to the working directory (e.g. the workspace
+			// root), not the JVM's; '..' is kept for the confinement check below.
+			filePath = resolveFilePath(filePath);
+		}
+		catch (InvalidPathException e) {
+			return "Error: Invalid path: " + e.getMessage();
 		}
 
 		String accessError = validateAllowedAccess(filePath);
@@ -456,9 +506,33 @@ public class FileSystemTools {
 
 	public static class Builder {
 
+		private Path workingDirectory;
+
 		private final AllowedDirectories.Collector allowedDirectories = new AllowedDirectories.Collector();
 
 		private Builder() {
+		}
+
+		/**
+		 * Set the working directory a relative {@code filePath} is resolved against.
+		 * Absolute paths are unchanged. When unset, relative paths keep the previous
+		 * behaviour and resolve against the JVM working directory.
+		 * @param workingDirectory the working directory path
+		 * @return this builder
+		 */
+		public Builder workingDirectory(Path workingDirectory) {
+			this.workingDirectory = workingDirectory;
+			return this;
+		}
+
+		/**
+		 * Set the working directory using a string path.
+		 * @param workingDirectory the working directory path as string
+		 * @return this builder
+		 */
+		public Builder workingDirectory(String workingDirectory) {
+			this.workingDirectory = workingDirectory != null ? Paths.get(workingDirectory) : null;
+			return this;
 		}
 
 		/**
@@ -494,19 +568,24 @@ public class FileSystemTools {
 		}
 
 		/**
-		 * Confines all file operations to the given workspace — shorthand for
-		 * {@code allowedDirectory(workspace.root())}.
+		 * Configures this tool for the given workspace — shorthand for
+		 * {@code workingDirectory(workspace.root())} plus
+		 * {@code allowedDirectory(workspace.root())}: a relative {@code filePath} resolves
+		 * against the workspace root and file operations are confined to it. A later
+		 * {@code workingDirectory} call overrides the resolution base while the
+		 * confinement remains.
 		 * @param workspace the workspace to operate within
 		 * @return this builder
 		 */
 		public Builder workspace(Workspace workspace) {
 			Assert.notNull(workspace, "workspace must not be null");
+			this.workingDirectory = workspace.root();
 			this.allowedDirectories.add(workspace.root());
 			return this;
 		}
 
 		public FileSystemTools build() {
-			return new FileSystemTools(this.allowedDirectories.toList());
+			return new FileSystemTools(this.workingDirectory, this.allowedDirectories.toList());
 		}
 
 	}

@@ -71,6 +71,85 @@ class WorkspaceAdoptionTest {
 		assertThat(tools.read(this.outside.resolve("secret.env").toString(), null, null)).startsWith(DENIED);
 	}
 
+	// Relative filePath resolves against the workspace, not the JVM working directory
+	// (https://github.com/spring-ai-community/spring-ai-agent-utils/issues/116). The test
+	// JVM runs outside the workspace, so resolving against it would be denied.
+
+	@Test
+	void fileSystemToolsResolvesRelativeFilePathAgainstWorkspaceNotJvmUserDir() throws Exception {
+		Path userDir = Path.of(System.getProperty("user.dir")).toAbsolutePath().normalize();
+		assertThat(this.workspace.root().toAbsolutePath().normalize()).isNotEqualTo(userDir);
+
+		Files.createDirectories(this.workspaceDir.resolve("agent"));
+		Files.writeString(this.workspaceDir.resolve("agent/steps.md"), "steps content\n");
+		Files.createDirectories(this.workspaceDir.resolve("notes"));
+		Files.writeString(this.workspaceDir.resolve("notes/plan.md"), "hello plan\n");
+
+		FileSystemTools tools = FileSystemTools.builder().workspace(this.workspace).build();
+
+		assertThat(tools.read("agent/steps.md", null, null)).contains("steps content");
+		assertThat(tools.read("notes/plan.md", null, null)).contains("hello plan");
+
+		assertThat(tools.write("notes/written.md", "from write\n")).contains("Successfully created file");
+		assertThat(Files.readString(this.workspaceDir.resolve("notes/written.md"))).isEqualTo("from write\n");
+
+		assertThat(tools.edit("notes/plan.md", "hello", "goodbye", null)).contains("has been updated");
+		assertThat(Files.readString(this.workspaceDir.resolve("notes/plan.md"))).isEqualTo("goodbye plan\n");
+
+		// Absolute paths are unchanged.
+		Path steps = this.workspaceDir.resolve("agent/steps.md").toAbsolutePath();
+		assertThat(tools.read(steps.toString(), null, null)).contains("steps content");
+		assertThat(tools.write(this.workspaceDir.resolve("notes/abs.md").toAbsolutePath().toString(), "abs\n"))
+			.contains("Successfully created file");
+		assertThat(Files.readString(this.workspaceDir.resolve("notes/abs.md"))).isEqualTo("abs\n");
+		assertThat(tools.edit(this.workspaceDir.resolve("notes/plan.md").toAbsolutePath().toString(), "goodbye",
+				"hello", null))
+			.contains("has been updated");
+
+		// '..' still reaches the confinement check.
+		assertThat(tools.read(escapePath() + "/secret.env", null, null)).startsWith(DENIED);
+	}
+
+	@Test
+	void fileSystemToolsWorkingDirectoryResolvesRelativeFilePath() throws Exception {
+		Files.createDirectories(this.workspaceDir.resolve("agent"));
+		Files.writeString(this.workspaceDir.resolve("agent/steps.md"), "steps content\n");
+
+		FileSystemTools tools = FileSystemTools.builder()
+			.workingDirectory(this.workspaceDir)
+			.allowedDirectory(this.workspaceDir)
+			.build();
+
+		assertThat(tools.read("agent/steps.md", null, null)).contains("steps content");
+		assertThat(tools.read(this.outside.resolve("secret.env").toString(), null, null)).startsWith(DENIED);
+	}
+
+	@Test
+	void fileSystemToolsWithoutWorkingDirectoryKeepsJvmRelativeResolution() throws Exception {
+		Path userDir = Path.of(System.getProperty("user.dir")).toAbsolutePath().normalize();
+		assertThat(this.workspace.root().toAbsolutePath().normalize()).isNotEqualTo(userDir);
+
+		Files.createDirectories(this.workspaceDir.resolve("agent"));
+		Files.writeString(this.workspaceDir.resolve("agent/steps.md"), "steps content\n");
+
+		// Confinement without a working directory: a relative filePath is still resolved
+		// against the JVM working directory and denied when that lands outside the jail.
+		FileSystemTools confined = FileSystemTools.builder().allowedDirectory(this.workspaceDir).build();
+		assertThat(confined.read("agent/steps.md", null, null)).startsWith(DENIED);
+		assertThat(confined.write("notes/should-not.md", "nope\n")).startsWith(DENIED);
+		assertThat(confined.edit("agent/steps.md", "steps", "nope", null)).startsWith(DENIED);
+		assertThat(Files.exists(this.workspaceDir.resolve("notes/should-not.md"))).isFalse();
+
+		// Absolute paths still work with no working directory.
+		assertThat(confined.read(this.workspaceDir.resolve("agent/steps.md").toString(), null, null))
+			.contains("steps content");
+
+		// No confinement and no working directory: the relative path is not the workspace
+		// file (it is resolved against user.dir, which is outside this workspace).
+		FileSystemTools plain = FileSystemTools.builder().build();
+		assertThat(plain.read("agent/steps.md", null, null)).doesNotContain("steps content");
+	}
+
 	@Test
 	void grepToolWorkspaceSetsWorkingDirectoryAndJail() {
 		GrepTool grep = GrepTool.builder().workspace(this.workspace).build();

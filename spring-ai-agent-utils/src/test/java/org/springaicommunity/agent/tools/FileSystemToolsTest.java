@@ -16,6 +16,7 @@
 package org.springaicommunity.agent.tools;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -64,6 +66,27 @@ class FileSystemToolsTest {
 			assertThat(tool.description()).doesNotContain("Claude Code");
 			assertThat(tool.description()).doesNotContain("Jupyter notebooks");
 			assertThat(tool.description()).doesNotContain("system reminder");
+			assertThat(tool.description()).contains("absolute or relative to the working directory");
+		}
+
+		@Test
+		@DisplayName("Should describe file paths as absolute or relative to the working directory")
+		void shouldDescribeFilePathAsAbsoluteOrRelativeToWorkingDirectory() throws NoSuchMethodException {
+			String expected = "absolute or relative to the working directory";
+
+			Method read = FileSystemTools.class.getMethod("read", String.class, Integer.class, Integer.class);
+			Method write = FileSystemTools.class.getMethod("write", String.class, String.class);
+			Method edit = FileSystemTools.class.getMethod("edit", String.class, String.class, String.class,
+					Boolean.class);
+
+			assertThat(read.getAnnotation(Tool.class).description()).contains(expected);
+			assertThat(write.getAnnotation(Tool.class).description()).contains(expected);
+			assertThat(read.getParameters()[0].getAnnotation(ToolParam.class).description()).contains(expected);
+			assertThat(write.getParameters()[0].getAnnotation(ToolParam.class).description()).contains(expected);
+			assertThat(edit.getParameters()[0].getAnnotation(ToolParam.class).description()).contains(expected);
+			assertThat(read.getAnnotation(Tool.class).description()).doesNotContain("must be absolute");
+			assertThat(write.getParameters()[0].getAnnotation(ToolParam.class).description())
+				.doesNotContain("must be absolute");
 		}
 
 		@Test

@@ -51,7 +51,7 @@ A workspace is a root directory plus a *display mapping*. For local execution th
 | Tool | `workspace(...)` effect |
 |---|---|
 | [GrepTool](GrepTool.md) / [GlobTool](GlobTool.md) / ListDirectoryTool | Working directory **and** allowed-directory confinement |
-| [FileSystemTools](FileSystemTools.md) | Allowed-directory confinement |
+| [FileSystemTools](FileSystemTools.md) | Working directory **and** allowed-directory confinement |
 | [ShellTools](ShellTools.md) | Working directory only (a shell can't be confined from Java — that's what a sandboxed `ExecBackend` is for) |
 | [SkillsTool](SkillsTool.md) | Announces skill base directories via `display(...)` |
 | [AgentEnvironment](AgentEnvironment.md) | Environment-info block describes the workspace, not the host |
