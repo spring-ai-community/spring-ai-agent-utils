@@ -66,7 +66,7 @@ public class ClaudeSubagentReferences {
 					.filter(path -> path.getFileName().toString().endsWith(".md"))
 					.forEach(path -> {
 						subagentReferences.add(new SubagentReference(path.toAbsolutePath().toString(),
-								ClaudeSubagentDefinition.KIND, null));
+								ClaudeSubagentDefinition.KIND));
 					});
 			}
 		}
@@ -92,7 +92,7 @@ public class ClaudeSubagentReferences {
 				return fromRootDirectory(path);
 			}
 
-			return List.of(new SubagentReference(path, ClaudeSubagentDefinition.KIND, null));
+			return List.of(new SubagentReference(path, ClaudeSubagentDefinition.KIND));
 		}
 		catch (IOException ex) {
 			throw new RuntimeException("Failed to load tasks from directory: " + agentRootPath, ex);

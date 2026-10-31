@@ -21,6 +21,8 @@ import org.springaicommunity.agent.common.task.subagent.SubagentReference;
 import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentDefinition;
 import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentResolver;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -35,8 +37,8 @@ class ClaudeSubagentResolverTest {
 
 	@Test
 	void shouldResolveOnlyClaudeSubagentKind() {
-		SubagentReference claudeRef = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, null);
-		SubagentReference a2aRef = new SubagentReference("http://example.com", "A2A", null);
+		SubagentReference claudeRef = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, (Map<String, String>) null);
+		SubagentReference a2aRef = new SubagentReference("http://example.com", "A2A", (Map<String, String>) null);
 
 		assertThat(resolver.canResolve(claudeRef)).isTrue();
 		assertThat(resolver.canResolve(a2aRef)).isFalse();
@@ -45,7 +47,7 @@ class ClaudeSubagentResolverTest {
 	@Test
 	void shouldResolveFromClasspathResource() {
 		SubagentReference ref = new SubagentReference("classpath:/agent/EXPLORE_SUBAGENT.md",
-				ClaudeSubagentDefinition.KIND, null);
+				ClaudeSubagentDefinition.KIND, (Map<String, String>) null);
 
 		SubagentDefinition subagent = resolver.resolve(ref);
 
@@ -57,7 +59,7 @@ class ClaudeSubagentResolverTest {
 
 	@Test
 	void shouldFailForNonExistentFile() {
-		SubagentReference ref = new SubagentReference("file:/non/existent/file.md", ClaudeSubagentDefinition.KIND, null);
+		SubagentReference ref = new SubagentReference("file:/non/existent/file.md", ClaudeSubagentDefinition.KIND, (Map<String, String>) null);
 
 		assertThatThrownBy(() -> resolver.resolve(ref)).isInstanceOf(RuntimeException.class)
 			.hasMessageContaining("Failed to read task file");
