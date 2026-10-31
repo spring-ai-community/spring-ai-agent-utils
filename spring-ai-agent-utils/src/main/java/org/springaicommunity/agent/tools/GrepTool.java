@@ -289,10 +289,14 @@ public class GrepTool {
 		List<String> matchingFiles = new ArrayList<>();
 		AtomicInteger count = new AtomicInteger(0);
 		int skip = offset != null ? offset : 0;
-		int limit = headLimit != null && headLimit > 0 ? headLimit : Integer.MAX_VALUE;
+		// No head_limit (or 0, documented as unlimited) used to fall back to
+		// Integer.MAX_VALUE, which overflows to a negative bound once skip > 0 —
+		// stopping the traversal before the first file was even examined. Widening the
+		// bound to long keeps "unlimited" meaning unlimited whatever the offset is.
+		long stop = (headLimit != null && headLimit > 0) ? (long) skip + headLimit : Long.MAX_VALUE;
 
 		this.processFiles(searchPath, matchers, file -> {
-			if (count.get() >= skip + limit) {
+			if (count.get() >= stop) {
 				return false; // Stop processing
 			}
 
@@ -320,10 +324,10 @@ public class GrepTool {
 		Map<String, Integer> fileCounts = new LinkedHashMap<>();
 		AtomicInteger fileCount = new AtomicInteger(0);
 		int skip = offset != null ? offset : 0;
-		int limit = headLimit != null && headLimit > 0 ? headLimit : Integer.MAX_VALUE;
+		long stop = (headLimit != null && headLimit > 0) ? (long) skip + headLimit : Long.MAX_VALUE;
 
 		this.processFiles(searchPath, matchers, file -> {
-			if (fileCount.get() >= skip + limit) {
+			if (fileCount.get() >= stop) {
 				return false; // Stop processing
 			}
 
@@ -357,10 +361,10 @@ public class GrepTool {
 		StringBuilder result = new StringBuilder();
 		AtomicInteger lineCount = new AtomicInteger(0);
 		int skip = offset != null ? offset : 0;
-		int limit = headLimit != null && headLimit > 0 ? headLimit : Integer.MAX_VALUE;
+		long stop = (headLimit != null && headLimit > 0) ? (long) skip + headLimit : Long.MAX_VALUE;
 
 		this.processFiles(searchPath, matchers, file -> {
-			if (lineCount.get() >= skip + limit) {
+			if (lineCount.get() >= stop) {
 				return false; // Stop processing
 			}
 
@@ -371,7 +375,7 @@ public class GrepTool {
 
 				// Add matches with offset and limit
 				for (String match : matches) {
-					if (lineCount.get() >= skip + limit) {
+					if (lineCount.get() >= stop) {
 						break;
 					}
 					if (lineCount.getAndIncrement() >= skip) {
@@ -380,7 +384,7 @@ public class GrepTool {
 				}
 				result.append("\n");
 			}
-			return lineCount.get() < skip + limit; // Continue if under limit
+			return lineCount.get() < stop; // Continue if under limit
 		});
 
 		if (result.length() == 0) {
