@@ -1,24 +1,23 @@
 /*
-* Copyright 2026 - 2026 the original author or authors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* https://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2026 - 2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springaicommunity.agent.subagent.a2a;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.a2aproject.sdk.client.http.A2ACardResolver;
+import org.a2aproject.sdk.compat03.A2A_v0_3;
+import org.a2aproject.sdk.compat03.spec.AgentCard_v0_3;
 import org.a2aproject.sdk.spec.AgentCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,62 +33,62 @@ import org.springaicommunity.agent.common.task.subagent.SubagentResolver;
  */
 public class A2ASubagentResolver implements SubagentResolver {
 
-	public static final String WELL_KNOWN_AGENT_CARD_PATH = "/.well-known/agent-card.json";
+    public static final String WELL_KNOWN_AGENT_CARD_PATH = "/.well-known/agent-card.json";
 
-	private static final Logger logger = LoggerFactory.getLogger(A2ASubagentResolver.class);
+    private static final Logger logger = LoggerFactory.getLogger(A2ASubagentResolver.class);
 
-	private final String agentCardPath;
+    private final String agentCardPath;
 
-	public A2ASubagentResolver() {
-		this(WELL_KNOWN_AGENT_CARD_PATH);
-	}
+    public A2ASubagentResolver() {
+        this(WELL_KNOWN_AGENT_CARD_PATH);
+    }
 
-	public A2ASubagentResolver(String agentCardPath) {
-		this.agentCardPath = agentCardPath;
-	}
+    public A2ASubagentResolver(String agentCardPath) {
+        this.agentCardPath = agentCardPath;
+    }
 
-	@Override
-	public boolean canResolve(SubagentReference subagentRef) {
-		if (subagentRef == null) {
-			throw new IllegalArgumentException("SubagentReference must not be null");
-		}
-		return subagentRef.kind().equals(A2ASubagentDefinition.KIND);
-	}
+    @Override
+    public boolean canResolve(SubagentReference subagentRef) {
+        if (subagentRef == null) {
+            throw new IllegalArgumentException("SubagentReference must not be null");
+        }
+        return subagentRef.kind().equals(A2ASubagentDefinition.KIND);
+    }
 
-	@Override
-	public A2ASubagentDefinition resolve(SubagentReference subagentRef) {
-		if (subagentRef == null) {
-			throw new IllegalArgumentException("SubagentReference must not be null");
-		}
-		try {
-			String url = subagentRef.uri();
-			AgentCard card = A2ACardResolver.builder()
-					.baseUrl(url)
-					.agentCardPath(this.agentCardPath)
-					.build()
-					.getAgentCard();
-			logger.debug("Discovered agent: {} at {}", card.name(), url);
-			return new A2ASubagentDefinition(subagentRef, card);
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+    @Override
+    public A2ASubagentDefinition resolve(SubagentReference subagentRef) {
+        if (subagentRef == null) {
+            throw new IllegalArgumentException("SubagentReference must not be null");
+        }
+        try {
+            String url = subagentRef.uri();
+            String protocolVersion = resolveProtocolVersion(subagentRef);
 
-	/**
-	 * Builds the card path to request for an agent. The A2A SDK resolves the card path
-	 * against the agent URL, where an absolute path replaces the agent's own path, so the
-	 * agent's path is prefixed explicitly (e.g. {@code http://host/agent} with the default
-	 * card path becomes {@code /agent/.well-known/agent-card.json}).
-	 * @param agentUrl the agent base URL
-	 * @param agentCardPath the card path, relative to the agent base URL
-	 * @return the absolute card path to request
-	 */
-	static String agentCardPath(String agentUrl, String agentCardPath) throws URISyntaxException {
-		// Raw (still percent-encoded) path: the SDK parses the result as a URI again
-		String basePath = new URI(agentUrl).getRawPath();
-		basePath = (basePath == null) ? "" : basePath.replaceAll("/+$", "");
-		return agentCardPath.startsWith("/") ? basePath + agentCardPath : basePath + "/" + agentCardPath;
-	}
+            if (A2ASubagentDefinition_v1_0.PROTOCOL_VERSION.equals(protocolVersion)) {
+                AgentCard card = A2ACardResolver.builder()
+                        .baseUrl(url)
+                        .agentCardPath(this.agentCardPath)
+                        .build()
+                        .getAgentCard();
+                logger.debug("Discovered agent: {} at {}", card.name(), url);
+                return new A2ASubagentDefinition_v1_0(subagentRef, card);
+            }
 
+            AgentCard_v0_3 card = A2A_v0_3.getAgentCard(url, this.agentCardPath, null);
+            logger.debug("Discovered v0.3 agent: {} at {}", card.name(), url);
+            return new A2ASubagentDefinition_v0_3(subagentRef, card);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Reads the protocol version from reference metadata, defaulting to 0.3 when absent.
+     * The kind alone ("A2A") does not carry version information.
+     */
+    private static String resolveProtocolVersion(SubagentReference ref) {
+        return ref.metadata().getOrDefault(
+                SubagentReference.META_PROTOCOL_VERSION,
+                A2ASubagentDefinition_v0_3.PROTOCOL_VERSION);
+    }
 }

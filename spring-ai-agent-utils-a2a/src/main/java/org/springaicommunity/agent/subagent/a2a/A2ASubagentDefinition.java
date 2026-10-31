@@ -1,93 +1,40 @@
 /*
-* Copyright 2026 - 2026 the original author or authors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* https://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2026 - 2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springaicommunity.agent.subagent.a2a;
 
-
-import java.util.Objects;
-
-import org.a2aproject.sdk.spec.AgentCard;
-import org.a2aproject.sdk.spec.AgentSkill;
 import org.springaicommunity.agent.common.task.subagent.SubagentDefinition;
-import org.springaicommunity.agent.common.task.subagent.SubagentReference;
 
 /**
- * A2A protocol subagent definition wrapping an AgentCard.
- * Demonstrates how to implement {@link SubagentDefinition} for remote agent protocols.
+ * Common contract for A2A subagent definitions, implemented per protocol version
+ * ({@link A2ASubagentDefinition_v1_0} and {@link A2ASubagentDefinition_v0_3}).
  *
- * @author Christian Tzolov
+ * <p>Each implementation wraps the {@code AgentCard} of its protocol version and
+ * invokes the remote agent through the matching A2A client. This lets the
+ * {@link A2ASubagentExecutor} remain protocol-agnostic and dispatch via
+ * {@link #invoke(String)}.
+ *
+ * @author Caio Henrique Silva
+ * @see A2ASubagentDefinition_v1_0
+ * @see A2ASubagentDefinition_v0_3
  * @see <a href="https://a2a-protocol.org">A2A Protocol Specification</a>
  */
-public class A2ASubagentDefinition implements SubagentDefinition {
+public sealed interface A2ASubagentDefinition extends SubagentDefinition
+        permits A2ASubagentDefinition_v1_0, A2ASubagentDefinition_v0_3 {
 
-	public static final String KIND = "A2A";
+    String KIND = "A2A";
 
-	private final SubagentReference subagentRef;
-
-	private final AgentCard card;
-
-	private final String description;
-
-	public A2ASubagentDefinition(SubagentReference subagentRef, AgentCard card) {
-		this.subagentRef = Objects.requireNonNull(subagentRef, "subagentRef must not be null");
-		this.card = Objects.requireNonNull(card, "card must not be null");
-		this.description = buildDescription(card);
-	}
-
-	@Override
-	public String getName() {
-		return card.name();
-	}
-
-	@Override
-	public String getDescription() {
-		return this.description;
-	}
-
-	@Override
-	public String getKind() {
-		return KIND;
-	}
-
-	@Override
-	public SubagentReference getReference() {
-		return subagentRef;
-	}
-
-	public AgentCard getAgentCard() {
-		return card;
-	}
-
-	/**
-	 * Builds the description from the card description and its skills. Skills are
-	 * indented so they read as part of this agent's entry in the Task tool's agent list,
-	 * and listed under "Can help with" rather than "Skills" so the model does not confuse
-	 * them with Agent Skills invoked through the Skill tool.
-	 */
-	private static String buildDescription(AgentCard card) {
-		StringBuilder sb = new StringBuilder(card.description());
-		if (!card.skills().isEmpty()) {
-			sb.append("\n  Can help with:");
-			for (AgentSkill skill : card.skills()) {
-				sb.append("\n  - ").append(skill.name()).append(": ").append(skill.description());
-				if (skill.examples() != null && !skill.examples().isEmpty()) {
-					sb.append("\n    Examples: ").append(String.join("; ", skill.examples()));
-				}
-			}
-		}
-		return sb.toString();
-	}
-
+    String invoke(String prompt);
 }

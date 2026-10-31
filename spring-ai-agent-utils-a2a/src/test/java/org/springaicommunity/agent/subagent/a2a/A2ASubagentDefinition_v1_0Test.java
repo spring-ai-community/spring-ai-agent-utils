@@ -27,24 +27,24 @@ import org.springaicommunity.agent.common.task.subagent.SubagentReference;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link A2ASubagentDefinition}.
+ * Tests for {@link A2ASubagentDefinition_v1_0}.
  *
- * @author Caio Henrique Silva
+ * @author a2ASubagentDefinitionV10Test
  */
-@DisplayName("A2ASubagentDefinition Tests")
-class A2ASubagentDefinitionTest {
+@DisplayName("A2ASubagentDefinition_v1_0 Tests")
+class A2ASubagentDefinition_v1_0Test {
 
 	private static final String CARD_DESC = "Main agent description";
 
 	private static final SubagentReference REF = new SubagentReference("http://localhost:8080/agent",
-			A2ASubagentDefinition.KIND);
+			A2ASubagentDefinition_v1_0.KIND, A2ASubagentDefinition_v1_0.PROTOCOL_VERSION);
 
 	@Test
 	@DisplayName("Should return only the card description when there are no skills")
 	void shouldReturnOnlyCardDescriptionWhenNoSkills() {
 		AgentCard card = baseCardBuilder().skills(List.of()).build();
 
-		assertThat(new A2ASubagentDefinition(REF, card).getDescription()).isEqualTo(CARD_DESC);
+		assertThat(new A2ASubagentDefinition_v1_0(REF, card).getDescription()).isEqualTo(CARD_DESC);
 	}
 
 	@Test
@@ -62,7 +62,7 @@ class A2ASubagentDefinitionTest {
 			.build();
 		AgentCard card = baseCardBuilder().skills(List.of(skill1, skill2)).build();
 
-		assertThat(new A2ASubagentDefinition(REF, card).getDescription()).isEqualTo("""
+		assertThat(new A2ASubagentDefinition_v1_0(REF, card).getDescription()).isEqualTo("""
 				Main agent description
 				  Can help with:
 				  - Skill One: Does something
@@ -80,7 +80,7 @@ class A2ASubagentDefinitionTest {
 			.build();
 		AgentCard card = baseCardBuilder().skills(List.of(skill)).build();
 
-		assertThat(new A2ASubagentDefinition(REF, card).getDescription()).isEqualTo("""
+		assertThat(new A2ASubagentDefinition_v1_0(REF, card).getDescription()).isEqualTo("""
 				Main agent description
 				  Can help with:
 				  - Calculator: Performs math
@@ -98,7 +98,7 @@ class A2ASubagentDefinitionTest {
 			.build();
 		AgentCard card = baseCardBuilder().skills(List.of(skill)).build();
 
-		assertThat(new A2ASubagentDefinition(REF, card).getDescription()).doesNotContain("Examples:");
+		assertThat(new A2ASubagentDefinition_v1_0(REF, card).getDescription()).doesNotContain("Examples:");
 	}
 
 	@Test
@@ -111,7 +111,7 @@ class A2ASubagentDefinitionTest {
 			.build();
 		AgentCard card = baseCardBuilder().skills(List.of(skill)).build();
 
-		String registration = new A2ASubagentDefinition(REF, card).toSubagentRegistrations();
+		String registration = new A2ASubagentDefinition_v1_0(REF, card).toSubagentRegistrations();
 
 		// Only the first line starts at column 0, so skills cannot be mistaken for other
 		// agents in the Task tool's agent list
