@@ -61,6 +61,11 @@ public class GrepTool {
 
 	private final AllowedDirectories allowedDirectories;
 
+	// Directory names never worth searching: VCS metadata, dependency caches and build
+	// output. Same set the file previously matched as a "/name/" substring.
+	private static final List<String> IGNORED_DIRECTORIES = List.of(".git", "node_modules", "target", "build", ".idea",
+			".vscode", "dist", "__pycache__");
+
 	// File type mappings (common extensions)
 	private static final Map<String, String[]> FILE_TYPE_EXTENSIONS = new HashMap<>();
 	static {
@@ -420,10 +425,16 @@ public class GrepTool {
 	 * Check if a file should be ignored (common ignore patterns)
 	 */
 	private boolean isIgnoredPath(Path path) {
-		String pathStr = path.toString();
-		return pathStr.contains("/.git/") || pathStr.contains("/node_modules/") || pathStr.contains("/target/")
-				|| pathStr.contains("/build/") || pathStr.contains("/.idea/") || pathStr.contains("/.vscode/")
-				|| pathStr.contains("/dist/") || pathStr.contains("/__pycache__/");
+		// Compare path components, as ListDirectoryTool.isIgnored() already does. Matching
+		// a substring of the rendered path ("/node_modules/") only works with Unix
+		// separators: on Windows the walk returns C:\project\node_modules\..., so nothing
+		// was ever ignored there.
+		for (Path part : path) {
+			if (IGNORED_DIRECTORIES.contains(part.toString())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
