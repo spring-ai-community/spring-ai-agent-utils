@@ -193,8 +193,12 @@ class GrepToolTest {
 					null, null, null, null, null, null, null, null);
 
 			// Then
-			assertThat(result).containsPattern(file1.toString() + ":\\d+");
-			assertThat(result).containsPattern(file2.toString() + ":\\d+");
+			// Assert the exact counts rather than ":\d+" as a regex: the path is used as
+			// the regex prefix, and on Windows it contains backslashes that Pattern reads
+			// as illegal escape sequences ("C:\Users\...\file1.txt:\d+"), so the assertion
+			// itself blew up with PatternSyntaxException instead of checking anything.
+			assertThat(result).contains(file1 + ":3");
+			assertThat(result).contains(file2 + ":1");
 		}
 
 		@Test
