@@ -33,7 +33,7 @@ class ClaudeSubagentTest {
 	@Test
 	void shouldParseBasicFrontmatter() {
 		Map<String, Object> frontMatter = Map.of("name", "test-agent", "description", "Test description");
-		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, null);
+		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND);
 
 		ClaudeSubagentDefinition subagent = new ClaudeSubagentDefinition(ref, frontMatter, "System prompt content");
 
@@ -46,7 +46,7 @@ class ClaudeSubagentTest {
 	@Test
 	void shouldParseToolsFromFrontmatter() {
 		Map<String, Object> frontMatter = Map.of("name", "test", "description", "desc", "tools", "Read, Grep, Glob");
-		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, null);
+		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND);
 
 		ClaudeSubagentDefinition subagent = new ClaudeSubagentDefinition(ref, frontMatter, "");
 
@@ -57,7 +57,7 @@ class ClaudeSubagentTest {
 	void shouldParseDisallowedToolsFromFrontmatter() {
 		Map<String, Object> frontMatter = Map.of("name", "test", "description", "desc", "disallowedTools",
 				"Bash, Shell");
-		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, null);
+		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND);
 
 		ClaudeSubagentDefinition subagent = new ClaudeSubagentDefinition(ref, frontMatter, "");
 
@@ -67,7 +67,7 @@ class ClaudeSubagentTest {
 	@Test
 	void shouldReturnEmptyListWhenNoToolsSpecified() {
 		Map<String, Object> frontMatter = Map.of("name", "test", "description", "desc");
-		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, null);
+		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND);
 
 		ClaudeSubagentDefinition subagent = new ClaudeSubagentDefinition(ref, frontMatter, "");
 
@@ -78,7 +78,7 @@ class ClaudeSubagentTest {
 	@Test
 	void shouldParseModelFromFrontmatter() {
 		Map<String, Object> frontMatter = Map.of("name", "test", "description", "desc", "model", "opus");
-		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, null);
+		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND);
 
 		ClaudeSubagentDefinition subagent = new ClaudeSubagentDefinition(ref, frontMatter, "");
 
@@ -88,7 +88,7 @@ class ClaudeSubagentTest {
 	@Test
 	void shouldReturnDefaultPermissionMode() {
 		Map<String, Object> frontMatter = Map.of("name", "test", "description", "desc");
-		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND, null);
+		SubagentReference ref = new SubagentReference("file:test.md", ClaudeSubagentDefinition.KIND);
 
 		ClaudeSubagentDefinition subagent = new ClaudeSubagentDefinition(ref, frontMatter, "");
 

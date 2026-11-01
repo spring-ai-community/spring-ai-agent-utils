@@ -15,25 +15,6 @@
 */
 package org.springaicommunity.agent.subagent.a2a;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-
-import io.a2a.client.Client;
-import io.a2a.client.ClientEvent;
-import io.a2a.client.TaskEvent;
-import io.a2a.client.TaskUpdateEvent;
-import io.a2a.client.config.ClientConfig;
-import io.a2a.client.transport.jsonrpc.JSONRPCTransport;
-import io.a2a.client.transport.jsonrpc.JSONRPCTransportConfig;
-import io.a2a.spec.AgentCard;
-import io.a2a.spec.Artifact;
-import io.a2a.spec.Message;
-import io.a2a.spec.Part;
-import io.a2a.spec.Task;
-import io.a2a.spec.TextPart;
-import io.a2a.spec.TaskState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springaicommunity.agent.common.task.subagent.SubagentDefinition;
@@ -45,7 +26,7 @@ import org.springaicommunity.agent.common.task.subagent.TaskCall;
  * Demonstrates how to implement {@link SubagentExecutor} for remote agent communication.
  *
  * @author Christian Tzolov
- * @see <a href="https://google.github.io/A2A/">A2A Protocol Specification</a>
+ * @see <a href="https://a2a-protocol.org">A2A Protocol Specification</a>
  */
 public class A2ASubagentExecutor implements SubagentExecutor {
 
@@ -59,72 +40,10 @@ public class A2ASubagentExecutor implements SubagentExecutor {
 	@Override
 	public String execute(TaskCall taskCall, SubagentDefinition subagent) {
 
-		AgentCard agentCard = ((A2ASubagentDefinition) subagent).getAgentCard();
-
-		try {
-			// Create the message
-			Message message = new Message.Builder().role(Message.Role.USER)
-				.parts(List.of(new TextPart(taskCall.prompt(), null)))
-				.build();
-
-			// Use CompletableFuture to wait for the response
-			CompletableFuture<String> responseFuture = new CompletableFuture<>();
-			AtomicReference<String> responseText = new AtomicReference<>("");
-
-			BiConsumer<ClientEvent, AgentCard> consumer = (event, card) -> {
-				Task task;
-
-				if (event instanceof TaskEvent taskEvent) {
-					task = taskEvent.getTask();
-				} else if (event instanceof TaskUpdateEvent taskUpdateEvent) {
-					task = taskUpdateEvent.getTask();
-				} else {
-					return;
-				}
-
-				TaskState taskState = task.getStatus().state();
-				logger.info("Received task response: status={}", taskState);
-
-				// Extract text from artifacts
-				if (task.getArtifacts() != null) {
-					StringBuilder sb = new StringBuilder();
-					for (Artifact artifact : task.getArtifacts()) {
-						if (artifact.parts() != null) {
-							for (Part<?> part : artifact.parts()) {
-								if (part instanceof TextPart textPart) {
-									sb.append(textPart.getText());
-								}
-							}
-						}
-					}
-					responseText.set(sb.toString());
-				}
-
-				if(taskState.isFinal()) {
-					responseFuture.complete(responseText.get());
-				}
-			};
-
-			// Create client with consumer via builder
-			ClientConfig clientConfig = new ClientConfig.Builder().setAcceptedOutputModes(List.of("text")).build();
-			
-			Client client = Client.builder(agentCard)
-				.clientConfig(clientConfig)
-				.withTransport(JSONRPCTransport.class, new JSONRPCTransportConfig())
-				.addConsumers(List.of(consumer))
-				.build();
-
-			client.sendMessage(message);
-
-			// Wait for response (with timeout)
-			String result = responseFuture.get(60, java.util.concurrent.TimeUnit.SECONDS);
-			logger.info("Agent '{}' response: {}", subagent.getName(), result);
-			return result;
-		}
-		catch (Exception e) {
-			logger.error("Error sending message to agent '{}': {}", subagent.getName(), e.getMessage());
-			return String.format("Error communicating with agent '%s': %s", subagent.getName(), e.getMessage());
-		}
+		A2ASubagentDefinition a2ASubagentDefinition = (A2ASubagentDefinition) subagent;
+		String result = a2ASubagentDefinition.invoke(taskCall.prompt());
+		logger.info("Agent '{}' response: {}", subagent.getName(), result);
+		return result;
 	}
 
 }

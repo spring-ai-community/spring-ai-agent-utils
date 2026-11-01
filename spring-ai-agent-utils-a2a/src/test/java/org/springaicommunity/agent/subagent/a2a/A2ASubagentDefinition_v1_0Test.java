@@ -17,9 +17,9 @@ package org.springaicommunity.agent.subagent.a2a;
 
 import java.util.List;
 
-import io.a2a.spec.AgentCapabilities;
-import io.a2a.spec.AgentCard;
-import io.a2a.spec.AgentSkill;
+import org.a2aproject.sdk.spec.AgentCapabilities;
+import org.a2aproject.sdk.spec.AgentCard;
+import org.a2aproject.sdk.spec.AgentSkill;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springaicommunity.agent.common.task.subagent.SubagentReference;
@@ -27,42 +27,42 @@ import org.springaicommunity.agent.common.task.subagent.SubagentReference;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link A2ASubagentDefinition}.
+ * Tests for {@link A2ASubagentDefinition_v1_0}.
  *
- * @author Caio Henrique Silva
+ * @author a2ASubagentDefinitionV10Test
  */
-@DisplayName("A2ASubagentDefinition Tests")
-class A2ASubagentDefinitionTest {
+@DisplayName("A2ASubagentDefinition_v1_0 Tests")
+class A2ASubagentDefinition_v1_0Test {
 
 	private static final String CARD_DESC = "Main agent description";
 
 	private static final SubagentReference REF = new SubagentReference("http://localhost:8080/agent",
-			A2ASubagentDefinition.KIND);
+			A2ASubagentDefinition_v1_0.KIND, A2ASubagentDefinition_v1_0.PROTOCOL_VERSION);
 
 	@Test
 	@DisplayName("Should return only the card description when there are no skills")
 	void shouldReturnOnlyCardDescriptionWhenNoSkills() {
 		AgentCard card = baseCardBuilder().skills(List.of()).build();
 
-		assertThat(new A2ASubagentDefinition(REF, card).getDescription()).isEqualTo(CARD_DESC);
+		assertThat(new A2ASubagentDefinition_v1_0(REF, card).getDescription()).isEqualTo(CARD_DESC);
 	}
 
 	@Test
 	@DisplayName("Should list skills indented under the card description")
 	void shouldListSkillsIndented() {
-		AgentSkill skill1 = new AgentSkill.Builder().id("s1")
+		AgentSkill skill1 = AgentSkill.builder().id("s1")
 			.name("Skill One")
 			.description("Does something")
 			.tags(List.of())
 			.build();
-		AgentSkill skill2 = new AgentSkill.Builder().id("s2")
+		AgentSkill skill2 = AgentSkill.builder().id("s2")
 			.name("Skill Two")
 			.description("Does another thing")
 			.tags(List.of())
 			.build();
 		AgentCard card = baseCardBuilder().skills(List.of(skill1, skill2)).build();
 
-		assertThat(new A2ASubagentDefinition(REF, card).getDescription()).isEqualTo("""
+		assertThat(new A2ASubagentDefinition_v1_0(REF, card).getDescription()).isEqualTo("""
 				Main agent description
 				  Can help with:
 				  - Skill One: Does something
@@ -72,7 +72,7 @@ class A2ASubagentDefinitionTest {
 	@Test
 	@DisplayName("Should include examples when present")
 	void shouldIncludeExamples() {
-		AgentSkill skill = new AgentSkill.Builder().id("s1")
+		AgentSkill skill = AgentSkill.builder().id("s1")
 			.name("Calculator")
 			.description("Performs math")
 			.tags(List.of())
@@ -80,7 +80,7 @@ class A2ASubagentDefinitionTest {
 			.build();
 		AgentCard card = baseCardBuilder().skills(List.of(skill)).build();
 
-		assertThat(new A2ASubagentDefinition(REF, card).getDescription()).isEqualTo("""
+		assertThat(new A2ASubagentDefinition_v1_0(REF, card).getDescription()).isEqualTo("""
 				Main agent description
 				  Can help with:
 				  - Calculator: Performs math
@@ -90,7 +90,7 @@ class A2ASubagentDefinitionTest {
 	@Test
 	@DisplayName("Should handle null examples without adding any")
 	void shouldHandleNullExamples() {
-		AgentSkill skill = new AgentSkill.Builder().id("s1")
+		AgentSkill skill = AgentSkill.builder().id("s1")
 			.name("Skill")
 			.description("desc")
 			.tags(List.of())
@@ -98,20 +98,20 @@ class A2ASubagentDefinitionTest {
 			.build();
 		AgentCard card = baseCardBuilder().skills(List.of(skill)).build();
 
-		assertThat(new A2ASubagentDefinition(REF, card).getDescription()).doesNotContain("Examples:");
+		assertThat(new A2ASubagentDefinition_v1_0(REF, card).getDescription()).doesNotContain("Examples:");
 	}
 
 	@Test
 	@DisplayName("Should keep skills nested within the agent's Task tool registration")
 	void shouldKeepSkillsNestedInRegistration() {
-		AgentSkill skill = new AgentSkill.Builder().id("s1")
+		AgentSkill skill = AgentSkill.builder().id("s1")
 			.name("Search")
 			.description("Find listings")
 			.tags(List.of())
 			.build();
 		AgentCard card = baseCardBuilder().skills(List.of(skill)).build();
 
-		String registration = new A2ASubagentDefinition(REF, card).toSubagentRegistrations();
+		String registration = new A2ASubagentDefinition_v1_0(REF, card).toSubagentRegistrations();
 
 		// Only the first line starts at column 0, so skills cannot be mistaken for other
 		// agents in the Task tool's agent list
@@ -121,13 +121,14 @@ class A2ASubagentDefinitionTest {
 	}
 
 	private static AgentCard.Builder baseCardBuilder() {
-		return new AgentCard.Builder().name("TestAgent")
+		return AgentCard.builder().name("TestAgent")
 			.description(CARD_DESC)
 			.url("https://example.com/agent")
 			.version("1.0.0")
 			.capabilities(new AgentCapabilities(true, true, true, List.of()))
 			.defaultInputModes(List.of("text"))
-			.defaultOutputModes(List.of("text"));
+			.defaultOutputModes(List.of("text"))
+			.supportedInterfaces(List.of());
 	}
 
 }
