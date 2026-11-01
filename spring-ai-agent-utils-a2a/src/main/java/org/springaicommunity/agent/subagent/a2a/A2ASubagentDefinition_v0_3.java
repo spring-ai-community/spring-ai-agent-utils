@@ -44,49 +44,31 @@ import java.util.function.BiConsumer;
 /**
  * {@link A2ASubagentDefinition} for the A2A protocol 0.3.
  *
- * <p>Wraps a protocol 0.3 {@link AgentCard_v0_3} and invokes the remote agent through
- * the 0.3 {@code Client_v0_3} over JSON-RPC. Handles both {@code MessageEvent_v0_3}
- * (synchronous responses) and task-based events
- * ({@code TaskEvent_v0_3} / {@code TaskUpdateEvent_v0_3}).
+ * <p>Wraps a protocol 0.3 {@link AgentCard_v0_3} and invokes the remote agent
+ * through the v0.3 client ({@code Client_v0_3}) over the JSON-RPC transport.
+ * Handles both synchronous message responses and task-based responses.
  *
  * @author Christian Tzolov
+ * @author Caio Henrique Silva
  * @see A2ASubagentDefinition
  * @see A2ASubagentDefinition_v1_0
  * @see <a href="https://a2a-protocol.org">A2A Protocol Specification</a>
  */
-public final class A2ASubagentDefinition_v0_3 implements A2ASubagentDefinition {
+public final class A2ASubagentDefinition_v0_3 extends A2ASubagentDefinition {
 
     private static final Logger logger = LoggerFactory.getLogger(A2ASubagentDefinition_v0_3.class);
     public static final String PROTOCOL_VERSION = "0.3";
 
-    private final SubagentReference subagentRef;
     private final AgentCard_v0_3 card;
-    private final String description;
 
     public A2ASubagentDefinition_v0_3(SubagentReference subagentRef, AgentCard_v0_3 card) {
-        this.subagentRef = Objects.requireNonNull(subagentRef, "subagentRef must not be null");
-        this.card = Objects.requireNonNull(card, "card must not be null");
-        this.description = buildDescription(card);
+        super(subagentRef, buildDescription(Objects.requireNonNull(card, "card must not be null")));
+        this.card = card;
     }
 
     @Override
     public String getName() {
         return card.name();
-    }
-
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public String getKind() {
-        return KIND;
-    }
-
-    @Override
-    public SubagentReference getReference() {
-        return subagentRef;
     }
 
     @Override
@@ -98,12 +80,12 @@ public final class A2ASubagentDefinition_v0_3 implements A2ASubagentDefinition {
                     .parts(List.of(new TextPart_v0_3(prompt, null)))
                     .build();
 
+            // Use CompletableFuture to wait for the response
             CompletableFuture<String> responseFuture = new CompletableFuture<>();
             AtomicReference<String> responseText = new AtomicReference<>("");
 
             BiConsumer<ClientEvent_v0_3, AgentCard_v0_3> consumer = (event, card) -> {
 
-                // 1. Resposta síncrona completa
                 if (event instanceof MessageEvent_v0_3 messageEvent) {
                     Message_v0_3 msg = messageEvent.getMessage();
                     StringBuilder sb = new StringBuilder();
@@ -118,7 +100,6 @@ public final class A2ASubagentDefinition_v0_3 implements A2ASubagentDefinition {
                     return;
                 }
 
-                // 2. Task completa ou atualização incremental
                 Task_v0_3 task;
                 if (event instanceof TaskEvent_v0_3 taskEvent) {
                     task = taskEvent.getTask();
@@ -131,6 +112,7 @@ public final class A2ASubagentDefinition_v0_3 implements A2ASubagentDefinition {
                 TaskState_v0_3 taskState = task.status().state();
                 logger.info("Received task response: status={}", taskState);
 
+                // Extract text from artifacts
                 if (task.artifacts() != null) {
                     StringBuilder sb = new StringBuilder();
                     for (Artifact_v0_3 artifact : task.artifacts()) {
@@ -150,6 +132,7 @@ public final class A2ASubagentDefinition_v0_3 implements A2ASubagentDefinition {
                 }
             };
 
+            // Create client with consumer via builder
             Client_v0_3 client = Client_v0_3.builder(card)
                     .withTransport(JSONRPCTransport_v0_3.class,
                             new JSONRPCTransportConfigBuilder_v0_3())

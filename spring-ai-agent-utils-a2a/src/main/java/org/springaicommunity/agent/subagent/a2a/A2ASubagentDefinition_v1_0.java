@@ -45,50 +45,31 @@ import org.springaicommunity.agent.common.task.subagent.SubagentReference;
 /**
  * {@link A2ASubagentDefinition} for the A2A protocol 1.0.
  *
- * <p>Wraps a protocol 1.0 {@link AgentCard} and invokes the remote agent through the
- * 1.0 {@code Client} over JSON-RPC. Handles both {@code MessageEvent} (synchronous
- * responses) and task-based events ({@code TaskEvent} / {@code TaskUpdateEvent}).
+ * <p>Wraps a protocol 1.0 {@link AgentCard} and invokes the remote agent through
+ * the v1.0 client ({@code Client}) over the JSON-RPC transport. Handles both
+ * synchronous message responses and task-based responses.
  *
+ * @author Christian Tzolov
  * @author Caio Henrique Silva
  * @see A2ASubagentDefinition
  * @see A2ASubagentDefinition_v0_3
  * @see <a href="https://a2a-protocol.org">A2A Protocol Specification</a>
  */
-public final class A2ASubagentDefinition_v1_0 implements A2ASubagentDefinition {
+public final class A2ASubagentDefinition_v1_0 extends A2ASubagentDefinition {
 
     private static final Logger logger = LoggerFactory.getLogger(A2ASubagentDefinition_v1_0.class);
     public static final String PROTOCOL_VERSION = "1.0";
 
-    private final SubagentReference subagentRef;
-
     private final AgentCard card;
 
-    private final String description;
-
     public A2ASubagentDefinition_v1_0(SubagentReference subagentRef, AgentCard card) {
-        this.subagentRef = Objects.requireNonNull(subagentRef, "subagentRef must not be null");
-        this.card = Objects.requireNonNull(card, "card must not be null");
-        this.description = buildDescription(card);
+        super(subagentRef, buildDescription(Objects.requireNonNull(card, "card must not be null")));
+        this.card = card;
     }
 
     @Override
     public String getName() {
         return card.name();
-    }
-
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public String getKind() {
-        return KIND;
-    }
-
-    @Override
-    public SubagentReference getReference() {
-        return subagentRef;
     }
 
     @Override
@@ -186,5 +167,4 @@ public final class A2ASubagentDefinition_v1_0 implements A2ASubagentDefinition {
         }
         return sb.toString();
     }
-
 }
