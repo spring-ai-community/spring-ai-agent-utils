@@ -127,7 +127,7 @@ Or add the core library directly:
 
 _Check the latest version:_ [![](https://img.shields.io/maven-central/v/org.springaicommunity/spring-ai-agent-utils.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/org.springaicommunity/spring-ai-agent-utils)
 
-> **Note:** You need Spring AI version `` or later.
+> **Note:** See [Requirements](#requirements) for the supported Spring AI version.
 
 **2. Configure your agent:**
 
