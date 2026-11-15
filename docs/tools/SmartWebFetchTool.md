@@ -479,6 +479,7 @@ SmartWebFetchTool.builder(chatClient).maxRetries(5).build();
 - Or refine your prompt to extract specific information
 
 ### "Failed after N attempts"
+- The text after the colon is the cause of the last attempt (for example `Server error: HTTP 503` or `Network error while fetching URL: ...`)
 - Check network connectivity
 - Verify URL is accessible
 - Increase `maxRetries` for unreliable connections
