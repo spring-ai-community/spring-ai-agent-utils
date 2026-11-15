@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../../images/logo2.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
     
     
       
@@ -31,10 +31,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -2142,11 +2142,20 @@
 </span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="c1">// No restriction (default — backward compatible)</span>
 </span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="n">FileSystemTools</span><span class="w"> </span><span class="n">tools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileSystemTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">();</span>
 </span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="c1">// Workspace shorthand — confines operations to the workspace root</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="n">FileSystemTools</span><span class="w"> </span><span class="n">tools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileSystemTools</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">    </span><span class="p">.</span><span class="na">workspace</span><span class="p">(</span><span class="n">Workspace</span><span class="p">.</span><span class="na">local</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">"/workspace/project"</span><span class="p">)))</span>
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="c1">// Workspace shorthand — working directory and confinement are the workspace root.</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="c1">// A relative filePath resolves against that root (same as Grep/Glob/ListDirectory).</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="n">FileSystemTools</span><span class="w"> </span><span class="n">tools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileSystemTools</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">    </span><span class="p">.</span><span class="na">workspace</span><span class="p">(</span><span class="n">Workspace</span><span class="p">.</span><span class="na">local</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">"/workspace/project"</span><span class="p">)))</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="c1">// Explicit working directory. A later workingDirectory overrides the workspace</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="c1">// default; confinement stays on the allowed directories.</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="n">FileSystemTools</span><span class="w"> </span><span class="n">tools</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FileSystemTools</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">    </span><span class="p">.</span><span class="na">workingDirectory</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">"/workspace/project"</span><span class="p">))</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="w">    </span><span class="p">.</span><span class="na">allowedDirectory</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">"/workspace/project"</span><span class="p">))</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
+<p><strong>Relative paths:</strong> <code>workingDirectory</code> is the base a relative <code>filePath</code> is resolved against. <code>workspace(...)</code> sets it to <code>workspace.root()</code>. Absolute paths are unchanged. With no working directory, relative paths still resolve against the JVM working directory. <code>..</code> components are still rejected by the confinement check.</p>
 <p><strong>Security guarantees:</strong></p>
 <p>Three layers block bypass attempts for each candidate directory:</p>
 <ol>
@@ -2165,7 +2174,7 @@
 <h3 id="1-read-read-file-contents">1. Read - Read File Contents<a class="headerlink" href="#1-read-read-file-contents" title="Permanent link">&para;</a></h3>
 <p>Reads a file from the local filesystem with optional line range support for handling large files.</p>
 <p><strong>Parameters:</strong>
-- <code>filePath</code> (required) - The absolute path to the file to read
+- <code>filePath</code> (required) - The path to the file to read, absolute or relative to the working directory
 - <code>offset</code> (optional) - The line number to start reading from (1-indexed)
 - <code>limit</code> (optional) - The number of lines to read (default: 2000)</p>
 <p><strong>Basic Usage:</strong></p>
@@ -2209,7 +2218,7 @@
 - <strong>Empty file detection</strong>: Returns "File is empty" message for empty files
 - <strong>Error handling</strong>: Clear error messages for non-existent files or directories</p>
 <p><strong>Important Notes:</strong>
-- File path must be absolute, not relative
+- File path is absolute, or relative to the working directory (the JVM working directory when none is configured)
 - Default limit is 2000 lines - recommended to read full file when possible
 - Line numbers are 1-indexed (first line is line 1)
 - Cannot read directories (use Bash tool with <code>ls</code> command)
@@ -2217,7 +2226,7 @@
 <h3 id="2-write-create-or-overwrite-files">2. Write - Create or Overwrite Files<a class="headerlink" href="#2-write-create-or-overwrite-files" title="Permanent link">&para;</a></h3>
 <p>Writes content to a file, creating new files or overwriting existing ones.</p>
 <p><strong>Parameters:</strong>
-- <code>filePath</code> (required) - The absolute path to the file to write (must be absolute)
+- <code>filePath</code> (required) - The path to the file to write, absolute or relative to the working directory
 - <code>content</code> (optional) - The content to write to the file (defaults to empty string if null)</p>
 <p><strong>Basic Usage:</strong></p>
 <div class="highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// Create a new file</span>
@@ -2252,9 +2261,9 @@
 - <strong>MUST read first</strong>: If overwriting an existing file, you MUST use the Read tool first
 - <strong>Prefer Edit</strong>: ALWAYS prefer editing existing files instead of writing new ones
 - <strong>No emojis</strong>: Avoid writing emojis unless explicitly requested by the user
-- <strong>No proactive docs</strong>: Never create documentation files (<em>.md, README) unless explicitly requested
-- </em><em>Parent directories</em><em>: Automatically creates parent directories if they don't exist
-- </em><em>Complete replacement</em>*: Overwrites the entire file content (does not append)</p>
+- <strong>No proactive docs</strong>: Never create documentation files (*.md, README) unless explicitly requested
+- <strong>Parent directories</strong>: Automatically creates parent directories if they don't exist
+- <strong>Complete replacement</strong>: Overwrites the entire file content (does not append)</p>
 <p><strong>When to Use:</strong>
 - Creating new files explicitly requested by the user
 - Generating configuration files, scripts, or source files
@@ -2265,7 +2274,7 @@
 <h3 id="3-edit-precise-string-replacement">3. Edit - Precise String Replacement<a class="headerlink" href="#3-edit-precise-string-replacement" title="Permanent link">&para;</a></h3>
 <p>Performs exact string replacements in files with safety checks to prevent unintended changes.</p>
 <p><strong>Parameters:</strong>
-- <code>filePath</code> (required) - The absolute path to the file to modify
+- <code>filePath</code> (required) - The path to the file to modify, absolute or relative to the working directory
 - <code>old_string</code> (required) - The exact text to replace
 - <code>new_string</code> (required) - The text to replace it with (must be different from old_string)
 - <code>replace_all</code> (optional) - Replace all occurrences (default: false)</p>
@@ -2534,10 +2543,10 @@ outside the workspace even when Read/Write/Edit are confined.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.path", "navigation.indexes", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": ["latest-snapshot", "latest"], "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.path", "navigation.indexes", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": ["latest-snapshot", "latest"], "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>
