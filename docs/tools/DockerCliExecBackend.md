@@ -23,13 +23,13 @@ try (DockerCliExecBackend backend = DockerCliExecBackend.builder()
 
     Workspace workspace = backend.workspace();        // host root + /workspace display mapping
 
-    // Shell commands execute inside the container
-    ShellTools shell = ShellTools.builder().execBackend(backend).build();
-
-    // File/search tools operate host-side through the mount, confined to it
-    FileSystemTools files = FileSystemTools.builder().workspace(workspace).build();
-    GrepTool grep = GrepTool.builder().workspace(workspace).build();
-    GlobTool glob = GlobTool.builder().workspace(workspace).build();
+    // Shell runs in the container; file and search tools stay host-side, confined to the mount.
+    // EXECUTE (the default) publishes Bash, BashOutput, KillShell, Read, Write, Edit, Grep, Glob
+    // and ListDirectory. See AgentToolset for READ/WRITE tiers, with/without and a listener.
+    List<ToolCallback> tools = AgentToolset.builder()
+        .execBackend(backend)
+        .workspace(workspace)
+        .build();
 
     // Skill base directories and environment prompts show container paths
     ToolCallback skills = SkillsTool.builder()
@@ -81,4 +81,5 @@ docker rm -f $(docker ps -aq --filter label=org.springaicommunity.agent.exec-bac
 - [Workspace & Exec SPI](WorkspaceAndExecSPI.md) — overview of the two seams this backend implements
 - [ShellTools](ShellTools.md#execution-backend--working-directory) — the `ExecBackend` seam this plugs into
 - [AgentEnvironment](AgentEnvironment.md) — workspace/backend-aware environment prompts
+- [AgentToolset](AgentToolset.md) — the factory used above
 - [FileSystemTools](FileSystemTools.md) / [GrepTool](GrepTool.md) / [GlobTool](GlobTool.md) — workspace confinement for the host-side file tools

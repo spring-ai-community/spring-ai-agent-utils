@@ -1,5 +1,6 @@
 package org.springaicommunity.agent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -8,6 +9,7 @@ import org.springaicommunity.agent.common.task.subagent.SubagentType;
 import org.springaicommunity.agent.subagent.a2a.A2ASubagentDefinition;
 import org.springaicommunity.agent.subagent.a2a.A2ASubagentExecutor;
 import org.springaicommunity.agent.subagent.a2a.A2ASubagentResolver;
+import org.springaicommunity.agent.tools.AgentToolset;
 import org.springaicommunity.agent.tools.BraveWebSearchTool;
 import org.springaicommunity.agent.tools.FileSystemTools;
 import org.springaicommunity.agent.tools.GlobTool;
@@ -70,9 +72,19 @@ public class Application {
 
 				.build();
 
+			List<Object> tools = new ArrayList<>();
+			tools.add(taskTools);
+			tools.add(SkillsTool.builder().addSkillsResources(skillPaths).build());
+			tools.add(TodoWriteTool.builder().build());
+			tools.add(GlobTool.builder().build());
+			tools.add(GrepTool.builder().build());
+			tools.add(ShellTools.builder().build());
+			tools.add(FileSystemTools.builder().build());
+			tools.add(SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build());
 			// Brave web search is optional: register it only when BRAVE_API_KEY is set
-			List<Object> webSearchTools = StringUtils.hasText(braveApiKey)
-					? List.of(BraveWebSearchTool.builder(braveApiKey).resultCount(15).build()) : List.of();
+			if (StringUtils.hasText(braveApiKey)) {
+				tools.add(BraveWebSearchTool.builder(braveApiKey).resultCount(15).build());
+			}
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off
 				// system prompt
@@ -80,27 +92,10 @@ public class Application {
 					.param(AgentEnvironment.ENVIRONMENT_INFO_KEY, AgentEnvironment.info())
 					.param(AgentEnvironment.GIT_STATUS_KEY, AgentEnvironment.gitStatus())
 					.param(AgentEnvironment.AGENT_MODEL_KEY, agentModel)
-					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, agentModelKnowledgeCutoff))
+					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, agentModelKnowledgeCutoff)
+					.params(AgentToolset.promptVariables(tools)))
 									
-				.defaultTools(
-					// Sub-agent task tool callbacks
-					taskTools,
-
-					// Agent Skills tool
-					SkillsTool.builder().addSkillsResources(skillPaths).build(),
-
-					// Task orchestration tools
-					TodoWriteTool.builder().build(),
-
-					// Common agentic tools
-					GlobTool.builder().build(),
-					GrepTool.builder().build(),
-					ShellTools.builder().build(),
-					FileSystemTools.builder().build(),
-					SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build())
-
-				// Optional web search tool
-				.defaultTools(webSearchTools.toArray())
+				.defaultTools(tools.toArray())
 
 				// Advisors
 				.defaultAdvisors(

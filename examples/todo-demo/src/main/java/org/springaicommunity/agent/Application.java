@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import org.springaicommunity.agent.tools.AgentToolset;
 import org.springaicommunity.agent.tools.BraveWebSearchTool;
 import org.springaicommunity.agent.tools.TodoWriteTool;
 import org.springaicommunity.agent.tools.TodoWriteTool.Todos;
@@ -62,7 +63,8 @@ public class Application {
 					.param(AgentEnvironment.ENVIRONMENT_INFO_KEY, AgentEnvironment.info())
 					.param(AgentEnvironment.GIT_STATUS_KEY, AgentEnvironment.gitStatus())
 					.param(AgentEnvironment.AGENT_MODEL_KEY, "Unknown Model")
-					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, "Unknown Cutoff"))
+					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, "Unknown Cutoff")
+					.params(AgentToolset.promptVariables(tools)))
 
 				.defaultTools(tools.toArray())
 

@@ -68,21 +68,22 @@ try (DockerCliExecBackend backend = DockerCliExecBackend.builder()
 
     Workspace workspace = backend.workspace();   // hostDir root, /workspace display
 
-    ShellTools shell = ShellTools.builder().execBackend(backend).build();
-    FileSystemTools files = FileSystemTools.builder().workspace(workspace).build();
-    GrepTool grep = GrepTool.builder().workspace(workspace).build();
+    List<ToolCallback> tools = AgentToolset.builder()
+        .execBackend(backend)
+        .workspace(workspace)
+        .build();
     String envInfo = AgentEnvironment.info(workspace);
 }
 ```
 
-See [DockerCliExecBackend](DockerCliExecBackend.md) for the complete recipe and its operational caveats.
+[AgentToolset](AgentToolset.md) is that recipe as a builder: the same `(ExecBackend, Workspace)` pair, plus a permission tier (`NONE` / `READ` / `WRITE` / `EXECUTE`), `with` / `without` for tools outside the default set, and an optional `ToolCallListener`. See [DockerCliExecBackend](DockerCliExecBackend.md) for the complete sandbox recipe and its operational caveats.
 
 ## Module map
 
 | Module | Contents |
 |---|---|
 | `spring-ai-agent-utils-common` | The SPIs: `ExecBackend`, `ExecSpec`, `ExecResult`, `ExecHandle`, `Workspace` — the `exec` and `workspace` packages are plain JDK, so backend implementations need no Spring on their classpath |
-| `spring-ai-agent-utils` | The tools plus `LocalExecBackend` (host default) |
+| `spring-ai-agent-utils` | The tools, `AgentToolset`, plus `LocalExecBackend` (host default) |
 | `exec-backends/spring-ai-agent-utils-docker-cli` | `DockerCliExecBackend` (Docker sandbox) |
 
 The `exec-backends/` folder is the home for further backend implementations as they land.
