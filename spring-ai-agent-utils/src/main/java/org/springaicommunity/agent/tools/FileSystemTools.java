@@ -292,6 +292,10 @@ public class FileSystemTools {
 				return "Error: Path is a directory, not a file: " + filePath;
 			}
 
+			if (old_string == null || old_string.isEmpty()) {
+				return "Error: old_string must not be empty";
+			}
+
 			// Validate that old_string and new_string are different
 			if (old_string.equals(new_string)) {
 				return "Error: old_string and new_string must be different";
