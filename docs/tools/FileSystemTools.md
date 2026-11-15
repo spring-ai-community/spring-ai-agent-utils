@@ -41,11 +41,21 @@ FileSystemTools tools = FileSystemTools.builder()
 // No restriction (default — backward compatible)
 FileSystemTools tools = FileSystemTools.builder().build();
 
-// Workspace shorthand — confines operations to the workspace root
+// Workspace shorthand — working directory and confinement are the workspace root.
+// A relative filePath resolves against that root (same as Grep/Glob/ListDirectory).
 FileSystemTools tools = FileSystemTools.builder()
     .workspace(Workspace.local(Path.of("/workspace/project")))
     .build();
+
+// Explicit working directory. A later workingDirectory overrides the workspace
+// default; confinement stays on the allowed directories.
+FileSystemTools tools = FileSystemTools.builder()
+    .workingDirectory(Path.of("/workspace/project"))
+    .allowedDirectory(Path.of("/workspace/project"))
+    .build();
 ```
+
+**Relative paths:** `workingDirectory` is the base a relative `filePath` is resolved against. `workspace(...)` sets it to `workspace.root()`. Absolute paths are unchanged. With no working directory, relative paths still resolve against the JVM working directory. `..` components are still rejected by the confinement check.
 
 **Security guarantees:**
 
@@ -73,7 +83,7 @@ Error: Access denied. Path is outside the allowed directories: /etc/passwd
 Reads a file from the local filesystem with optional line range support for handling large files.
 
 **Parameters:**
-- `filePath` (required) - The absolute path to the file to read
+- `filePath` (required) - The path to the file to read, absolute or relative to the working directory
 - `offset` (optional) - The line number to start reading from (1-indexed)
 - `limit` (optional) - The number of lines to read (default: 2000)
 
@@ -124,7 +134,7 @@ Showing lines 1-10 of 150
 - **Error handling**: Clear error messages for non-existent files or directories
 
 **Important Notes:**
-- File path must be absolute, not relative
+- File path is absolute, or relative to the working directory (the JVM working directory when none is configured)
 - Default limit is 2000 lines - recommended to read full file when possible
 - Line numbers are 1-indexed (first line is line 1)
 - Cannot read directories (use Bash tool with `ls` command)
@@ -135,7 +145,7 @@ Showing lines 1-10 of 150
 Writes content to a file, creating new files or overwriting existing ones.
 
 **Parameters:**
-- `filePath` (required) - The absolute path to the file to write (must be absolute)
+- `filePath` (required) - The path to the file to write, absolute or relative to the working directory
 - `content` (optional) - The content to write to the file (defaults to empty string if null)
 
 **Basic Usage:**
@@ -192,7 +202,7 @@ String result = fileTools.write(
 Performs exact string replacements in files with safety checks to prevent unintended changes.
 
 **Parameters:**
-- `filePath` (required) - The absolute path to the file to modify
+- `filePath` (required) - The path to the file to modify, absolute or relative to the working directory
 - `old_string` (required) - The exact text to replace
 - `new_string` (required) - The text to replace it with (must be different from old_string)
 - `replace_all` (optional) - Replace all occurrences (default: false)
