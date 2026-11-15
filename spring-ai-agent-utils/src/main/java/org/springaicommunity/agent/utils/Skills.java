@@ -174,11 +174,14 @@ public class Skills {
 		}
 
 		JarURLConnection jarConnection = (JarURLConnection) resourceUrl.openConnection();
+		jarConnection.setUseCaches(false);
 		String entryPrefix = jarConnection.getEntryName();
 		if (!entryPrefix.endsWith("/")) {
 			entryPrefix = entryPrefix + "/";
 		}
-		return scanJarForSkills(jarConnection.getJarFile(), entryPrefix);
+		try (JarFile jarFile = jarConnection.getJarFile()) {
+			return scanJarForSkills(jarFile, entryPrefix);
+		}
 	}
 
 	/**
@@ -196,7 +199,9 @@ public class Skills {
 			throws IOException {
 		// Primary: Spring's ResourcePatternResolver — works for well-formed JARs with
 		// explicit directory entries and for resources on the filesystem.
-		ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(classLoader);
+		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(classLoader);
+		// Do not retain cached JAR handles after loading skills (they lock files on Windows).
+		resolver.setUseCaches(false);
 		Resource[] resources = resolver.getResources("classpath*:" + classpathPrefix + "/**/SKILL.md");
 
 		if (resources.length > 0) {
@@ -255,7 +260,10 @@ public class Skills {
 			}
 
 			JarURLConnection jarConnection = (JarURLConnection) manifestUrl.openConnection();
-			skills.addAll(scanJarForSkills(jarConnection.getJarFile(), prefix));
+			jarConnection.setUseCaches(false);
+			try (JarFile jarFile = jarConnection.getJarFile()) {
+				skills.addAll(scanJarForSkills(jarFile, prefix));
+			}
 		}
 
 		return skills;

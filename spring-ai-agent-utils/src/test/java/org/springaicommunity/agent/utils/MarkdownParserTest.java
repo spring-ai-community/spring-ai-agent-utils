@@ -32,6 +32,64 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MarkdownParserTest {
 
 	@Nested
+	@DisplayName("Front Matter Delimiter Tests")
+	class FrontMatterDelimiterTests {
+
+		@Test
+		void shouldPreserveDashesInMetadataValues() {
+			String markdown = "---\nname: diff-skill\ndescription: \"Compare before---after\"\n---\n# Instructions";
+			MarkdownParser parser = new MarkdownParser(markdown);
+
+			assertThat(parser.getFrontMatter()).containsEntry("name", "diff-skill")
+				.containsEntry("description", "Compare before---after");
+			assertThat(parser.getContent()).isEqualTo("# Instructions");
+		}
+
+		@Test
+		void shouldNotTreatLongerDashLinesAsClosingDelimiters() {
+			MarkdownParser parser = new MarkdownParser("---\n----\nname: diff-skill\n---\n# Instructions");
+
+			assertThat(parser.getFrontMatter()).containsEntry("name", "diff-skill");
+			assertThat(parser.getContent()).isEqualTo("# Instructions");
+		}
+
+		@Test
+		void shouldNotTreatDelimiterPrefixesAsFrontMatter() {
+			String markdown = "---heading\nname: diff-skill\n---\n# Instructions";
+			MarkdownParser parser = new MarkdownParser(markdown);
+
+			assertThat(parser.getFrontMatter()).isEmpty();
+			assertThat(parser.getContent()).isEqualTo(markdown);
+		}
+
+		@Test
+		void shouldPreserveDocumentWithoutStandaloneClosingDelimiter() {
+			String markdown = "---\nname: diff-skill\ndescription: Compare before---after\n# Instructions";
+			MarkdownParser parser = new MarkdownParser(markdown);
+
+			assertThat(parser.getFrontMatter()).isEmpty();
+			assertThat(parser.getContent()).isEqualTo(markdown);
+		}
+
+		@Test
+		void shouldParseCrLfDelimitersWithTrailingWhitespace() {
+			MarkdownParser parser = new MarkdownParser("--- \t\r\nname: diff-skill\r\n---\t \r\n# Instructions");
+
+			assertThat(parser.getFrontMatter()).containsEntry("name", "diff-skill");
+			assertThat(parser.getContent()).isEqualTo("# Instructions");
+		}
+
+		@Test
+		void shouldParseClosingDelimiterAtEndOfInput() {
+			MarkdownParser parser = new MarkdownParser("---\nname: diff-skill\n---");
+
+			assertThat(parser.getFrontMatter()).containsEntry("name", "diff-skill");
+			assertThat(parser.getContent()).isEmpty();
+		}
+
+	}
+
+	@Nested
 	@DisplayName("Front Matter Parsing Tests")
 	class FrontMatterParsingTests {
 
@@ -204,10 +262,9 @@ class MarkdownParserTest {
 			MarkdownParser parser = new MarkdownParser(markdown);
 			Map<String, Object> frontMatter = parser.getFrontMatter();
 
-			assertThat(frontMatter).hasSize(2)
-				.containsEntry("title", "My Title")
-				.containsEntry("author", "John Doe");
+			assertThat(frontMatter).hasSize(2).containsEntry("title", "My Title").containsEntry("author", "John Doe");
 		}
+
 	}
 
 	@Nested
@@ -282,6 +339,7 @@ class MarkdownParserTest {
 				.contains("- Item 1")
 				.contains("```java");
 		}
+
 	}
 
 	@Nested
@@ -339,6 +397,7 @@ class MarkdownParserTest {
 			assertThat(parser.getFrontMatter()).isEmpty();
 			assertThat(parser.getContent()).isEqualTo(markdown);
 		}
+
 	}
 
 	@Nested
@@ -376,9 +435,7 @@ class MarkdownParserTest {
 			MarkdownParser parser = new MarkdownParser(markdown);
 			Map<String, Object> frontMatter = parser.getFrontMatter();
 
-			assertThat(frontMatter).hasSize(2)
-				.containsEntry("title", "My Post")
-				.containsEntry("author", "John Doe");
+			assertThat(frontMatter).hasSize(2).containsEntry("title", "My Post").containsEntry("author", "John Doe");
 			assertThat(parser.getContent()).isEmpty();
 		}
 
@@ -451,8 +508,7 @@ class MarkdownParserTest {
 			Map<String, Object> frontMatter = parser.getFrontMatter();
 
 			// Mismatched quotes should not be removed
-			assertThat(frontMatter).containsEntry("title", "\"My Title'")
-				.containsEntry("author", "'John Doe\"");
+			assertThat(frontMatter).containsEntry("title", "\"My Title'").containsEntry("author", "'John Doe\"");
 		}
 
 		@Test
@@ -475,6 +531,7 @@ class MarkdownParserTest {
 			// Empty values should be stored as empty strings
 			assertThat(frontMatter).containsEntry("key without value", "");
 		}
+
 	}
 
 	@Nested
@@ -505,6 +562,7 @@ class MarkdownParserTest {
 
 			assertThat(frontMatter3).doesNotContainKey("new-key").hasSize(1);
 		}
+
 	}
 
 	@Nested
@@ -578,6 +636,7 @@ class MarkdownParserTest {
 				.containsEntry("status", "draft")
 				.containsEntry("reviewers", "Alice, Bob, Charlie");
 		}
+
 	}
 
 }
