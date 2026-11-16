@@ -119,8 +119,9 @@ public class AutoMemoryToolsAdvisor implements BaseChatMemoryAdvisor {
 
 	public static final class Builder {
 
-		// Before the default ToolCallingAdvisor which is at HIGHEST_PRECEDENCE + 300
-		private int order = BaseAdvisor.HIGHEST_PRECEDENCE + 200;
+		// After Spring AI's SessionTurnAdvisor (HIGHEST_PRECEDENCE + 200), so the two never
+		// tie, and before the default ToolCallingAdvisor (HIGHEST_PRECEDENCE + 300)
+		private int order = BaseAdvisor.HIGHEST_PRECEDENCE + 250;
 
 		private String memoriesRootDirectory = "";
 

@@ -11,13 +11,11 @@ Reference: [Claude Code Todo Tracking](https://platform.claude.com/docs/en/agent
 ```java
 ChatClient chatClient = chatClientBuilder
     .defaultTools(TodoWriteTool.builder().build())
-    .defaultAdvisors(
-        ToolCallAdvisor.builder().conversationHistoryEnabled(false).build(),
-        MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().build()).build())
+    .defaultAdvisors(SessionAdvisors.builder(sessionService).build())
     .build();
 ```
 
-> **Note:** Requires [Chat Memory](https://docs.spring.io/spring-ai/reference/api/chat-memory.html) and [ToolCallAdvisor](https://docs.spring.io/spring-ai/reference/api/advisors-recursive.html#_toolcalladvisor). For best results, use a system prompt like [MAIN_AGENT_SYSTEM_PROMPT_V2](https://github.com/spring-ai-community/spring-ai-agent-utils/blob/main/spring-ai-agent-utils/src/main/resources/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md#task-management).
+> **Note:** Requires conversation memory, such as Spring AI's [session advisors](https://docs.spring.io/spring-ai/reference/api/session.html) (`SessionAdvisors` from `spring-ai-session-advisor`, over a `SessionService`), so the task list carries over between turns; run each request on a session with `.advisors(SessionAdvisors.session(sessionId))`. For best results, use a system prompt like [MAIN_AGENT_SYSTEM_PROMPT_V2](https://github.com/spring-ai-community/spring-ai-agent-utils/blob/main/spring-ai-agent-utils/src/main/resources/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md#task-management).
 
 ## Task Structure
 

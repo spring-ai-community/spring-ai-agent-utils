@@ -18,31 +18,32 @@ If the prompt carries no `ToolCallingChatOptions` the request is returned unchan
 
 ## Long-term memory vs. session memory
 
-`AutoMemoryToolsAdvisor` is a **long-term memory** mechanism. It is designed to complement, not replace, Spring AI's built-in short-term conversation memory (e.g. `MessageChatMemoryAdvisor` + `MessageWindowChatMemory`). The two layers serve fundamentally different purposes and should normally be used together:
+`AutoMemoryToolsAdvisor` is a **long-term memory** mechanism. It is designed to complement, not replace, Spring AI's short-term conversation memory ([session memory](https://docs.spring.io/spring-ai/reference/api/session.html): `SessionAdvisors` over a `SessionService`). The two layers serve fundamentally different purposes and should normally be used together:
 
-| | Session memory (`MessageChatMemoryAdvisor`) | Long-term memory (`AutoMemoryToolsAdvisor`) |
+| | Session memory (`SessionAdvisors`) | Long-term memory (`AutoMemoryToolsAdvisor`) |
 |---|---|---|
 | **Scope** | Current conversation only | Persists across conversations |
-| **Storage** | In-process (`ChatMemory`) | Files on disk via `AutoMemoryTools` |
+| **Storage** | A `SessionService` repository (in-memory or JDBC) | Files on disk via `AutoMemoryTools` |
 | **Content** | Full message exchange — every turn | Curated facts worth keeping forever |
 | **Managed by** | Spring AI automatically | The model itself via tool calls |
-| **Expires** | When the process stops (or window fills) | Never — until the model deletes a file |
+| **Expires** | With the session (in memory: when the process stops); compaction trims what the prompt sees | Never — until the model deletes a file |
 
 A typical agent setup combines both:
 
 ```java
 ChatClient chatClient = ChatClient.builder(chatModel)
-    .defaultAdvisors(
-        // Long-term memory — facts that survive across sessions
-        AutoMemoryToolsAdvisor.builder()
-            .memoriesRootDirectory("/home/user/.agent/memories")
-            .build(),
+    // Long-term memory — facts that survive across sessions
+    .defaultAdvisors(AutoMemoryToolsAdvisor.builder()
+        .memoriesRootDirectory("/home/user/.agent/memories")
+        .build())
 
-        // Short-term memory — full conversation history for this session
-        MessageChatMemoryAdvisor.builder(
-            MessageWindowChatMemory.builder().maxMessages(100).build())
-            .build())
+    // Short-term memory — the conversation history of this session
+    .defaultAdvisors(SessionAdvisors.builder(sessionService).build())
     .build();
+
+chatClient.prompt(userInput)
+    .advisors(SessionAdvisors.session(sessionId))  // every request names its session
+    .call();
 ```
 
 In this setup the model has the best of both worlds: the full context of the current conversation via the session window, and persistent knowledge about the user and project that it accumulated over previous sessions via the memory files.
@@ -70,7 +71,7 @@ That's all. On the first turn the model reads `MEMORY.md` via `MemoryView`, load
 ```java
 AutoMemoryToolsAdvisor advisor = AutoMemoryToolsAdvisor.builder()
     .memoriesRootDirectory("/path/to/memories")          // required
-    .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200)         // optional
+    .order(BaseAdvisor.HIGHEST_PRECEDENCE + 250)         // optional
     .memorySystemPrompt(customPromptResource)            // optional
     .memoryConsolidationTrigger((req, instant) -> false) // optional
     .build();
@@ -79,7 +80,7 @@ AutoMemoryToolsAdvisor advisor = AutoMemoryToolsAdvisor.builder()
 | Builder method | Type | Default | Description |
 |---|---|---|---|
 | `memoriesRootDirectory(String)` | `String` | — (**required**) | Root directory for all memory files. Created automatically if absent. |
-| `order(int)` | `int` | `HIGHEST_PRECEDENCE + 200` | Advisor order. Runs before the default `ToolCallingAdvisor` at `+300`. |
+| `order(int)` | `int` | `HIGHEST_PRECEDENCE + 250` | Advisor order. Runs after `SessionTurnAdvisor` (`+200`) and before the default `ToolCallingAdvisor` (`+300`). |
 | `memorySystemPrompt(Resource)` | `Resource` | `classpath:/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md` | Prompt template to inject. Must contain the `{MEMORIES_ROOT_DIERCTORY}` placeholder. |
 | `memoryConsolidationTrigger(BiPredicate<ChatClientRequest, Instant>)` | `BiPredicate` | `(req, t) -> false` | Evaluated on each request. When `true`, a consolidation reminder is appended to the system message. |
 
@@ -136,7 +137,9 @@ AtomicInteger counter = new AtomicInteger();
 
 ## Advisor Ordering
 
-The default order `BaseAdvisor.HIGHEST_PRECEDENCE + 200` places this advisor **before** the `ToolCallingAdvisor` (which sits at `+300`). This ordering ensures memory tools are registered in the options before the tool-calling advisor processes them.
+The default order `BaseAdvisor.HIGHEST_PRECEDENCE + 250` places this advisor **before** the `ToolCallingAdvisor` (which sits at `+300`). This ordering ensures memory tools are registered in the options before the tool-calling advisor processes them.
+
+It also sits just after the `SessionTurnAdvisor` that `SessionAdvisors` registers at `HIGHEST_PRECEDENCE + 200`, so the two never tie. Before 0.14.0 the default was `+200`.
 
 If you use other advisors that also modify tool options (e.g. additional `ToolCallingAdvisor` instances), verify that their relative order does not prevent the memory tools from reaching the model.
 
@@ -202,7 +205,7 @@ AutoMemoryToolsAdvisor.builder()
 
 ## Demo Application
 
-See [`memory-tools-advisor-demo`](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-advisor-demo) for a complete runnable example showing `AutoMemoryToolsAdvisor` combined with `MessageChatMemoryAdvisor` and a custom logging advisor.
+See [`memory-tools-advisor-demo`](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-advisor-demo) for a complete runnable example showing `AutoMemoryToolsAdvisor` combined with Spring AI's session advisors and a custom logging advisor.
 
 ## See Also
 

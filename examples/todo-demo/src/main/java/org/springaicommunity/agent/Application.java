@@ -11,9 +11,11 @@ import org.springaicommunity.agent.tools.TodoWriteTool.Todos.TodoItem;
 import org.springaicommunity.agent.utils.AgentEnvironment;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.session.DefaultSessionService;
+import org.springframework.ai.session.EventFilter;
+import org.springframework.ai.session.InMemorySessionRepository;
+import org.springframework.ai.session.SessionService;
+import org.springframework.ai.session.advisor.SessionAdvisors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -22,7 +24,6 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.Ordered;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -56,6 +57,11 @@ public class Application {
 				tools.add(BraveWebSearchTool.builder(braveApiKey).resultCount(15).build());
 			}
 
+			// Short-term conversation memory: an in-memory session store, reset on every run
+			SessionService sessionService = DefaultSessionService.builder()
+				.sessionRepository(InMemorySessionRepository.builder().build())
+				.build();
+
 			// @formatter:off
 			ChatClient chatClient = chatClientBuilder
 				.defaultSystem(p -> p.text(systemPrompt) // system prompt
@@ -67,9 +73,10 @@ public class Application {
 				.defaultTools(tools.toArray())
 
 				// Advisors
-				.defaultAdvisors(
-					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build())
-					.order(Ordered.HIGHEST_PRECEDENCE + 1000).build())
+				// Conversation memory: the session advisors replay the last 500 events of the session
+				.defaultAdvisors(SessionAdvisors.builder(sessionService)
+					.memory(memory -> memory.eventFilter(EventFilter.lastN(500)))
+					.build())
 				.build();
 				// @formatter:on
 
@@ -80,7 +87,7 @@ public class Application {
 				while (true) {
 					System.out.print("\n> USER: ");
 					System.out.println("\n> ASSISTANT: " + chatClient.prompt(scanner.nextLine())
-						.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "session-1"))
+						.advisors(SessionAdvisors.session("session-1"))
 						.call()
 						.content());
 				}

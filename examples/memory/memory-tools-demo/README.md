@@ -18,7 +18,7 @@ This is **long-term memory** sitting alongside the session's conversation histor
 | | Conversation history | AutoMemoryTools (long-term) |
 |---|---|---|
 | Scope | Current session | Persists across sessions |
-| Storage | In-process (`ChatMemory`) | Files on disk |
+| Storage | A session store (`SessionService`) | Files on disk |
 | Content | Full message exchange | Curated facts worth keeping |
 | Managed by | Spring AI advisors | Agent via tool calls |
 
@@ -86,9 +86,7 @@ ChatClient chatClient = chatClientBuilder
     .defaultTools(
         memoryTools,                 // long-term memory
         TodoWriteTool.builder().build())
-    .defaultAdvisors(
-        ToolCallAdvisor.builder().build(),
-        MyLoggingAdvisor.builder().build())
+    .defaultAdvisors(MyLoggingAdvisor.builder().build())
     .build();
 ```
 

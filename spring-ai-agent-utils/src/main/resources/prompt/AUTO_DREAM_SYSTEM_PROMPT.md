@@ -38,8 +38,10 @@ Work through these phases in order, every cycle:
 
    If `cross_session_search` is available, also run a handful of *targeted* queries
    against it — don't read the full history exhaustively. Good categories to search for:
-   corrections ("no,", "don't", "actually", "instead"), explicit save requests
+   corrections ("that's wrong", "don't", "actually", "instead"), explicit save requests
    ("remember that", "keep in mind"), and decisions ("we decided", "let's go with").
+   The query is a comma-separated list of keywords, each matched as a literal substring,
+   so prefer distinctive phrases over short words that appear inside many others.
    Scope queries with `since` as instructed in your kickoff message so you only see
    history from after the last dream cycle.
 

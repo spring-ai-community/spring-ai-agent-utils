@@ -1,24 +1,25 @@
 # memory-tools-dream-demo
 
-A runnable Spring Boot console agent demonstrating [`AutoDreamAdvisor` / `AutoDreamService`](../../../docs/tools/AutoDreamAdvisor.md) — **both Phase 1 and Phase 2 of Auto-Dream** — running an out-of-band memory-consolidation cycle on top of [`AutoMemoryToolsAdvisor`](../../../docs/tools/AutoMemoryToolsAdvisor.md), with cross-session recall backed by `spring-ai-session`.
+A runnable Spring Boot console agent demonstrating [`AutoDreamAdvisor` / `AutoDreamService`](../../../docs/tools/AutoDreamAdvisor.md) — **both Phase 1 and Phase 2 of Auto-Dream** — running an out-of-band memory-consolidation cycle on top of [`AutoMemoryToolsAdvisor`](../../../docs/tools/AutoMemoryToolsAdvisor.md), with cross-session recall backed by Spring AI's session module (`spring-ai-session` + `spring-ai-session-advisor`).
 
 ## What it demonstrates
 
 - **Seeded, deliberately messy memory (Phase 1 signal)** — on first run the memory directory is seeded with two overlapping `feedback` memories (same fact, worded differently) and one dangling `MEMORY.md` link (points at a file that doesn't exist), so the first dream cycle has real signal to consolidate.
-- **Seeded past session (Phase 2 signal)** — on every run (the in-memory session store doesn't persist), a past session is seeded for user `alice` containing a "decision" ("we decided to use PostgreSQL...") and a "correction" ("actually, let's go with blue-green instead of canary...") timestamped two days ago — exactly the kind of signal the Dreamer's `cross_session_search` tool is instructed to look for.
+- **Seeded past session (Phase 2 signal)** — on every run (the in-memory session store doesn't persist), a past session is seeded for user `alice` (tagged with `SessionAttributes.PRINCIPAL_NAME` metadata, which is how `cross_session_search` finds a user's sessions) containing a "decision" ("we decided to use PostgreSQL...") and a "correction" ("actually, let's go with blue-green instead of canary...") timestamped two days ago — exactly the kind of signal the Dreamer's `cross_session_search` tool is instructed to look for.
 - **`AutoDreamAdvisor` firing automatically** — wired with a demo trigger that fires every 3 conversation turns (`state.sessionsSinceLastDream() >= 3`), independent of the production-realistic `DreamTriggers.hoursAndSessions(24, 5)` default, and with `.userId("alice")` so triggered cycles get cross-session recall too. Watch the console for a `Dream cycle [...] finished with status=...` log line appearing **on its own, in the background**, while you keep chatting — that's the point: dreaming never blocks the conversation.
 - **`AutoDreamService` on demand** — type `/dream` in the REPL to run a synchronous dream cycle immediately (via `runDreamCycle(memoryDir, userId)`) and print its result, without waiting for the trigger.
 - **A separate `ChatClient.Builder` for the Dreamer** — the demo clones the builder *before* the main agent's system prompt/tools are chained onto it, so the Dreamer only ever sees `AutoMemoryTools` + (when configured) `cross_session_search`, never the main agent's own tools.
 - **`AutoMemoryToolsAdvisor`** — the live agent's own read/write long-term memory, unchanged from the other memory demos.
-- **`SessionMemoryAdvisor`** — short-term conversation history for the live agent, backed by the *same* `SessionService` the Dreamer's `cross_session_search` reads from. This is what makes the two phases share one substrate: chat here, and it becomes material the next dream cycle can find. Bounded with `TurnCountTrigger(20)` + `SlidingWindowCompactionStrategy.maxEvents(10)` — the same combo used in spring-ai-session's own quickstart — so a long demo session can't grow the live prompt without limit. Compacted-out events are archived, not deleted, and stay searchable via `conversation_search`/`cross_session_search`.
+- **Session advisors (`SessionAdvisors`)** — short-term conversation history for the live agent, backed by the *same* `SessionService` the Dreamer's `cross_session_search` reads from. This is what makes the two phases share one substrate: chat here, and it becomes material the next dream cycle can find. The live session is tagged with the user through `SessionMemoryAdvisor.SESSION_METADATA_CONTEXT_KEY`, and compacted with `TurnCountTrigger(20)` + `WindowCompactionStrategy.lastEvents(10)` so a long demo session can't grow the live prompt without limit. Compacted-out events stay in the log, not deleted, and remain searchable via `conversation_search`/`cross_session_search`.
 
 ## Advisor stack
 
 ```
-AutoMemoryToolsAdvisor   (HIGHEST_PRECEDENCE + 200)  ← long-term memory (live agent)
 AutoDreamAdvisor         (HIGHEST_PRECEDENCE + 150)  ← schedules background dream cycles, userId="alice"
+SessionTurnAdvisor       (HIGHEST_PRECEDENCE + 200)  ← session turns + compaction (from SessionAdvisors)
+AutoMemoryToolsAdvisor   (HIGHEST_PRECEDENCE + 250)  ← long-term memory (live agent)
 SessionMemoryAdvisor     (HIGHEST_PRECEDENCE + 1000) ← short-term conversation window, backed by SessionService
-MyLoggingAdvisor         (order = 0)                 ← dev console logger
+MyLoggingAdvisor         (HIGHEST_PRECEDENCE + 1100) ← dev console logger
 ```
 
 ## Key source files
@@ -58,7 +59,7 @@ The `application.properties` contains commented-out sections for Anthropic and O
 
 ### Session store is in-memory
 
-`InMemorySessionRepository` backs the demo's `SessionService` — the seeded past session (and anything you chat about) resets every time you restart the app. Swap in `spring-ai-session-jdbc` for a persistent store; nothing else in `Application.java` would need to change, since `AutoDreamService`/`SessionMemoryAdvisor` only depend on the `SessionService` interface.
+`InMemorySessionRepository` backs the demo's `SessionService` — the seeded past session (and anything you chat about) resets every time you restart the app. Swap in `spring-ai-session-jdbc` for a persistent store; nothing else in `Application.java` would need to change, since `AutoDreamService` and the session advisors only depend on the `SessionService` interface.
 
 ## Resetting the demo
 

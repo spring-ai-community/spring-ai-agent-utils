@@ -128,19 +128,18 @@ Key implementation details in [Application.java](src/main/java/org/springaicommu
 
 ### Disable Answer Validation
 
-By default, the tool validates that all questions are answered. To allow partial answers, set `answersValidation(false)` when building the tool (see line 57 in [Application.java](src/main/java/org/springaicommunity/agent/Application.java#L57)).
+By default, the tool validates that all questions are answered. To allow partial answers, set `answersValidation(false)` when building the tool (see [Application.java](src/main/java/org/springaicommunity/agent/Application.java)).
 
-### Adjust Chat Memory
+### Adjust Conversation Memory
 
-The demo keeps the last 500 messages in memory (line 64). Adjust this value based on your needs:
+The demo keeps its conversation in a Spring AI session and replays the last 500 events of it into each prompt. Adjust the window on the session advisors:
 
 ```java
-MessageChatMemoryAdvisor.builder(
-    MessageWindowChatMemory.builder()
-        .maxMessages(100)  // Change this value
-        .build()
-).build()
+SessionAdvisors.builder(sessionService)
+    .memory(memory -> memory.eventFilter(EventFilter.lastN(100)))  // Change this value
+    .build()
 ```
+
 ### Change AI Provider
 
 Edit the model and provider configuration in [application.properties](src/main/resources/application.properties#L7) as well as the pom dependecies.

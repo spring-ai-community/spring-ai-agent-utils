@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.springaicommunity.agent.advisors.AutoMemoryToolsAdvisor;
@@ -15,7 +16,6 @@ import org.springaicommunity.agent.dream.AutoDreamService;
 import org.springaicommunity.agent.dream.DreamResult;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.session.CreateSessionRequest;
@@ -23,9 +23,11 @@ import org.springframework.ai.session.DefaultSessionService;
 import org.springframework.ai.session.InMemorySessionRepository;
 import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.session.SessionService;
+import org.springframework.ai.session.SessionAttributes;
+import org.springframework.ai.session.advisor.SessionAdvisors;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
-import org.springframework.ai.session.compaction.SlidingWindowCompactionStrategy;
 import org.springframework.ai.session.compaction.TurnCountTrigger;
+import org.springframework.ai.session.compaction.WindowCompactionStrategy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -36,8 +38,10 @@ import org.springframework.core.Ordered;
 /**
  * Demonstrates {@code AutoDreamAdvisor} / {@code AutoDreamService} running an
  * out-of-band memory-consolidation ("dream") cycle on top of {@code AutoMemoryToolsAdvisor},
- * including the Phase 2 cross-session recall capability (spring-ai-session's
- * {@code SessionService} + {@code CrossSessionRecallTools}).
+ * including the Phase 2 cross-session recall capability (Spring AI's
+ * {@code SessionService} + agent-utils' {@code CrossSessionRecallTools}). Sessions are
+ * tagged with the user as {@link SessionAttributes#PRINCIPAL_NAME} metadata, which is how
+ * the Dreamer's {@code cross_session_search} finds them.
  *
  * <p>
  * On first run the memory directory is seeded with two deliberately overlapping memory
@@ -111,24 +115,25 @@ public class Application {
 						.userId(userId)
 						.build(),
 
-					// Short-term conversation window, backed by the same SessionService the
-					// Dreamer's cross_session_search reads from — this is what feeds it.
-					// Bounded via the same trigger+strategy combo as the project's own
-					// quickstart, so a long demo session can't grow the live prompt without
-					// limit — compacted-out events stay archived and remain searchable via
-					// conversation_search/cross_session_search, they are not deleted.
-					SessionMemoryAdvisor.builder(sessionService)
-						.defaultUserId(userId)
-						.compactionTrigger(new TurnCountTrigger(20))
-						.compactionStrategy(SlidingWindowCompactionStrategy.builder().maxEvents(10).build())
-						.order(Ordered.HIGHEST_PRECEDENCE + 1000)
-						.build(),
-
 					MyLoggingAdvisor.builder()
 						.showAvailableTools(true)
 						.showSystemMessage(false)
 						.order(Ordered.HIGHEST_PRECEDENCE + 1100)
 						.build())
+
+				// Short-term conversation window, backed by the same SessionService the
+				// Dreamer's cross_session_search reads from — this is what feeds it.
+				// Compaction keeps a long demo session from growing the live prompt without
+				// limit — compacted-out events stay in the log and remain searchable via
+				// conversation_search/cross_session_search, they are not deleted.
+				.defaultAdvisors(SessionAdvisors.builder(sessionService)
+					.compaction(new TurnCountTrigger(20), WindowCompactionStrategy.builder().lastEvents(10).build())
+					.build())
+
+				// Sessions the advisors create are tagged with the user, so the Dreamer's
+				// cross_session_search (scoped to that user) can find them.
+				.defaultAdvisors(a -> a.param(SessionMemoryAdvisor.SESSION_METADATA_CONTEXT_KEY,
+						Map.of(SessionAttributes.PRINCIPAL_NAME, userId)))
 				.build();
 				// @formatter:on
 
@@ -149,7 +154,7 @@ public class Application {
 					}
 
 					System.out.println("\n\033[1;34mASSISTANT>\033[0m " + chatClient.prompt(userInput)
-						.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "session-1"))
+						.advisors(SessionAdvisors.session("session-1"))
 						.call()
 						.content());
 				}
@@ -216,7 +221,8 @@ public class Application {
 	 * only seeds once).
 	 */
 	private static void seedDemoSessionHistory(SessionService sessionService, String userId) {
-		var pastSession = sessionService.create(CreateSessionRequest.builder().userId(userId).build());
+		var pastSession = sessionService
+			.create(CreateSessionRequest.builder().metadata(SessionAttributes.PRINCIPAL_NAME, userId).build());
 
 		Instant twoDaysAgo = Instant.now().minus(Duration.ofDays(2));
 

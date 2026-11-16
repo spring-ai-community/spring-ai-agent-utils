@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.2</version>
+		<version>4.2.0-RC2</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
@@ -20,8 +20,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<maven.deploy.skip>true</maven.deploy.skip>
-		<spring-ai.version>2.0.1</spring-ai.version>
-		<spring-ai-session.version>0.10.0</spring-ai-session.version>
+		<spring-ai.version>2.1.0-SNAPSHOT</spring-ai.version>
 	</properties>
 
 	<dependencies>
@@ -35,9 +34,12 @@
 		<!-- spring-ai-session is `provided` + `optional` on spring-ai-agent-utils itself,
 			so consumers who want Phase 2 (cross-session recall) must declare it directly. -->
 		<dependency>
-			<groupId>org.springaicommunity</groupId>
+			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-session</artifactId>
-			<version>${spring-ai-session.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-session-advisor</artifactId>
 		</dependency>
 
 		<dependency>

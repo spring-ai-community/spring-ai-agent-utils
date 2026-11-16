@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.ai.util.json.JsonParser;
+import org.springframework.ai.util.JsonHelper;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -128,6 +128,8 @@ public class BraveWebSearchTool {
 
 	private static final Logger logger = LoggerFactory.getLogger(BraveWebSearchTool.class);
 
+	private static final JsonHelper JSON = new JsonHelper();
+
 	private static final String BRAVE_API_BASE_URL = "https://api.search.brave.com";
 
 	private static final String WEB_SEARCH_PATH = "/res/v1/web/search";
@@ -214,7 +216,7 @@ public class BraveWebSearchTool {
 
 		if (!StringUtils.hasText(query)) {
 			logger.warn("Empty search query provided");
-			return JsonParser.toJson(Collections.emptyList());
+			return JSON.toJson(Collections.emptyList());
 		}
 
 		try {
@@ -231,7 +233,7 @@ public class BraveWebSearchTool {
 
 			if (queryResponse == null || queryResponse.isEmpty()) {
 				logger.warn("Empty response from Brave Search API for query: {}", query);
-				return JsonParser.toJson(Collections.emptyList());
+				return JSON.toJson(Collections.emptyList());
 			}
 
 			List<SearchResult> allResults = new ArrayList<>();
@@ -259,13 +261,13 @@ public class BraveWebSearchTool {
 				logger.debug("Search for '{}' returned {} results (no filtering applied)", query, allResults.size());
 			}
 
-			return JsonParser.toJson(filteredResults);
+			return JSON.toJson(filteredResults);
 
 		}
 		catch (RestClientException e) {
 			logger.error("Error executing Brave Search API request for query: {}", query, e);
 			// Return empty list to maintain consistent response format
-			return JsonParser.toJson(Collections.emptyList());
+			return JSON.toJson(Collections.emptyList());
 		}
 	}
 
