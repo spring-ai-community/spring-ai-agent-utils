@@ -73,12 +73,12 @@ class AutoMemoryToolsAdvisorTest {
 	class BuilderTests {
 
 		@Test
-		@DisplayName("Default order is HIGHEST_PRECEDENCE + 200")
+		@DisplayName("Default order is HIGHEST_PRECEDENCE + 250")
 		void defaultOrder() {
 			AutoMemoryToolsAdvisor a = AutoMemoryToolsAdvisor.builder()
 				.memoriesRootDirectory(tempDir.toString())
 				.build();
-			assertThat(a.getOrder()).isEqualTo(BaseAdvisor.HIGHEST_PRECEDENCE + 200);
+			assertThat(a.getOrder()).isEqualTo(BaseAdvisor.HIGHEST_PRECEDENCE + 250);
 		}
 
 		@Test

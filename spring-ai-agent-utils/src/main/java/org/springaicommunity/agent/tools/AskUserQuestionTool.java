@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.ai.util.json.JsonParser;
+import org.springframework.ai.util.JsonHelper;
 import org.springframework.util.Assert;
 
 /**
@@ -60,6 +60,8 @@ import org.springframework.util.Assert;
 public class AskUserQuestionTool {
 
 	private static final Logger logger = LoggerFactory.getLogger(AskUserQuestionTool.class);
+
+	private static final JsonHelper JSON = new JsonHelper();
 
 	/**
 	 * Functional interface for handling user questions.
@@ -212,7 +214,7 @@ public class AskUserQuestionTool {
 			logger.debug("Received {} answer(s) from user", result.size());
 		}
 
-		return "User has answered your questions: " + JsonParser.toJson(result);
+		return "User has answered your questions: " + JSON.toJson(result);
 	}
 
 	/**

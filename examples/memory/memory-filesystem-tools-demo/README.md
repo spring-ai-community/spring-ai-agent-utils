@@ -103,9 +103,7 @@ ChatClient chatClient = chatClientBuilder
     .defaultTools(
         ShellTools.builder().build(),          // Bash — for ls, mkdir, etc.
         FileSystemTools.builder().build())     // Read, Write, Edit — memory file operations
-    .defaultAdvisors(
-        ToolCallAdvisor.builder().build(),
-        MyLoggingAdvisor.builder().build())
+    .defaultAdvisors(MyLoggingAdvisor.builder().build())
     .build();
 ```
 

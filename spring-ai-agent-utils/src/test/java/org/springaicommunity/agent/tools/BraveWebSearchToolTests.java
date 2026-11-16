@@ -25,7 +25,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.ai.util.json.JsonParser;
+import org.springframework.ai.util.JsonHelper;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -43,6 +43,8 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  * @author Christian Tzolov
  */
 class BraveWebSearchToolTests {
+
+	private static final JsonHelper JSON = new JsonHelper();
 
 	@Nested
 	@DisplayName("Builder Tests")
@@ -157,7 +159,7 @@ class BraveWebSearchToolTests {
 
 			String result = this.tool.webSearch("test query", List.of("spring.io"), null);
 
-			assertThat(result).isEqualTo(JsonParser.toJson(List.of(
+			assertThat(result).isEqualTo(JSON.toJson(List.of(
 				new BraveWebSearchTool.SearchResult("Spring AI", "https://spring.io/projects/spring-ai",
 					"Spring AI project"),
 				new BraveWebSearchTool.SearchResult("Spring AI Reference",
@@ -171,7 +173,7 @@ class BraveWebSearchToolTests {
 
 			String result = this.tool.webSearch("test query", null, List.of("example.com"));
 
-			assertThat(result).isEqualTo(JsonParser.toJson(List.of(
+			assertThat(result).isEqualTo(JSON.toJson(List.of(
 				new BraveWebSearchTool.SearchResult("Spring AI", "https://spring.io/projects/spring-ai",
 					"Spring AI project"),
 				new BraveWebSearchTool.SearchResult("Spring AI Reference",
@@ -187,7 +189,7 @@ class BraveWebSearchToolTests {
 			String result = this.tool.webSearch("test query", List.of("spring.io", "example.com"),
 					List.of("docs.spring.io"));
 
-			assertThat(result).isEqualTo(JsonParser.toJson(List.of(
+			assertThat(result).isEqualTo(JSON.toJson(List.of(
 				new BraveWebSearchTool.SearchResult("Spring AI", "https://spring.io/projects/spring-ai",
 					"Spring AI project"),
 				new BraveWebSearchTool.SearchResult("Example", "https://example.com/spring-ai",
@@ -201,7 +203,7 @@ class BraveWebSearchToolTests {
 
 			String result = this.tool.webSearch("test query", Collections.emptyList(), Collections.emptyList());
 
-			assertThat(result).isEqualTo(JsonParser.toJson(List.of(
+			assertThat(result).isEqualTo(JSON.toJson(List.of(
 				new BraveWebSearchTool.SearchResult("Spring AI", "https://spring.io/projects/spring-ai",
 					"Spring AI project"),
 				new BraveWebSearchTool.SearchResult("Spring AI Reference",
@@ -240,7 +242,7 @@ class BraveWebSearchToolTests {
 
 			String result = tool.webSearch(null, null, null);
 
-			assertThat(result).isEqualTo(JsonParser.toJson(Collections.emptyList()));
+			assertThat(result).isEqualTo(JSON.toJson(Collections.emptyList()));
 		}
 
 		@Test
@@ -250,7 +252,7 @@ class BraveWebSearchToolTests {
 
 			String result = tool.webSearch("", null, null);
 
-			assertThat(result).isEqualTo(JsonParser.toJson(Collections.emptyList()));
+			assertThat(result).isEqualTo(JSON.toJson(Collections.emptyList()));
 		}
 
 		@Test
@@ -260,7 +262,7 @@ class BraveWebSearchToolTests {
 
 			String result = tool.webSearch("   ", null, null);
 
-			assertThat(result).isEqualTo(JsonParser.toJson(Collections.emptyList()));
+			assertThat(result).isEqualTo(JSON.toJson(Collections.emptyList()));
 		}
 
 	}

@@ -76,7 +76,7 @@ While these tools can be used standalone, truly agentic behavior emerges when th
 
 _Check the latest version:_ [![](https://img.shields.io/maven-central/v/org.springaicommunity/spring-ai-agent-utils.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/org.springaicommunity/spring-ai-agent-utils)
 
-> **Note:** You need Spring AI version `2.0.0` or later.
+> **Note:** You need Spring AI version `2.1` or later.
 
 
 ## Quick Start
@@ -99,6 +99,11 @@ public class Application {
                     .skillsResources(skillPaths)
                     .braveApiKey(braveApiKey)
                     .build())
+                .build();
+
+            // Conversation memory: an in-memory session store
+            SessionService sessionService = DefaultSessionService.builder()
+                .sessionRepository(InMemorySessionRepository.builder().build())
                 .build();
 
             ChatClient chatClient = chatClientBuilder
@@ -134,21 +139,22 @@ public class Application {
                     .questionHandler(new CommandLineQuestionHandler())
                     .build())
 
-                // Advisors
-                .defaultAdvisors(
-                    ToolCallAdvisor.builder().conversationHistoryEnabled(false).build(), // Tool Calling
-                    MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build()).build()) // Memory
+                // Conversation memory
+                .defaultAdvisors(SessionAdvisors.builder(sessionService).build())
 
                 .build();
 
             String response = chatClient
                 .prompt("Search for Spring AI documentation and summarize it")
+                .advisors(SessionAdvisors.session("session-1"))
                 .call()
                 .content();
         };
     }
 }
 ```
+
+The conversation memory in this example comes from Spring AI's session module: add `org.springframework.ai:spring-ai-session-advisor` (its version comes from the Spring AI BOM, and it brings in `spring-ai-session`). See [Session Memory](https://docs.spring.io/spring-ai/reference/api/session.html) for persistent stores and compaction.
 
 ### Examples
 
@@ -525,8 +531,8 @@ brave.api.key=${BRAVE_API_KEY}
 ## Requirements
 
 - Java 17+
-- Spring Boot 3.x / 4.x
-- Spring AI 2.0.0
+- Spring Boot 4.2 or later (the version Spring AI 2.1 is built on)
+- Spring AI 2.1 or later
 
 ## License
 

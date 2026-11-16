@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.0</version>
+		<version>4.2.0-RC2</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
@@ -20,7 +20,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<maven.deploy.skip>true</maven.deploy.skip>
-		<spring-ai.version>2.0.0</spring-ai.version>
+		<spring-ai.version>2.1.0-SNAPSHOT</spring-ai.version>
 	</properties>
 
 	<dependencies>
@@ -40,6 +40,16 @@
 			<groupId>org.springaicommunity</groupId>
 			<artifactId>spring-ai-agent-utils</artifactId>
 			<version>0.14.0-SNAPSHOT</version>
+		</dependency>
+
+		<!-- Conversation memory: Spring AI sessions and the session advisors -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-session</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-session-advisor</artifactId>
 		</dependency>
 
 		<dependency>

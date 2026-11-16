@@ -122,7 +122,7 @@ public class AutoDreamAdvisor implements BaseChatMemoryAdvisor {
 
 	public static final class Builder {
 
-		// Higher precedence than AutoMemoryToolsAdvisor's default (+200) so this
+		// Higher precedence than AutoMemoryToolsAdvisor's default (+250) so this
 		// advisor's after() — which only fires a background task — wraps outermost.
 		private int order = BaseAdvisor.HIGHEST_PRECEDENCE + 150;
 

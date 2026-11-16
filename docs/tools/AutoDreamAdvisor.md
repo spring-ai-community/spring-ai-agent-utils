@@ -25,9 +25,13 @@ AutoDreamAdvisor dreamAdvisor = AutoDreamAdvisor.builder()
 ChatClient chatClient = ChatClient.builder(chatModel)
     .defaultAdvisors(
         AutoMemoryToolsAdvisor.builder().memoriesRootDirectory(dir).build(),
-        dreamAdvisor,
-        MessageChatMemoryAdvisor.builder(chatMemory).build())
+        dreamAdvisor)
+    .defaultAdvisors(SessionAdvisors.builder(sessionService).build())  // conversation memory
     .build();
+
+chatClient.prompt(userInput)
+    .advisors(SessionAdvisors.session(sessionId))  // every request names its session
+    .call();
 ```
 
 Point `AutoDreamAdvisor` and `AutoMemoryToolsAdvisor` at the same `memoriesRootDirectory` — one gives the live agent read/write memory tools, the other schedules the Dreamer that periodically cleans that same store up.
@@ -52,11 +56,11 @@ AutoDreamAdvisor advisor = AutoDreamAdvisor.builder()
 | `dreamTrigger(DreamTrigger)` | `DreamTrigger` | `DreamTriggers.manualOnly()` | Decides whether a cycle should fire on each turn. See [AutoDreamService — Dream Triggers](AutoDreamService.md#dream-triggers). |
 | `userId(String)` | `String` | none | Optional. When set, triggered cycles call the cross-session-aware `runDreamCycle(dir, userId)` overload instead of the memory-only one — see below. |
 | `taskRepository(TaskRepository)` | `TaskRepository` | a fresh `DefaultTaskRepository` | Where the background dream task is submitted. Override to share a `TaskRepository` with `TaskTool` or other background work. |
-| `order(int)` | `int` | `HIGHEST_PRECEDENCE + 150` | Advisor order — higher precedence than `AutoMemoryToolsAdvisor`'s default (`+200`). |
+| `order(int)` | `int` | `HIGHEST_PRECEDENCE + 150` | Advisor order — higher precedence than `AutoMemoryToolsAdvisor`'s default (`+250`). |
 
 ### `userId(String)` and cross-session recall
 
-Setting `.userId(...)` only has an effect if the advisor's `dreamService` was itself built with `.sessionService(...)` configured (see [AutoDreamService — Cross-Session Recall](AutoDreamService.md#cross-session-recall-optional)). If the service has no `sessionService`, `userId` is passed through but ignored — the Dreamer still only sees the memory store. There's no error in either misconfiguration direction; both degrade gracefully to memory-only dreaming.
+Setting `.userId(...)` only has an effect if the advisor's `dreamService` was itself built with `.sessionService(...)` configured (see [AutoDreamService — Cross-Session Recall](AutoDreamService.md#cross-session-recall-optional)). The Dreamer then searches the sessions whose `SessionAttributes.PRINCIPAL_NAME` metadata equals `userId` (see [Which sessions are searched](AutoDreamService.md#which-sessions-are-searched)). If the service has no `sessionService`, `userId` is passed through but ignored — the Dreamer still only sees the memory store. There's no error in either misconfiguration direction; both degrade gracefully to memory-only dreaming.
 
 ## Turn counting
 

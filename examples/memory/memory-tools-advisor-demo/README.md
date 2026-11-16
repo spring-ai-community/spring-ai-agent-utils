@@ -5,17 +5,17 @@ A runnable Spring Boot console agent demonstrating [`AutoMemoryToolsAdvisor`](..
 ## What it demonstrates
 
 - **`AutoMemoryToolsAdvisor`** with a dual-condition consolidation trigger — consolidates when more than 60 seconds pass between turns *or* when the user message contains `"bye"`
-- **`ToolCallAdvisor`** with `disableInternalConversationHistory()` — handles recursive tool calling while deferring conversation history to a dedicated advisor
-- **`MessageChatMemoryAdvisor`** backed by `MessageWindowChatMemory` (100-message window) — provides short-term session memory alongside the long-term file-based memory
+- **`SessionAdvisors`** (Spring AI session memory) over an in-memory `SessionService`, replaying the last 100 events of the session — short-term conversation memory alongside the long-term file-based memory
 - **`MyLoggingAdvisor`** — a custom advisor that prints tool calls and message text to the console in colour for easy tracing during development
 
 ## Advisor stack
 
 ```
-AutoMemoryToolsAdvisor   (HIGHEST_PRECEDENCE + 200)  ← long-term memory
-ToolCallAdvisor                                       ← recursive tool execution
-MessageChatMemoryAdvisor                              ← short-term conversation window
-MyLoggingAdvisor         (order = 0)                 ← dev console logger
+SessionTurnAdvisor       (HIGHEST_PRECEDENCE + 200)  ← session turns (from SessionAdvisors)
+AutoMemoryToolsAdvisor   (HIGHEST_PRECEDENCE + 250)  ← long-term memory
+ToolCallingAdvisor       (HIGHEST_PRECEDENCE + 300)  ← tool-calling loop, registered by the ChatClient
+SessionMemoryAdvisor     (HIGHEST_PRECEDENCE + 1000) ← short-term conversation history, last 100 events
+MyLoggingAdvisor         (HIGHEST_PRECEDENCE + 1100) ← dev console logger
 ```
 
 ## Key source files

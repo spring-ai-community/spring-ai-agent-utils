@@ -69,6 +69,7 @@ nav:
     - InterruptAdvisor: tools/InterruptAdvisor.md
     - ToolCallListener: tools/ToolCallListener.md
   - Migration:
+    - 0.13.0 to 0.14.0: tools/migration-0.14.md
     - 0.12.0 to 0.13.0: tools/migration-0.13.md
     - 0.11.0 to 0.12.0: tools/migration-0.12.md
     - 0.7.x to 0.9.0: tools/migration-0.9.md

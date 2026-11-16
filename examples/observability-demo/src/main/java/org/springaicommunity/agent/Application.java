@@ -22,9 +22,11 @@ import org.springaicommunity.agent.tools.ToolCallListener;
 import org.springaicommunity.agent.tools.ToolCallListeners;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.session.DefaultSessionService;
+import org.springframework.ai.session.EventFilter;
+import org.springframework.ai.session.InMemorySessionRepository;
+import org.springframework.ai.session.SessionService;
+import org.springframework.ai.session.advisor.SessionAdvisors;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.annotation.Value;
@@ -87,6 +89,11 @@ public class Application {
 					ShellTools.builder().build(), FileSystemTools.builder().build(), GlobTool.builder().build(),
 					GrepTool.builder().build(), ListDirectoryTool.builder().build())), listener);
 
+			// Short-term conversation memory: an in-memory session store, reset on every run
+			SessionService sessionService = DefaultSessionService.builder()
+				.sessionRepository(InMemorySessionRepository.builder().build())
+				.build();
+
 			// @formatter:off
 			ChatClient chatClient = chatClientBuilder
 				.defaultSystem("You are a helpful assistant with shell and file system tools. "
@@ -97,9 +104,11 @@ public class Application {
 					// tool-calling loop. Stops on /stop or when the tool-call budget is used up.
 					InterruptAdvisor.builder()
 						.interruptSignal(() -> stopRequested.get() || toolCalls.get() >= maxToolCallsPerTurn)
-						.build(),
-					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(100).build())
 						.build())
+				// 3. Conversation memory: the session advisors replay the last 100 events of the session
+				.defaultAdvisors(SessionAdvisors.builder(sessionService)
+					.memory(memory -> memory.eventFilter(EventFilter.lastN(100)))
+					.build())
 				.build();
 			// @formatter:on
 
@@ -144,7 +153,7 @@ public class Application {
 					turn = worker.submit(() -> {
 						try {
 							String answer = chatClient.prompt(line)
-								.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "session-1"))
+								.advisors(SessionAdvisors.session("session-1"))
 								.call()
 								.content();
 							System.out.println("\n> ASSISTANT: " + answer);

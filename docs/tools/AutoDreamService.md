@@ -119,7 +119,7 @@ Write a custom trigger for anything else — it's a single-method functional int
 
 ## Cross-Session Recall (optional)
 
-When [`spring-ai-session`](https://github.com/spring-ai-community/spring-ai-session) is on the classpath and `sessionService(...)` is configured, `runDreamCycle(memoriesRootDirectory, userId)` additionally gives the Dreamer a **read-only** `cross_session_search` tool (spring-ai-session's `CrossSessionRecallTools`), scoped to that one user's entire session history — not just the memory store.
+When Spring AI's session module (`org.springframework.ai:spring-ai-session`) is on the classpath and `sessionService(...)` is configured, `runDreamCycle(memoriesRootDirectory, userId)` additionally gives the Dreamer a **read-only** `cross_session_search` tool (`CrossSessionRecallTools`), scoped to that one user's entire session history — not just the memory store.
 
 ```java
 AutoDreamService dreamService = AutoDreamService.builder(chatClientBuilder.clone())
@@ -131,10 +131,56 @@ dreamService.runDreamCycle(memoriesRootDirectory, "alice");
 
 Both conditions must hold for cross-session recall to activate: `sessionService(...)` configured on the builder, **and** a non-empty `userId` passed to `runDreamCycle(...)`. Omit either and the Dreamer falls back to memory-only dreaming — no error, no behavior change from the base case.
 
-!!! note "Optional dependency"
-    `spring-ai-agent-utils` declares `spring-ai-session` as `provided` + `optional`. Consumers who never call `.sessionService(...)` don't need it on their own classpath — it's never pulled in transitively. Add it directly to your own project's dependencies to use this feature.
+### Which sessions are searched
 
-The Dreamer's kickoff prompt automatically tells it when `cross_session_search` is available and scopes its queries with `since = <last dream's timestamp>`, so each cycle only mines history since the previous one. See spring-ai-session's [Cross-Session Recall](https://spring-ai-community.github.io/spring-ai-session/session-management/cross-session-recall/) docs for the tool itself.
+Spring AI sessions have no user id of their own. A user's sessions are the ones whose `SessionAttributes.PRINCIPAL_NAME` metadata equals the `userId` passed to `runDreamCycle(...)`, so tag sessions when they are created:
+
+```java
+// Sessions you create yourself
+sessionService.create(CreateSessionRequest.builder()
+    .metadata(SessionAttributes.PRINCIPAL_NAME, "alice")
+    .build());
+
+// Sessions the session advisors create on first use
+ChatClient chatClient = chatClientBuilder
+    .defaultAdvisors(SessionAdvisors.builder(sessionService).build())
+    .defaultAdvisors(a -> a.param(SessionMemoryAdvisor.SESSION_METADATA_CONTEXT_KEY,
+            Map.of(SessionAttributes.PRINCIPAL_NAME, "alice")))
+    .build();
+
+chatClient.prompt(userInput)
+    .advisors(SessionAdvisors.session(sessionId))  // every request names its session
+    .call();
+```
+
+Sessions without that metadata are never searched. The user is bound when the tool is built and is not a tool parameter, so a prompt cannot make the Dreamer search another user's sessions.
+
+### The `cross_session_search` tool
+
+`CrossSessionRecallTools` (`org.springaicommunity.agent.tools`) finds the user's sessions with `SessionService.findByMetadata(...)`, runs Spring AI's keyword search (`SessionService.searchEvents(...)`, see `EventQuery`) on each, and returns the matches oldest first across all of them. It can also be used on its own, outside Auto-Dream:
+
+```java
+ChatClient analyst = chatClientBuilder
+    .defaultTools(CrossSessionRecallTools.builder(sessionService, "alice")
+        .pageSize(20)          // matches per page, default 10, max 100
+        .maxTextLength(500)    // longer messages are cut to an excerpt around the keyword
+        .build())
+    .build();
+```
+
+| Parameter | Description |
+|---|---|
+| `query` | One or more comma-separated keywords, matched as literal text, ignoring case (at most 20). |
+| `matchMode` | `any` (default): a message matches when it contains one keyword. `all`: it must contain every keyword. |
+| `since` | ISO-8601 instant; only messages at or after it. Omit for the full history. |
+| `page` | Zero-based page of matches. |
+
+A page with matches is returned as JSON: `results`, each with `sessionId`, `timestamp`, `type` and `text`, and `nextPage` when more matches may follow. When nothing matches it returns the plain text `No results found.` (or `No more results.` past the last page). Each call runs one search per session of the user, so it suits a handful of targeted queries rather than exhaustive reads. As with Spring AI's `conversation_search`, only message text is searched (never tool results or compaction summaries), compacted-out messages are still found, and paging stops after the first 1000 matches. Invalid input is answered with an `Error: ...` text the model can correct, not an exception.
+
+!!! note "Optional dependency"
+    `spring-ai-agent-utils` declares `spring-ai-session` as `provided` + `optional`. Consumers who never call `.sessionService(...)` don't need it on their own classpath — it's never pulled in transitively. Add `org.springframework.ai:spring-ai-session` (version managed by the Spring AI BOM) to your own project to use this feature, and `spring-ai-session-advisor` for the session advisors.
+
+The Dreamer's kickoff prompt automatically tells it when `cross_session_search` is available and scopes its queries with `since = <last dream's timestamp>`, so each cycle only mines history since the previous one.
 
 ## System Prompt
 

@@ -78,11 +78,10 @@
 
 		<!-- Optional: Auto-Dream Phase 2 cross-session recall (AutoDreamService.sessionService(...)).
 			Provided + optional — consumers who don't wire session-integrated dreaming
-			never pull this in transitively. -->
+			never pull this in transitively. Version managed by the Spring AI BOM. -->
 		<dependency>
-			<groupId>org.springaicommunity</groupId>
+			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-session</artifactId>
-			<version>${spring-ai-session.version}</version>
 			<scope>provided</scope>
 			<optional>true</optional>
 		</dependency>

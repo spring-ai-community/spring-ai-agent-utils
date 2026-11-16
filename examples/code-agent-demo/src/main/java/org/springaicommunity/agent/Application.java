@@ -22,9 +22,11 @@ import org.springaicommunity.agent.utils.AgentEnvironment;
 import org.springaicommunity.agent.utils.CommandLineQuestionHandler;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.session.DefaultSessionService;
+import org.springframework.ai.session.EventFilter;
+import org.springframework.ai.session.InMemorySessionRepository;
+import org.springframework.ai.session.SessionService;
+import org.springframework.ai.session.advisor.SessionAdvisors;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -33,7 +35,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.Ordered;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
@@ -91,6 +92,11 @@ public class Application {
 			// polled before every model request of the tool-calling loop.
 			AtomicLong turnDeadline = new AtomicLong(Long.MAX_VALUE);
 
+			// Short-term conversation memory: an in-memory session store, reset on every run
+			SessionService sessionService = DefaultSessionService.builder()
+				.sessionRepository(InMemorySessionRepository.builder().build())
+				.build();
+
 			ChatClient chatClient = chatClientBuilder
 				.defaultSystem(p -> p.text(systemPrompt) // system prompt
 					.param(AgentEnvironment.ENVIRONMENT_INFO_KEY, AgentEnvironment.info())
@@ -105,15 +111,16 @@ public class Application {
 				.defaultAdvisors(
 					InterruptAdvisor.builder()
 						.interruptSignal(() -> System.currentTimeMillis() > turnDeadline.get())
-						.build(),
-					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build())
-						.order(Ordered.HIGHEST_PRECEDENCE + 1000)
 						.build())
-					// logging advisor	
-					// MyLoggingAdvisor.builder()
-					// 	.showAvailableTools(false)
-					// 	.showSystemMessage(false)
-					// 	.build())
+				// Conversation memory: the session advisors replay the last 500 events of the session
+				.defaultAdvisors(SessionAdvisors.builder(sessionService)
+					.memory(memory -> memory.eventFilter(EventFilter.lastN(500)))
+					.build())
+				// logging advisor
+				// .defaultAdvisors(MyLoggingAdvisor.builder()
+				// 	.showAvailableTools(false)
+				// 	.showSystemMessage(false)
+				// 	.build())
 				.build();
 				// @formatter:on
 
@@ -127,7 +134,7 @@ public class Application {
 					turnDeadline.set(System.currentTimeMillis() + turnTimeout.toMillis());
 					try {
 						System.out.println("\n> ASSISTANT: " + chatClient.prompt(userInput)
-							.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "session-1"))
+							.advisors(SessionAdvisors.session("session-1"))
 							.call()
 							.content());
 					}

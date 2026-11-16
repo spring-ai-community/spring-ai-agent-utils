@@ -544,6 +544,11 @@ public class Application {
                     .build())
                 .build();
 
+            // Conversation memory: an in-memory session store
+            SessionService sessionService = DefaultSessionService.builder()
+                .sessionRepository(InMemorySessionRepository.builder().build())
+                .build();
+
             // Build main chat client
             ChatClient chatClient = chatClientBuilder
                 .defaultToolCallbacks(taskTool)
@@ -554,14 +559,7 @@ public class Application {
                     ShellTools.builder().build(),
                     TodoWriteTool.builder().build()
                 )
-                .defaultAdvisors(
-                    ToolCallAdvisor.builder()
-                        .conversationHistoryEnabled(false)
-                        .build(),
-                    MessageChatMemoryAdvisor.builder(
-                        MessageWindowChatMemory.builder().maxMessages(500).build()
-                    ).build()
-                )
+                .defaultAdvisors(SessionAdvisors.builder(sessionService).build())
                 .build();
 
             // Interactive chat loop
@@ -570,6 +568,7 @@ public class Application {
                     System.out.print("\nUSER: ");
                     String response = chatClient
                         .prompt(scanner.nextLine())
+                        .advisors(SessionAdvisors.session("session-1"))
                         .call()
                         .content();
                     System.out.println("\nASSISTANT: " + response);

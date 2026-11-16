@@ -123,9 +123,14 @@ ChatClient chatClient = chatClientBuilder
     .defaultAdvisors(
         InterruptAdvisor.builder()                      // stop turns past the deadline
             .interruptSignal(() -> System.currentTimeMillis() > turnDeadline.get())
-            .build(),
-        MessageChatMemoryAdvisor)                       // 500-message memory
+            .build())
+    .defaultAdvisors(SessionAdvisors.builder(sessionService)  // session memory: last 500 events
+        .memory(memory -> memory.eventFilter(EventFilter.lastN(500)))
+        .build())
     .build();
+
+// Each request runs on the demo's one session
+chatClient.prompt(userInput).advisors(SessionAdvisors.session("session-1")).call().content();
 ```
 
 A stopped turn ends with a `TurnInterruptedException`, which the console loop catches.
@@ -187,13 +192,15 @@ code-agent-demo/
 3. Agent processes request using system prompt guidance
 4. Agent selects and invokes appropriate tools
 5. Results synthesized into response
-6. Conversation memory maintains context (500 messages)
+6. Session memory maintains context (the last 500 events of the session)
 
 ## Customization
 
 **Adjust memory**:
 ```java
-MessageWindowChatMemory.builder().maxMessages(1000).build()
+SessionAdvisors.builder(sessionService)
+    .memory(memory -> memory.eventFilter(EventFilter.lastN(1000)))
+    .build()
 ```
 
 **Tool configuration**:

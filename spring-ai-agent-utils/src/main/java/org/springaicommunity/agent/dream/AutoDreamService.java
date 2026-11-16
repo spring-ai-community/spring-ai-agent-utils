@@ -32,10 +32,10 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springaicommunity.agent.tools.AutoMemoryTools;
+import org.springaicommunity.agent.tools.CrossSessionRecallTools;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.session.SessionService;
-import org.springframework.ai.session.tool.CrossSessionRecallTools;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -57,7 +57,10 @@ import org.springframework.util.StringUtils;
  * {@link #runDreamCycle(String, String)} additionally gives the Dreamer a read-only
  * {@code cross_session_search} tool ({@link CrossSessionRecallTools}) scoped to the given
  * {@code userId}, so it can mine historical conversation signal in addition to
- * self-consolidating the memory store. Without a configured {@code sessionService} (or
+ * self-consolidating the memory store. The {@code userId} is matched against the
+ * {@link org.springframework.ai.session.SessionAttributes#PRINCIPAL_NAME} metadata of the
+ * sessions, so sessions must be created with that metadata to be searchable. Without a
+ * configured {@code sessionService} (or
  * without a {@code userId}), the Dreamer only ever sees {@code AutoMemoryTools} — this is
  * an additive, opt-in capability, not a requirement.
  *
@@ -110,7 +113,9 @@ public class AutoDreamService {
 	 * Runs one dream cycle against {@code memoriesRootDirectory}. When both a
 	 * {@code sessionService} was configured on the builder and {@code userId} is
 	 * non-empty, the Dreamer additionally gets a read-only {@code cross_session_search}
-	 * tool scoped to that user's session history; otherwise this behaves exactly like
+	 * tool scoped to that user's session history (the sessions whose
+	 * {@link org.springframework.ai.session.SessionAttributes#PRINCIPAL_NAME} metadata is
+	 * {@code userId}); otherwise this behaves exactly like
 	 * {@link #runDreamCycle(String)}.
 	 * @param memoriesRootDirectory the memories root directory to consolidate
 	 * @param userId whose session history to make searchable, or {@code null}/empty for

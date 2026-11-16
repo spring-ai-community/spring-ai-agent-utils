@@ -71,7 +71,7 @@ Or add the core library directly:
 _Check the latest version:_ [![](https://img.shields.io/maven-central/v/org.springaicommunity/spring-ai-agent-utils.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/org.springaicommunity/spring-ai-agent-utils)
 
 !!! note
-    You need Spring AI version `2.0.0` or later.
+    You need Spring AI version `2.1` or later.
 
 **2. Configure your agent:**
 
@@ -93,6 +93,11 @@ public class Application {
                     .skillsResources(skillPaths)
                     .braveApiKey(braveApiKey)
                     .build())
+                .build();
+
+            // Conversation memory: an in-memory session store
+            SessionService sessionService = DefaultSessionService.builder()
+                .sessionRepository(InMemorySessionRepository.builder().build())
                 .build();
 
             ChatClient chatClient = chatClientBuilder
@@ -126,15 +131,14 @@ public class Application {
                         .questionHandler(new CommandLineQuestionHandler())
                         .build())
 
-                // Advisors
-                .defaultAdvisors(
-                    MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build()).build())
+                // Conversation memory
+                .defaultAdvisors(SessionAdvisors.builder(sessionService).build())
 
                 .build();
 
             String response = chatClient
                 .prompt("Search for Spring AI documentation and summarize it")
-                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "session-1"))
+                .advisors(SessionAdvisors.session("session-1"))
                 .call()
                 .content();
         };
@@ -142,11 +146,13 @@ public class Application {
 }
 ```
 
+The conversation memory in this example comes from Spring AI's session module: add `org.springframework.ai:spring-ai-session-advisor` (its version comes from the Spring AI BOM, and it brings in `spring-ai-session`). See [Session Memory](https://docs.spring.io/spring-ai/reference/api/session.html) for persistent stores and compaction.
+
 ## Requirements
 
 - Java 17+
-- Spring Boot 3.x / 4.x
-- Spring AI 2.0.0 or later
+- Spring Boot 4.2 or later (the version Spring AI 2.1 is built on)
+- Spring AI 2.1 or later
 - Maven 3.6+
 
 ## Building

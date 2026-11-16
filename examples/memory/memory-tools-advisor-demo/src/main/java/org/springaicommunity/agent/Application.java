@@ -8,9 +8,11 @@ import org.springaicommunity.agent.advisors.AutoMemoryToolsAdvisor;
 import org.springaicommunity.agent.utils.AgentEnvironment;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.session.DefaultSessionService;
+import org.springframework.ai.session.EventFilter;
+import org.springframework.ai.session.InMemorySessionRepository;
+import org.springframework.ai.session.SessionService;
+import org.springframework.ai.session.advisor.SessionAdvisors;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -37,6 +39,11 @@ public class Application {
 			@Value("${agent.memory.dir}") String memoryDir) throws IOException {
 
 		return args -> {
+
+			// Short-term conversation memory: an in-memory session store, reset on every run
+			SessionService sessionService = DefaultSessionService.builder()
+				.sessionRepository(InMemorySessionRepository.builder().build())
+				.build();
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off
 				
@@ -67,15 +74,17 @@ public class Application {
 						})
 						.build(),
 
-					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(100).build())
-						.order(Ordered.HIGHEST_PRECEDENCE + 1000).build(),
-
 					// Custom logging advisor
 					MyLoggingAdvisor.builder()
 						.showAvailableTools(true)
 						.showSystemMessage(false)
 						.order(Ordered.HIGHEST_PRECEDENCE + 1100)
 						.build())
+
+				// Conversation memory: the session advisors replay the last 100 events of the session
+				.defaultAdvisors(SessionAdvisors.builder(sessionService)
+					.memory(memory -> memory.eventFilter(EventFilter.lastN(100)))
+					.build())
 				.build();
 				// @formatter:on
 
@@ -86,7 +95,7 @@ public class Application {
 				while (true) {
 					System.out.print("\n\033[1;34mUSER>\033[0m ");
 					System.out.println("\n\033[1;34mASSISTANT>\033[0m " + chatClient.prompt(scanner.nextLine())
-						.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "session-1"))
+						.advisors(SessionAdvisors.session("session-1"))
 						.call()
 						.content());
 				}

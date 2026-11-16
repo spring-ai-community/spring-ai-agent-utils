@@ -9,10 +9,10 @@ A persistent, file-based **long-term memory** toolkit for AI agents. Complements
 | | Conversation history | AutoMemoryTools (long-term memory) |
 |---|---|---|
 | **Scope** | Current session only | Persists across sessions |
-| **Storage** | In-process (RAM / `ChatMemory`) | Files on disk |
+| **Storage** | A session store (`SessionService`) | Files on disk |
 | **Content** | Full message exchange — every turn | Curated facts worth keeping forever |
 | **Size** | Bounded by context window | Grows over time; agent loads selectively |
-| **Managed by** | Spring AI `ChatMemory` / advisors | Agent via tool calls |
+| **Managed by** | Spring AI session advisors | Agent via tool calls |
 
 Use conversation history for the short-term working context of the current task. Use `AutoMemoryTools` for facts that should still be available in the next conversation, next week, or next month — things the agent would otherwise have to re-learn from scratch every time.
 
@@ -35,7 +35,6 @@ AutoMemoryTools memoryTools = AutoMemoryTools.builder()
 ChatClient chatClient = chatClientBuilder
     .defaultSystem(systemPrompt)            // include AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md
     .defaultTools(memoryTools)
-    .defaultAdvisors(ToolCallAdvisor.builder().build())
     .build();
 ```
 
@@ -329,7 +328,6 @@ See [memory-tools-demo](https://github.com/spring-ai-community/spring-ai-agent-u
 
 - Combining `MAIN_AGENT_SYSTEM_PROMPT_V2.md` and `AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md`
 - Configuring `AutoMemoryTools` with a path from `application.properties`
-- Using `ToolCallAdvisor` for recursive tool calling
 - A console chat loop that builds up memory across turns
 
 ## Inspiration
