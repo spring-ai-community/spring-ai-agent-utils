@@ -15,6 +15,8 @@
 */
 package org.springaicommunity.agent.tools;
 
+import org.springframework.ai.chat.model.ToolContext;
+
 /**
  * Observes individual tool invocations when attached via
  * {@link ToolCallListeners#wrap(org.springframework.ai.tool.ToolCallback, ToolCallListener)}.
@@ -26,6 +28,12 @@ package org.springaicommunity.agent.tools;
  * {@link #afterCall}/{@link #onError} for the same invocation — enough to correlate
  * use/result pairs (e.g. an event id) or measure durations, without the decorator
  * imposing a schema. All default implementations are no-ops.
+ *
+ * <p>
+ * Overloads accepting {@link ToolContext} are provided so listeners can correlate
+ * invocations with conversation state, user identifiers, or streaming channels (e.g. SSE
+ * emitters) stored in {@link ToolContext#getContext()}. Default implementations delegate
+ * to the corresponding legacy methods without {@link ToolContext}.
  *
  * <p>
  * <b>Listener methods must not throw.</b> The decorator deliberately does not guard
@@ -45,11 +53,37 @@ public interface ToolCallListener {
 	 * Called before the tool executes.
 	 * @param toolName the tool's definition name
 	 * @param toolInput the raw JSON input the model produced
+	 * @param toolContext the execution context associated with this invocation; may be
+	 * null
+	 * @return an opaque correlation context passed to {@link #afterCall}/{@link #onError}
+	 * for this invocation; may be null
+	 */
+	default Object beforeCall(String toolName, String toolInput, ToolContext toolContext) {
+		return beforeCall(toolName, toolInput);
+	}
+
+	/**
+	 * Called before the tool executes.
+	 * @param toolName the tool's definition name
+	 * @param toolInput the raw JSON input the model produced
 	 * @return an opaque correlation context passed to {@link #afterCall}/{@link #onError}
 	 * for this invocation; may be null
 	 */
 	default Object beforeCall(String toolName, String toolInput) {
 		return null;
+	}
+
+	/**
+	 * Called after the tool returned normally.
+	 * @param context the value returned by {@link #beforeCall} (may be null)
+	 * @param toolName the tool's definition name
+	 * @param toolInput the raw JSON input
+	 * @param toolContext the execution context associated with this invocation; may be
+	 * null
+	 * @param result the tool's result string
+	 */
+	default void afterCall(Object context, String toolName, String toolInput, ToolContext toolContext, String result) {
+		afterCall(context, toolName, toolInput, result);
 	}
 
 	/**
@@ -69,11 +103,42 @@ public interface ToolCallListener {
 	 * @param context the value returned by {@link #beforeCall} (may be null)
 	 * @param toolName the tool's definition name
 	 * @param toolInput the raw JSON input
+	 * @param toolContext the execution context associated with this invocation; may be
+	 * null
+	 * @param exception the failure
+	 * @return the error string to return to the model, or null to rethrow
+	 */
+	default String onError(Object context, String toolName, String toolInput, ToolContext toolContext,
+			RuntimeException exception) {
+		return onError(context, toolName, toolInput, exception);
+	}
+
+	/**
+	 * Called when the tool threw. Return a non-null string to report the failure to the
+	 * model as the tool result — letting the agent loop adapt instead of dying — or null
+	 * to propagate the exception to the caller.
+	 * @param context the value returned by {@link #beforeCall} (may be null)
+	 * @param toolName the tool's definition name
+	 * @param toolInput the raw JSON input
 	 * @param exception the failure
 	 * @return the error string to return to the model, or null to rethrow
 	 */
 	default String onError(Object context, String toolName, String toolInput, RuntimeException exception) {
 		return null;
+	}
+
+	/**
+	 * Called once after the invocation completes, whether it returned normally or failed.
+	 * Use this for unconditional cleanup of resources associated with the invocation.
+	 * This method is not called if {@link #beforeCall} throws.
+	 * @param context the value returned by {@link #beforeCall} (may be null)
+	 * @param toolName the tool's definition name
+	 * @param toolInput the raw JSON input
+	 * @param toolContext the execution context associated with this invocation; may be
+	 * null
+	 */
+	default void afterCompletion(Object context, String toolName, String toolInput, ToolContext toolContext) {
+		afterCompletion(context, toolName, toolInput);
 	}
 
 	/**
