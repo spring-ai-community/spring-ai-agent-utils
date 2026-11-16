@@ -423,7 +423,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../migration-0.13/" class="md-tabs__link">
+        <a href="../migration-0.14/" class="md-tabs__link">
           
   
   
@@ -1765,6 +1765,8 @@
       
         
       
+        
+      
     
     
     
@@ -1809,6 +1811,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-0.14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0.13.0 to 0.14.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -2138,9 +2168,13 @@
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ChatClient</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatModel</span><span class="p">)</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">        </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="n">dir</span><span class="p">).</span><span class="na">build</span><span class="p">(),</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">        </span><span class="n">dreamAdvisor</span><span class="p">,</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">        </span><span class="n">MessageChatMemoryAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatMemory</span><span class="p">).</span><span class="na">build</span><span class="p">())</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">        </span><span class="n">dreamAdvisor</span><span class="p">)</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span><span class="n">SessionAdvisors</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">sessionService</span><span class="p">).</span><span class="na">build</span><span class="p">())</span><span class="w">  </span><span class="c1">// conversation memory</span>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="n">chatClient</span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="n">userInput</span><span class="p">)</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="p">.</span><span class="na">advisors</span><span class="p">(</span><span class="n">SessionAdvisors</span><span class="p">.</span><span class="na">session</span><span class="p">(</span><span class="n">sessionId</span><span class="p">))</span><span class="w">  </span><span class="c1">// every request names its session</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">    </span><span class="p">.</span><span class="na">call</span><span class="p">();</span>
 </span></code></pre></div>
 <p>Point <code>AutoDreamAdvisor</code> and <code>AutoMemoryToolsAdvisor</code> at the same <code>memoriesRootDirectory</code> — one gives the live agent read/write memory tools, the other schedules the Dreamer that periodically cleans that same store up.</p>
 <h2 id="builder-configuration">Builder Configuration<a class="headerlink" href="#builder-configuration" title="Permanent link">&para;</a></h2>
@@ -2197,12 +2231,12 @@
 <td><code>order(int)</code></td>
 <td><code>int</code></td>
 <td><code>HIGHEST_PRECEDENCE + 150</code></td>
-<td>Advisor order — higher precedence than <code>AutoMemoryToolsAdvisor</code>'s default (<code>+200</code>).</td>
+<td>Advisor order — higher precedence than <code>AutoMemoryToolsAdvisor</code>'s default (<code>+250</code>).</td>
 </tr>
 </tbody>
 </table>
 <h3 id="useridstring-and-cross-session-recall"><code>userId(String)</code> and cross-session recall<a class="headerlink" href="#useridstring-and-cross-session-recall" title="Permanent link">&para;</a></h3>
-<p>Setting <code>.userId(...)</code> only has an effect if the advisor's <code>dreamService</code> was itself built with <code>.sessionService(...)</code> configured (see <a href="../AutoDreamService/#cross-session-recall-optional">AutoDreamService — Cross-Session Recall</a>). If the service has no <code>sessionService</code>, <code>userId</code> is passed through but ignored — the Dreamer still only sees the memory store. There's no error in either misconfiguration direction; both degrade gracefully to memory-only dreaming.</p>
+<p>Setting <code>.userId(...)</code> only has an effect if the advisor's <code>dreamService</code> was itself built with <code>.sessionService(...)</code> configured (see <a href="../AutoDreamService/#cross-session-recall-optional">AutoDreamService — Cross-Session Recall</a>). The Dreamer then searches the sessions whose <code>SessionAttributes.PRINCIPAL_NAME</code> metadata equals <code>userId</code> (see <a href="../AutoDreamService/#which-sessions-are-searched">Which sessions are searched</a>). If the service has no <code>sessionService</code>, <code>userId</code> is passed through but ignored — the Dreamer still only sees the memory store. There's no error in either misconfiguration direction; both degrade gracefully to memory-only dreaming.</p>
 <h2 id="turn-counting">Turn counting<a class="headerlink" href="#turn-counting" title="Permanent link">&para;</a></h2>
 <p><code>DreamState.sessionsSinceLastDream()</code> counts <strong>conversation turns processed by this advisor instance</strong> — every call to <code>after()</code> increments it, regardless of whether the turn involved memory tools at all. This is not the same thing as a <code>spring-ai-session</code> "session": there is no dependency on session-transcript storage for the trigger itself, only (optionally) for what the Dreamer can search once a cycle starts.</p>
 <h2 id="relationship-to-memoryconsolidationtrigger">Relationship to <code>memoryConsolidationTrigger</code><a class="headerlink" href="#relationship-to-memoryconsolidationtrigger" title="Permanent link">&para;</a></h2>

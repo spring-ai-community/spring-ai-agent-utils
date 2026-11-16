@@ -423,7 +423,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../migration-0.13/" class="md-tabs__link">
+        <a href="../migration-0.14/" class="md-tabs__link">
           
   
   
@@ -2370,6 +2370,8 @@
       
         
       
+        
+      
     
     
     
@@ -2414,6 +2416,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-0.14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0.13.0 to 0.14.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -3838,40 +3868,39 @@
 </span><span id="__span-25-18"><a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a><span class="w">                    </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
 </span><span id="__span-25-19"><a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span><span id="__span-25-20"><a id="__codelineno-25-20" name="__codelineno-25-20" href="#__codelineno-25-20"></a>
-</span><span id="__span-25-21"><a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a><span class="w">            </span><span class="c1">// Build main chat client</span>
-</span><span id="__span-25-22"><a id="__codelineno-25-22" name="__codelineno-25-22" href="#__codelineno-25-22"></a><span class="w">            </span><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClientBuilder</span>
-</span><span id="__span-25-23"><a id="__codelineno-25-23" name="__codelineno-25-23" href="#__codelineno-25-23"></a><span class="w">                </span><span class="p">.</span><span class="na">defaultToolCallbacks</span><span class="p">(</span><span class="n">taskTool</span><span class="p">)</span>
-</span><span id="__span-25-24"><a id="__codelineno-25-24" name="__codelineno-25-24" href="#__codelineno-25-24"></a><span class="w">                </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span>
-</span><span id="__span-25-25"><a id="__codelineno-25-25" name="__codelineno-25-25" href="#__codelineno-25-25"></a><span class="w">                    </span><span class="n">FileSystemTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
-</span><span id="__span-25-26"><a id="__codelineno-25-26" name="__codelineno-25-26" href="#__codelineno-25-26"></a><span class="w">                    </span><span class="n">GrepTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
-</span><span id="__span-25-27"><a id="__codelineno-25-27" name="__codelineno-25-27" href="#__codelineno-25-27"></a><span class="w">                    </span><span class="n">GlobTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
-</span><span id="__span-25-28"><a id="__codelineno-25-28" name="__codelineno-25-28" href="#__codelineno-25-28"></a><span class="w">                    </span><span class="n">ShellTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
-</span><span id="__span-25-29"><a id="__codelineno-25-29" name="__codelineno-25-29" href="#__codelineno-25-29"></a><span class="w">                    </span><span class="n">TodoWriteTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">()</span>
-</span><span id="__span-25-30"><a id="__codelineno-25-30" name="__codelineno-25-30" href="#__codelineno-25-30"></a><span class="w">                </span><span class="p">)</span>
-</span><span id="__span-25-31"><a id="__codelineno-25-31" name="__codelineno-25-31" href="#__codelineno-25-31"></a><span class="w">                </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span>
-</span><span id="__span-25-32"><a id="__codelineno-25-32" name="__codelineno-25-32" href="#__codelineno-25-32"></a><span class="w">                    </span><span class="n">ToolCallAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-25-33"><a id="__codelineno-25-33" name="__codelineno-25-33" href="#__codelineno-25-33"></a><span class="w">                        </span><span class="p">.</span><span class="na">conversationHistoryEnabled</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
-</span><span id="__span-25-34"><a id="__codelineno-25-34" name="__codelineno-25-34" href="#__codelineno-25-34"></a><span class="w">                        </span><span class="p">.</span><span class="na">build</span><span class="p">(),</span>
-</span><span id="__span-25-35"><a id="__codelineno-25-35" name="__codelineno-25-35" href="#__codelineno-25-35"></a><span class="w">                    </span><span class="n">MessageChatMemoryAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span>
-</span><span id="__span-25-36"><a id="__codelineno-25-36" name="__codelineno-25-36" href="#__codelineno-25-36"></a><span class="w">                        </span><span class="n">MessageWindowChatMemory</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">maxMessages</span><span class="p">(</span><span class="mi">500</span><span class="p">).</span><span class="na">build</span><span class="p">()</span>
-</span><span id="__span-25-37"><a id="__codelineno-25-37" name="__codelineno-25-37" href="#__codelineno-25-37"></a><span class="w">                    </span><span class="p">).</span><span class="na">build</span><span class="p">()</span>
-</span><span id="__span-25-38"><a id="__codelineno-25-38" name="__codelineno-25-38" href="#__codelineno-25-38"></a><span class="w">                </span><span class="p">)</span>
-</span><span id="__span-25-39"><a id="__codelineno-25-39" name="__codelineno-25-39" href="#__codelineno-25-39"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
-</span><span id="__span-25-40"><a id="__codelineno-25-40" name="__codelineno-25-40" href="#__codelineno-25-40"></a>
-</span><span id="__span-25-41"><a id="__codelineno-25-41" name="__codelineno-25-41" href="#__codelineno-25-41"></a><span class="w">            </span><span class="c1">// Interactive chat loop</span>
-</span><span id="__span-25-42"><a id="__codelineno-25-42" name="__codelineno-25-42" href="#__codelineno-25-42"></a><span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Scanner</span><span class="w"> </span><span class="n">scanner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-25-43"><a id="__codelineno-25-43" name="__codelineno-25-43" href="#__codelineno-25-43"></a><span class="w">                </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-25-44"><a id="__codelineno-25-44" name="__codelineno-25-44" href="#__codelineno-25-44"></a><span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="s">"\nUSER: "</span><span class="p">);</span>
-</span><span id="__span-25-45"><a id="__codelineno-25-45" name="__codelineno-25-45" href="#__codelineno-25-45"></a><span class="w">                    </span><span class="n">String</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClient</span>
-</span><span id="__span-25-46"><a id="__codelineno-25-46" name="__codelineno-25-46" href="#__codelineno-25-46"></a><span class="w">                        </span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="n">scanner</span><span class="p">.</span><span class="na">nextLine</span><span class="p">())</span>
-</span><span id="__span-25-47"><a id="__codelineno-25-47" name="__codelineno-25-47" href="#__codelineno-25-47"></a><span class="w">                        </span><span class="p">.</span><span class="na">call</span><span class="p">()</span>
-</span><span id="__span-25-48"><a id="__codelineno-25-48" name="__codelineno-25-48" href="#__codelineno-25-48"></a><span class="w">                        </span><span class="p">.</span><span class="na">content</span><span class="p">();</span>
-</span><span id="__span-25-49"><a id="__codelineno-25-49" name="__codelineno-25-49" href="#__codelineno-25-49"></a><span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"\nASSISTANT: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">response</span><span class="p">);</span>
-</span><span id="__span-25-50"><a id="__codelineno-25-50" name="__codelineno-25-50" href="#__codelineno-25-50"></a><span class="w">                </span><span class="p">}</span>
-</span><span id="__span-25-51"><a id="__codelineno-25-51" name="__codelineno-25-51" href="#__codelineno-25-51"></a><span class="w">            </span><span class="p">}</span>
-</span><span id="__span-25-52"><a id="__codelineno-25-52" name="__codelineno-25-52" href="#__codelineno-25-52"></a><span class="w">        </span><span class="p">};</span>
-</span><span id="__span-25-53"><a id="__codelineno-25-53" name="__codelineno-25-53" href="#__codelineno-25-53"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-25-54"><a id="__codelineno-25-54" name="__codelineno-25-54" href="#__codelineno-25-54"></a><span class="p">}</span>
+</span><span id="__span-25-21"><a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a><span class="w">            </span><span class="c1">// Conversation memory: an in-memory session store</span>
+</span><span id="__span-25-22"><a id="__codelineno-25-22" name="__codelineno-25-22" href="#__codelineno-25-22"></a><span class="w">            </span><span class="n">SessionService</span><span class="w"> </span><span class="n">sessionService</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DefaultSessionService</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-25-23"><a id="__codelineno-25-23" name="__codelineno-25-23" href="#__codelineno-25-23"></a><span class="w">                </span><span class="p">.</span><span class="na">sessionRepository</span><span class="p">(</span><span class="n">InMemorySessionRepository</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">())</span>
+</span><span id="__span-25-24"><a id="__codelineno-25-24" name="__codelineno-25-24" href="#__codelineno-25-24"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-25-25"><a id="__codelineno-25-25" name="__codelineno-25-25" href="#__codelineno-25-25"></a>
+</span><span id="__span-25-26"><a id="__codelineno-25-26" name="__codelineno-25-26" href="#__codelineno-25-26"></a><span class="w">            </span><span class="c1">// Build main chat client</span>
+</span><span id="__span-25-27"><a id="__codelineno-25-27" name="__codelineno-25-27" href="#__codelineno-25-27"></a><span class="w">            </span><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClientBuilder</span>
+</span><span id="__span-25-28"><a id="__codelineno-25-28" name="__codelineno-25-28" href="#__codelineno-25-28"></a><span class="w">                </span><span class="p">.</span><span class="na">defaultToolCallbacks</span><span class="p">(</span><span class="n">taskTool</span><span class="p">)</span>
+</span><span id="__span-25-29"><a id="__codelineno-25-29" name="__codelineno-25-29" href="#__codelineno-25-29"></a><span class="w">                </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span>
+</span><span id="__span-25-30"><a id="__codelineno-25-30" name="__codelineno-25-30" href="#__codelineno-25-30"></a><span class="w">                    </span><span class="n">FileSystemTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
+</span><span id="__span-25-31"><a id="__codelineno-25-31" name="__codelineno-25-31" href="#__codelineno-25-31"></a><span class="w">                    </span><span class="n">GrepTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
+</span><span id="__span-25-32"><a id="__codelineno-25-32" name="__codelineno-25-32" href="#__codelineno-25-32"></a><span class="w">                    </span><span class="n">GlobTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
+</span><span id="__span-25-33"><a id="__codelineno-25-33" name="__codelineno-25-33" href="#__codelineno-25-33"></a><span class="w">                    </span><span class="n">ShellTools</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">(),</span>
+</span><span id="__span-25-34"><a id="__codelineno-25-34" name="__codelineno-25-34" href="#__codelineno-25-34"></a><span class="w">                    </span><span class="n">TodoWriteTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">()</span>
+</span><span id="__span-25-35"><a id="__codelineno-25-35" name="__codelineno-25-35" href="#__codelineno-25-35"></a><span class="w">                </span><span class="p">)</span>
+</span><span id="__span-25-36"><a id="__codelineno-25-36" name="__codelineno-25-36" href="#__codelineno-25-36"></a><span class="w">                </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span><span class="n">SessionAdvisors</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">sessionService</span><span class="p">).</span><span class="na">build</span><span class="p">())</span>
+</span><span id="__span-25-37"><a id="__codelineno-25-37" name="__codelineno-25-37" href="#__codelineno-25-37"></a><span class="w">                </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-25-38"><a id="__codelineno-25-38" name="__codelineno-25-38" href="#__codelineno-25-38"></a>
+</span><span id="__span-25-39"><a id="__codelineno-25-39" name="__codelineno-25-39" href="#__codelineno-25-39"></a><span class="w">            </span><span class="c1">// Interactive chat loop</span>
+</span><span id="__span-25-40"><a id="__codelineno-25-40" name="__codelineno-25-40" href="#__codelineno-25-40"></a><span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Scanner</span><span class="w"> </span><span class="n">scanner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Scanner</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-25-41"><a id="__codelineno-25-41" name="__codelineno-25-41" href="#__codelineno-25-41"></a><span class="w">                </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-25-42"><a id="__codelineno-25-42" name="__codelineno-25-42" href="#__codelineno-25-42"></a><span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="s">"\nUSER: "</span><span class="p">);</span>
+</span><span id="__span-25-43"><a id="__codelineno-25-43" name="__codelineno-25-43" href="#__codelineno-25-43"></a><span class="w">                    </span><span class="n">String</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClient</span>
+</span><span id="__span-25-44"><a id="__codelineno-25-44" name="__codelineno-25-44" href="#__codelineno-25-44"></a><span class="w">                        </span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="n">scanner</span><span class="p">.</span><span class="na">nextLine</span><span class="p">())</span>
+</span><span id="__span-25-45"><a id="__codelineno-25-45" name="__codelineno-25-45" href="#__codelineno-25-45"></a><span class="w">                        </span><span class="p">.</span><span class="na">advisors</span><span class="p">(</span><span class="n">SessionAdvisors</span><span class="p">.</span><span class="na">session</span><span class="p">(</span><span class="s">"session-1"</span><span class="p">))</span>
+</span><span id="__span-25-46"><a id="__codelineno-25-46" name="__codelineno-25-46" href="#__codelineno-25-46"></a><span class="w">                        </span><span class="p">.</span><span class="na">call</span><span class="p">()</span>
+</span><span id="__span-25-47"><a id="__codelineno-25-47" name="__codelineno-25-47" href="#__codelineno-25-47"></a><span class="w">                        </span><span class="p">.</span><span class="na">content</span><span class="p">();</span>
+</span><span id="__span-25-48"><a id="__codelineno-25-48" name="__codelineno-25-48" href="#__codelineno-25-48"></a><span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"\nASSISTANT: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">response</span><span class="p">);</span>
+</span><span id="__span-25-49"><a id="__codelineno-25-49" name="__codelineno-25-49" href="#__codelineno-25-49"></a><span class="w">                </span><span class="p">}</span>
+</span><span id="__span-25-50"><a id="__codelineno-25-50" name="__codelineno-25-50" href="#__codelineno-25-50"></a><span class="w">            </span><span class="p">}</span>
+</span><span id="__span-25-51"><a id="__codelineno-25-51" name="__codelineno-25-51" href="#__codelineno-25-51"></a><span class="w">        </span><span class="p">};</span>
+</span><span id="__span-25-52"><a id="__codelineno-25-52" name="__codelineno-25-52" href="#__codelineno-25-52"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-25-53"><a id="__codelineno-25-53" name="__codelineno-25-53" href="#__codelineno-25-53"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
 <h3 id="1-design-focused-sub-agents">1. Design Focused Sub-Agents<a class="headerlink" href="#1-design-focused-sub-agents" title="Permanent link">&para;</a></h3>

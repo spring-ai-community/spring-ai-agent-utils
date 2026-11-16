@@ -423,7 +423,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../migration-0.13/" class="md-tabs__link">
+        <a href="../migration-0.14/" class="md-tabs__link">
           
   
   
@@ -1748,6 +1748,8 @@
       
         
       
+        
+      
     
     
     
@@ -1792,6 +1794,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-0.14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0.13.0 to 0.14.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -2090,13 +2120,11 @@
 <h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClientBuilder</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span><span class="n">TodoWriteTool</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="n">ToolCallAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">conversationHistoryEnabled</span><span class="p">(</span><span class="kc">false</span><span class="p">).</span><span class="na">build</span><span class="p">(),</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">        </span><span class="n">MessageChatMemoryAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">MessageWindowChatMemory</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">()).</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span><span class="n">SessionAdvisors</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">sessionService</span><span class="p">).</span><span class="na">build</span><span class="p">())</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
 <blockquote>
-<p><strong>Note:</strong> Requires <a href="https://docs.spring.io/spring-ai/reference/api/chat-memory.html">Chat Memory</a> and <a href="https://docs.spring.io/spring-ai/reference/api/advisors-recursive.html#_toolcalladvisor">ToolCallAdvisor</a>. For best results, use a system prompt like <a href="https://github.com/spring-ai-community/spring-ai-agent-utils/blob/main/spring-ai-agent-utils/src/main/resources/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md#task-management">MAIN_AGENT_SYSTEM_PROMPT_V2</a>.</p>
+<p><strong>Note:</strong> Requires conversation memory, such as Spring AI's <a href="https://docs.spring.io/spring-ai/reference/api/session.html">session advisors</a> (<code>SessionAdvisors</code> from <code>spring-ai-session-advisor</code>, over a <code>SessionService</code>), so the task list carries over between turns; run each request on a session with <code>.advisors(SessionAdvisors.session(sessionId))</code>. For best results, use a system prompt like <a href="https://github.com/spring-ai-community/spring-ai-agent-utils/blob/main/spring-ai-agent-utils/src/main/resources/prompt/MAIN_AGENT_SYSTEM_PROMPT_V2.md#task-management">MAIN_AGENT_SYSTEM_PROMPT_V2</a>.</p>
 </blockquote>
 <h2 id="task-structure">Task Structure<a class="headerlink" href="#task-structure" title="Permanent link">&para;</a></h2>
 <p>Each task has three fields:</p>

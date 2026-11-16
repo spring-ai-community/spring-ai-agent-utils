@@ -423,7 +423,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../migration-0.13/" class="md-tabs__link">
+        <a href="../migration-0.14/" class="md-tabs__link">
           
   
   
@@ -1339,6 +1339,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Cross-Session Recall (optional)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#which-sessions-are-searched" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which sessions are searched
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-cross_session_search-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The cross_session_search tool
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1798,6 +1826,8 @@
       
         
       
+        
+      
     
     
     
@@ -1842,6 +1872,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-0.14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0.13.0 to 0.14.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -2079,6 +2137,34 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Cross-Session Recall (optional)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#which-sessions-are-searched" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which sessions are searched
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-cross_session_search-tool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The cross_session_search tool
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2369,7 +2455,7 @@
 </table>
 <p><code>PROPOSE</code> mode produces a plain directory copy — no diff is generated. Compare it against the live directory yourself (e.g. <code>diff -r</code>), or read the Dreamer's summary in the returned <code>DreamResult</code>.</p>
 <h2 id="cross-session-recall-optional">Cross-Session Recall (optional)<a class="headerlink" href="#cross-session-recall-optional" title="Permanent link">&para;</a></h2>
-<p>When <a href="https://github.com/spring-ai-community/spring-ai-session"><code>spring-ai-session</code></a> is on the classpath and <code>sessionService(...)</code> is configured, <code>runDreamCycle(memoriesRootDirectory, userId)</code> additionally gives the Dreamer a <strong>read-only</strong> <code>cross_session_search</code> tool (spring-ai-session's <code>CrossSessionRecallTools</code>), scoped to that one user's entire session history — not just the memory store.</p>
+<p>When Spring AI's session module (<code>org.springframework.ai:spring-ai-session</code>) is on the classpath and <code>sessionService(...)</code> is configured, <code>runDreamCycle(memoriesRootDirectory, userId)</code> additionally gives the Dreamer a <strong>read-only</strong> <code>cross_session_search</code> tool (<code>CrossSessionRecallTools</code>), scoped to that one user's entire session history — not just the memory store.</p>
 <div class="highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">AutoDreamService</span><span class="w"> </span><span class="n">dreamService</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoDreamService</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatClientBuilder</span><span class="p">.</span><span class="na">clone</span><span class="p">())</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="p">.</span><span class="na">sessionService</span><span class="p">(</span><span class="n">sessionService</span><span class="p">)</span><span class="w">   </span><span class="c1">// any SessionService — in-memory, JDBC, etc.</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
@@ -2377,11 +2463,66 @@
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">dreamService</span><span class="p">.</span><span class="na">runDreamCycle</span><span class="p">(</span><span class="n">memoriesRootDirectory</span><span class="p">,</span><span class="w"> </span><span class="s">"alice"</span><span class="p">);</span>
 </span></code></pre></div>
 <p>Both conditions must hold for cross-session recall to activate: <code>sessionService(...)</code> configured on the builder, <strong>and</strong> a non-empty <code>userId</code> passed to <code>runDreamCycle(...)</code>. Omit either and the Dreamer falls back to memory-only dreaming — no error, no behavior change from the base case.</p>
+<h3 id="which-sessions-are-searched">Which sessions are searched<a class="headerlink" href="#which-sessions-are-searched" title="Permanent link">&para;</a></h3>
+<p>Spring AI sessions have no user id of their own. A user's sessions are the ones whose <code>SessionAttributes.PRINCIPAL_NAME</code> metadata equals the <code>userId</code> passed to <code>runDreamCycle(...)</code>, so tag sessions when they are created:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// Sessions you create yourself</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">sessionService</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="n">CreateSessionRequest</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="p">.</span><span class="na">metadata</span><span class="p">(</span><span class="n">SessionAttributes</span><span class="p">.</span><span class="na">PRINCIPAL_NAME</span><span class="p">,</span><span class="w"> </span><span class="s">"alice"</span><span class="p">)</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">());</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="c1">// Sessions the session advisors create on first use</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClientBuilder</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span><span class="n">SessionAdvisors</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">sessionService</span><span class="p">).</span><span class="na">build</span><span class="p">())</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span><span class="n">a</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="na">param</span><span class="p">(</span><span class="n">SessionMemoryAdvisor</span><span class="p">.</span><span class="na">SESSION_METADATA_CONTEXT_KEY</span><span class="p">,</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">            </span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">SessionAttributes</span><span class="p">.</span><span class="na">PRINCIPAL_NAME</span><span class="p">,</span><span class="w"> </span><span class="s">"alice"</span><span class="p">)))</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="n">chatClient</span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="n">userInput</span><span class="p">)</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="p">.</span><span class="na">advisors</span><span class="p">(</span><span class="n">SessionAdvisors</span><span class="p">.</span><span class="na">session</span><span class="p">(</span><span class="n">sessionId</span><span class="p">))</span><span class="w">  </span><span class="c1">// every request names its session</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="p">.</span><span class="na">call</span><span class="p">();</span>
+</span></code></pre></div>
+<p>Sessions without that metadata are never searched. The user is bound when the tool is built and is not a tool parameter, so a prompt cannot make the Dreamer search another user's sessions.</p>
+<h3 id="the-cross_session_search-tool">The <code>cross_session_search</code> tool<a class="headerlink" href="#the-cross_session_search-tool" title="Permanent link">&para;</a></h3>
+<p><code>CrossSessionRecallTools</code> (<code>org.springaicommunity.agent.tools</code>) finds the user's sessions with <code>SessionService.findByMetadata(...)</code>, runs Spring AI's keyword search (<code>SessionService.searchEvents(...)</code>, see <code>EventQuery</code>) on each, and returns the matches oldest first across all of them. It can also be used on its own, outside Auto-Dream:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">analyst</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClientBuilder</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span><span class="n">CrossSessionRecallTools</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">sessionService</span><span class="p">,</span><span class="w"> </span><span class="s">"alice"</span><span class="p">)</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">        </span><span class="p">.</span><span class="na">pageSize</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w">          </span><span class="c1">// matches per page, default 10, max 100</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">        </span><span class="p">.</span><span class="na">maxTextLength</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span><span class="w">    </span><span class="c1">// longer messages are cut to an excerpt around the keyword</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">        </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>query</code></td>
+<td>One or more comma-separated keywords, matched as literal text, ignoring case (at most 20).</td>
+</tr>
+<tr>
+<td><code>matchMode</code></td>
+<td><code>any</code> (default): a message matches when it contains one keyword. <code>all</code>: it must contain every keyword.</td>
+</tr>
+<tr>
+<td><code>since</code></td>
+<td>ISO-8601 instant; only messages at or after it. Omit for the full history.</td>
+</tr>
+<tr>
+<td><code>page</code></td>
+<td>Zero-based page of matches.</td>
+</tr>
+</tbody>
+</table>
+<p>A page with matches is returned as JSON: <code>results</code>, each with <code>sessionId</code>, <code>timestamp</code>, <code>type</code> and <code>text</code>, and <code>nextPage</code> when more matches may follow. When nothing matches it returns the plain text <code>No results found.</code> (or <code>No more results.</code> past the last page). Each call runs one search per session of the user, so it suits a handful of targeted queries rather than exhaustive reads. As with Spring AI's <code>conversation_search</code>, only message text is searched (never tool results or compaction summaries), compacted-out messages are still found, and paging stops after the first 1000 matches. Invalid input is answered with an <code>Error: ...</code> text the model can correct, not an exception.</p>
 <div class="admonition note">
 <p class="admonition-title">Optional dependency</p>
-<p><code>spring-ai-agent-utils</code> declares <code>spring-ai-session</code> as <code>provided</code> + <code>optional</code>. Consumers who never call <code>.sessionService(...)</code> don't need it on their own classpath — it's never pulled in transitively. Add it directly to your own project's dependencies to use this feature.</p>
+<p><code>spring-ai-agent-utils</code> declares <code>spring-ai-session</code> as <code>provided</code> + <code>optional</code>. Consumers who never call <code>.sessionService(...)</code> don't need it on their own classpath — it's never pulled in transitively. Add <code>org.springframework.ai:spring-ai-session</code> (version managed by the Spring AI BOM) to your own project to use this feature, and <code>spring-ai-session-advisor</code> for the session advisors.</p>
 </div>
-<p>The Dreamer's kickoff prompt automatically tells it when <code>cross_session_search</code> is available and scopes its queries with <code>since = &lt;last dream's timestamp&gt;</code>, so each cycle only mines history since the previous one. See spring-ai-session's <a href="https://spring-ai-community.github.io/spring-ai-session/session-management/cross-session-recall/">Cross-Session Recall</a> docs for the tool itself.</p>
+<p>The Dreamer's kickoff prompt automatically tells it when <code>cross_session_search</code> is available and scopes its queries with <code>since = &lt;last dream's timestamp&gt;</code>, so each cycle only mines history since the previous one.</p>
 <h2 id="system-prompt">System Prompt<a class="headerlink" href="#system-prompt" title="Permanent link">&para;</a></h2>
 <p>The default companion prompt is bundled at <code>classpath:/prompt/AUTO_DREAM_SYSTEM_PROMPT.md</code>. It encodes the four-phase pipeline described above, and — when cross-session recall is available — instructs the Dreamer to run a handful of <em>targeted</em> queries (not an exhaustive history read) for three signal categories: corrections ("no,", "don't", "actually", "instead"), explicit save requests ("remember that", "keep in mind"), and decisions ("we decided", "let's go with").</p>
 <p>Provide your own via <code>.dreamSystemPrompt(customResource)</code> if you need different phases or tone.</p>

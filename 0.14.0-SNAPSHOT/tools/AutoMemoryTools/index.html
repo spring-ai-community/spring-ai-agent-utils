@@ -423,7 +423,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../migration-0.13/" class="md-tabs__link">
+        <a href="../migration-0.14/" class="md-tabs__link">
           
   
   
@@ -1892,6 +1892,8 @@
       
         
       
+        
+      
     
     
     
@@ -1936,6 +1938,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-0.14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0.13.0 to 0.14.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -2391,7 +2421,7 @@
 </tr>
 <tr>
 <td><strong>Storage</strong></td>
-<td>In-process (RAM / <code>ChatMemory</code>)</td>
+<td>A session store (<code>SessionService</code>)</td>
 <td>Files on disk</td>
 </tr>
 <tr>
@@ -2406,7 +2436,7 @@
 </tr>
 <tr>
 <td><strong>Managed by</strong></td>
-<td>Spring AI <code>ChatMemory</code> / advisors</td>
+<td>Spring AI session advisors</td>
 <td>Agent via tool calls</td>
 </tr>
 </tbody>
@@ -2428,8 +2458,7 @@
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chatClientBuilder</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultSystem</span><span class="p">(</span><span class="n">systemPrompt</span><span class="p">)</span><span class="w">            </span><span class="c1">// include AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultTools</span><span class="p">(</span><span class="n">memoryTools</span><span class="p">)</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span><span class="n">ToolCallAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
 <p>Load the companion system prompt from the classpath (available inside the <code>spring-ai-agent-utils</code> jar):</p>
 <div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@Value</span><span class="p">(</span><span class="s">"classpath:/prompt/AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md"</span><span class="p">)</span>
@@ -2695,7 +2724,6 @@
 <ul>
 <li>Combining <code>MAIN_AGENT_SYSTEM_PROMPT_V2.md</code> and <code>AUTO_MEMORY_TOOLS_SYSTEM_PROMPT.md</code></li>
 <li>Configuring <code>AutoMemoryTools</code> with a path from <code>application.properties</code></li>
-<li>Using <code>ToolCallAdvisor</code> for recursive tool calling</li>
 <li>A console chat loop that builds up memory across turns</li>
 </ul>
 <h2 id="inspiration">Inspiration<a class="headerlink" href="#inspiration" title="Permanent link">&para;</a></h2>

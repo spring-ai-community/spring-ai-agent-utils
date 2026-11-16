@@ -423,7 +423,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../migration-0.13/" class="md-tabs__link">
+        <a href="../migration-0.14/" class="md-tabs__link">
           
   
   
@@ -1815,6 +1815,8 @@
       
         
       
+        
+      
     
     
     
@@ -1859,6 +1861,34 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migration-0.14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0.13.0 to 0.14.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -2230,12 +2260,12 @@
 <p>If the prompt carries no <code>ToolCallingChatOptions</code> the request is returned unchanged — both the tool injection and the system prompt augmentation are skipped.</p>
 <p><code>after()</code> is a passthrough. Memory persistence is driven entirely by the model via tool calls during the conversation; no post-processing is needed.</p>
 <h2 id="long-term-memory-vs-session-memory">Long-term memory vs. session memory<a class="headerlink" href="#long-term-memory-vs-session-memory" title="Permanent link">&para;</a></h2>
-<p><code>AutoMemoryToolsAdvisor</code> is a <strong>long-term memory</strong> mechanism. It is designed to complement, not replace, Spring AI's built-in short-term conversation memory (e.g. <code>MessageChatMemoryAdvisor</code> + <code>MessageWindowChatMemory</code>). The two layers serve fundamentally different purposes and should normally be used together:</p>
+<p><code>AutoMemoryToolsAdvisor</code> is a <strong>long-term memory</strong> mechanism. It is designed to complement, not replace, Spring AI's short-term conversation memory (<a href="https://docs.spring.io/spring-ai/reference/api/session.html">session memory</a>: <code>SessionAdvisors</code> over a <code>SessionService</code>). The two layers serve fundamentally different purposes and should normally be used together:</p>
 <table>
 <thead>
 <tr>
 <th></th>
-<th>Session memory (<code>MessageChatMemoryAdvisor</code>)</th>
+<th>Session memory (<code>SessionAdvisors</code>)</th>
 <th>Long-term memory (<code>AutoMemoryToolsAdvisor</code>)</th>
 </tr>
 </thead>
@@ -2247,7 +2277,7 @@
 </tr>
 <tr>
 <td><strong>Storage</strong></td>
-<td>In-process (<code>ChatMemory</code>)</td>
+<td>A <code>SessionService</code> repository (in-memory or JDBC)</td>
 <td>Files on disk via <code>AutoMemoryTools</code></td>
 </tr>
 <tr>
@@ -2262,24 +2292,25 @@
 </tr>
 <tr>
 <td><strong>Expires</strong></td>
-<td>When the process stops (or window fills)</td>
+<td>With the session (in memory: when the process stops); compaction trims what the prompt sees</td>
 <td>Never — until the model deletes a file</td>
 </tr>
 </tbody>
 </table>
 <p>A typical agent setup combines both:</p>
 <div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ChatClient</span><span class="w"> </span><span class="n">chatClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ChatClient</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">chatModel</span><span class="p">)</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="c1">// Long-term memory — facts that survive across sessions</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">            </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">"/home/user/.agent/memories"</span><span class="p">)</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">            </span><span class="p">.</span><span class="na">build</span><span class="p">(),</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">        </span><span class="c1">// Short-term memory — full conversation history for this session</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">        </span><span class="n">MessageChatMemoryAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">            </span><span class="n">MessageWindowChatMemory</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">maxMessages</span><span class="p">(</span><span class="mi">100</span><span class="p">).</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">            </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="c1">// Long-term memory — facts that survive across sessions</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">        </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">"/home/user/.agent/memories"</span><span class="p">)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">        </span><span class="p">.</span><span class="na">build</span><span class="p">())</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="c1">// Short-term memory — the conversation history of this session</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="p">.</span><span class="na">defaultAdvisors</span><span class="p">(</span><span class="n">SessionAdvisors</span><span class="p">.</span><span class="na">builder</span><span class="p">(</span><span class="n">sessionService</span><span class="p">).</span><span class="na">build</span><span class="p">())</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">chatClient</span><span class="p">.</span><span class="na">prompt</span><span class="p">(</span><span class="n">userInput</span><span class="p">)</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="p">.</span><span class="na">advisors</span><span class="p">(</span><span class="n">SessionAdvisors</span><span class="p">.</span><span class="na">session</span><span class="p">(</span><span class="n">sessionId</span><span class="p">))</span><span class="w">  </span><span class="c1">// every request names its session</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="p">.</span><span class="na">call</span><span class="p">();</span>
 </span></code></pre></div>
 <p>In this setup the model has the best of both worlds: the full context of the current conversation via the session window, and persistent knowledge about the user and project that it accumulated over previous sessions via the memory files.</p>
 <p><strong>Rule of thumb:</strong>
@@ -2298,7 +2329,7 @@
 <h2 id="builder-configuration">Builder Configuration<a class="headerlink" href="#builder-configuration" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">AutoMemoryToolsAdvisor</span><span class="w"> </span><span class="n">advisor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AutoMemoryToolsAdvisor</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="p">.</span><span class="na">memoriesRootDirectory</span><span class="p">(</span><span class="s">"/path/to/memories"</span><span class="p">)</span><span class="w">          </span><span class="c1">// required</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="p">.</span><span class="na">order</span><span class="p">(</span><span class="n">BaseAdvisor</span><span class="p">.</span><span class="na">HIGHEST_PRECEDENCE</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">200</span><span class="p">)</span><span class="w">         </span><span class="c1">// optional</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="p">.</span><span class="na">order</span><span class="p">(</span><span class="n">BaseAdvisor</span><span class="p">.</span><span class="na">HIGHEST_PRECEDENCE</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">250</span><span class="p">)</span><span class="w">         </span><span class="c1">// optional</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="p">.</span><span class="na">memorySystemPrompt</span><span class="p">(</span><span class="n">customPromptResource</span><span class="p">)</span><span class="w">            </span><span class="c1">// optional</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="p">.</span><span class="na">memoryConsolidationTrigger</span><span class="p">((</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">instant</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="c1">// optional</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
@@ -2322,8 +2353,8 @@
 <tr>
 <td><code>order(int)</code></td>
 <td><code>int</code></td>
-<td><code>HIGHEST_PRECEDENCE + 200</code></td>
-<td>Advisor order. Runs before the default <code>ToolCallingAdvisor</code> at <code>+300</code>.</td>
+<td><code>HIGHEST_PRECEDENCE + 250</code></td>
+<td>Advisor order. Runs after <code>SessionTurnAdvisor</code> (<code>+200</code>) and before the default <code>ToolCallingAdvisor</code> (<code>+300</code>).</td>
 </tr>
 <tr>
 <td><code>memorySystemPrompt(Resource)</code></td>
@@ -2396,7 +2427,8 @@
 </span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">    </span><span class="n">counter</span><span class="p">.</span><span class="na">incrementAndGet</span><span class="p">()</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">50</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="advisor-ordering">Advisor Ordering<a class="headerlink" href="#advisor-ordering" title="Permanent link">&para;</a></h2>
-<p>The default order <code>BaseAdvisor.HIGHEST_PRECEDENCE + 200</code> places this advisor <strong>before</strong> the <code>ToolCallingAdvisor</code> (which sits at <code>+300</code>). This ordering ensures memory tools are registered in the options before the tool-calling advisor processes them.</p>
+<p>The default order <code>BaseAdvisor.HIGHEST_PRECEDENCE + 250</code> places this advisor <strong>before</strong> the <code>ToolCallingAdvisor</code> (which sits at <code>+300</code>). This ordering ensures memory tools are registered in the options before the tool-calling advisor processes them.</p>
+<p>It also sits just after the <code>SessionTurnAdvisor</code> that <code>SessionAdvisors</code> registers at <code>HIGHEST_PRECEDENCE + 200</code>, so the two never tie. Before 0.14.0 the default was <code>+200</code>.</p>
 <p>If you use other advisors that also modify tool options (e.g. additional <code>ToolCallingAdvisor</code> instances), verify that their relative order does not prevent the memory tools from reaching the model.</p>
 <h2 id="relation-to-automemorytools">Relation to AutoMemoryTools<a class="headerlink" href="#relation-to-automemorytools" title="Permanent link">&para;</a></h2>
 <p><code>AutoMemoryToolsAdvisor</code> is a thin orchestration layer. The six memory operations, sandboxing logic, and file conventions all live in <a href="../AutoMemoryTools/"><code>AutoMemoryTools</code></a>. The advisor adds:</p>
@@ -2449,7 +2481,7 @@
 </span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
 </span></code></pre></div>
 <h2 id="demo-application">Demo Application<a class="headerlink" href="#demo-application" title="Permanent link">&para;</a></h2>
-<p>See <a href="https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-advisor-demo"><code>memory-tools-advisor-demo</code></a> for a complete runnable example showing <code>AutoMemoryToolsAdvisor</code> combined with <code>MessageChatMemoryAdvisor</code> and a custom logging advisor.</p>
+<p>See <a href="https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/memory/memory-tools-advisor-demo"><code>memory-tools-advisor-demo</code></a> for a complete runnable example showing <code>AutoMemoryToolsAdvisor</code> combined with Spring AI's session advisors and a custom logging advisor.</p>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../AutoMemoryTools/">AutoMemoryTools</a> — the underlying tool implementations, file conventions, and security model</li>
