@@ -55,8 +55,8 @@
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 
-        <spring-ai.version>2.1.0-SNAPSHOT</spring-ai.version>
-        <spring-framework.version>7.1.0-RC2</spring-framework.version>
+        <spring-ai.version>2.1.0</spring-ai.version>
+        <spring-framework.version>7.1.0</spring-framework.version>
         <flexmark.version>0.64.8</flexmark.version>
     
 
