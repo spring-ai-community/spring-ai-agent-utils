@@ -196,6 +196,39 @@ public class WebQuestionHandler {
 }
 ```
 
+### Heartbeats while waiting over SSE
+
+Use `org.springaicommunity.agent.utils.Heartbeats` to send liveness events while a question is pending. First register the pending answer with the application, then compose the question and heartbeat events into the response stream:
+
+```java
+Flux<ServerSentEvent<String>> questionAndHeartbeats = Flux.just(questionEvent)
+    .concatWith(Heartbeats.until(
+        Mono.fromFuture(answerFuture, true),
+        Duration.ofSeconds(15),
+        ServerSentEvent.<String>builder().comment("keep-alive").build()));
+```
+
+Here `questionEvent` is the application's SSE event and `answerFuture` is the `CompletableFuture` the application completes when the user answers. If the answer is still pending, the heartbeat stream emits one event immediately after the question and then emits periodically. An answer already available at subscription skips the heartbeat entirely. An error terminates the stream and client cancellation stops the timer. The `true` argument keeps cancellation of the heartbeat subscription from cancelling the shared answer future. The application still owns the timeout and cleanup of pending answers.
+
+`Heartbeats` accepts any event type and any Reactive Streams publisher as the stop signal, so the same helper works for approval requests and other pending operations. For SSE deployments, configure proxies to stream the response without buffering. Heartbeats alone cannot guarantee that a proxy flushes the question to the client.
+
+For a Spring AI chat endpoint that produces `text/event-stream`, pass the text chunks directly to `Heartbeats.sse`:
+
+```java
+Flux<String> content = chatClient.prompt().user(message).stream().content();
+return Heartbeats.sse(content);
+```
+
+Each chunk becomes an SSE data event. Use `Heartbeats.sse(content, heartbeatInterval)` for a configured interval. If your application already produces `ServerSentEvent<T>` objects with event names or IDs, use `Heartbeats.keepAlive(chatEvents)` to preserve those fields.
+
+Each connection subscribes to the source once. The first `keep-alive` comment is sent after 15 seconds and repeats every 15 seconds until the stream ends or the client disconnects. The browser ignores these comment lines. The [HTML Standard](https://html.spec.whatwg.org/multipage/server-sent-events.html#authoring-notes) recommends periodic comments and leaves their text to the application.
+
+To use an interval from your application configuration, pass the `Duration` as the second argument: `Heartbeats.keepAlive(chatEvents, heartbeatInterval)`. For a `Flux<MyChatEvent>`, choose the representation your client consumes. `Heartbeats.sse(events)` writes each object as SSE data and sends keep-alives as comments. To keep the return type `Flux<MyChatEvent>` and deliver the heartbeat as a domain event, supply an event of your own type:
+
+```java
+return Heartbeats.keepAlive(events, heartbeatInterval, MyChatEvent.heartbeat());
+```
+
 ## Demo Application
 
 See the [ask-user-question-demo](https://github.com/spring-ai-community/spring-ai-agent-utils/tree/main/examples/ask-user-question-demo) for a complete working example of a console-based AI chat application using the AskUserQuestionTool with `CommandLineQuestionHandler`. The demo shows how to:
