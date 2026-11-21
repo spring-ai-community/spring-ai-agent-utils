@@ -32,7 +32,7 @@ try (DockerCliExecBackend backend = DockerCliExecBackend.builder()
     GlobTool glob = GlobTool.builder().workspace(workspace).build();
 
     // Skill base directories and environment prompts show container paths
-    ToolCallback skills = SkillsTool.builder()
+    ToolCallbackProvider skills = SkillsTool.builder()
         .addSkillsDirectory(hostWorkspace.resolve("skills").toString())
         .workspace(workspace)
         .build();
