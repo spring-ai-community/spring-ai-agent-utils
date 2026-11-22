@@ -46,6 +46,7 @@ nav:
     - Shell: tools/ShellTools.md
     - Grep: tools/GrepTool.md
     - Glob: tools/GlobTool.md
+    - Context Web Search: tools/ContextWebSearchTool.md
     - Smart Web Fetch: tools/SmartWebFetchTool.md
     - Brave Web Search: tools/BraveWebSearchTool.md
   - Ask User Question:
