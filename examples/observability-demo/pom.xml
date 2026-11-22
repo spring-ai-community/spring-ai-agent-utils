@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.2.0-RC2</version>
+		<version>4.2.0</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
@@ -20,7 +20,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<maven.deploy.skip>true</maven.deploy.skip>
-		<spring-ai.version>2.1.0-SNAPSHOT</spring-ai.version>
+		<spring-ai.version>2.1.0</spring-ai.version>
 	</properties>
 
 	<dependencies>
