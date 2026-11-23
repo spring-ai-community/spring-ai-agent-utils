@@ -24,19 +24,30 @@ export GOOGLE_CLOUD_PROJECT=your-project-id
 ### Task Tools Setup
 
 ```java
+SessionService sessionService = DefaultSessionService.builder()
+    .sessionRepository(InMemorySessionRepository.builder().build())
+    .build();
+
 var taskTool = TaskTool.builder()
+    .sessionService(sessionService)                  // sub-agent memory
     .subagentTypes(ClaudeSubagentType.builder()
         .skillsResources(skillPaths)
         .chatClientBuilder("default", chatClientBuilder.clone())
+        .sessionService(sessionService)              // sub-agent transcripts
         .braveApiKey(braveApiKey)
         .build())
     .build();
 
 ChatClient chatClient = chatClientBuilder
     .defaultToolCallbacks(taskTool)
+    .defaultAdvisors(SessionAdvisors.builder(sessionService)
+        .sessionIdInToolContext(true)                // the Task tool finds the main session here
+        .build())
     // ... other tools and advisors
     .build();
 ```
+
+Each `Task` call runs its sub-agent on a session of its own, a child of the main agent's session, and the result starts with `agent_id: <id>`; the model passes that id as `resume` to continue the same sub-agent with its earlier work in context. See [Sub-Agent Memory](../../docs/tools/SubagentMemory.md).
 
 ### Application Properties
 
@@ -78,6 +89,7 @@ You are a Spring AI Expert...
 - **Custom Sub-Agents** - Domain-specific expert (Spring AI)
 - **Skills Integration** - Sub-agents receive preloaded skill content in their system prompt
 - **Multi-Model Support** - Route sub-agents to different models via the `model` frontmatter field
+- **Sub-Agent Memory** - Each sub-agent run keeps its transcript in a child session of the main agent's, and can be resumed
 
 ## Dependencies
 

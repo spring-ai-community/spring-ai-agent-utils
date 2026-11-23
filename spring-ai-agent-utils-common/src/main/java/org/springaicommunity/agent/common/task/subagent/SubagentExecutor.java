@@ -28,4 +28,24 @@ public interface SubagentExecutor {
 	/** Executes the task using the specified subagent definition. */
 	String execute(TaskCall taskCall, SubagentDefinition subagent);
 
+	/**
+	 * Executes the task with what the Task tool knows about the call: the sub-agent's
+	 * session when sub-agents have memory, and the caller's tool context. An executor that
+	 * can keep the sub-agent's transcript in that session overrides this; the default
+	 * ignores the context and runs {@link #execute(TaskCall, SubagentDefinition)}.
+	 */
+	default String execute(TaskCall taskCall, SubagentDefinition subagent, TaskContext context) {
+		return execute(taskCall, subagent);
+	}
+
+	/**
+	 * Whether {@link #execute(TaskCall, SubagentDefinition, TaskContext)} keeps the
+	 * sub-agent's transcript in {@link TaskContext#sessionId()}, so that a later task can
+	 * resume it. The Task tool gives a sub-agent a session of its own, and returns an agent
+	 * id to resume with, only when its executor does; {@code false} by default.
+	 */
+	default boolean keepsSessions() {
+		return false;
+	}
+
 }

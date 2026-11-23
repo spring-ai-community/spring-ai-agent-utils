@@ -31,6 +31,8 @@ import org.springaicommunity.agent.tools.SmartWebFetchTool;
 import org.springaicommunity.agent.tools.TodoWriteTool;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.session.SessionService;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.core.io.Resource;
@@ -54,6 +56,10 @@ public class ClaudeSubagentType {
 		private Map<String, ChatClient.Builder> chatClientBuilderMap = new ConcurrentHashMap<>();
 
 		private List<String> skillsDirectories = new ArrayList<>();
+
+		private SessionService sessionService;
+
+		private List<Advisor> sessionAdvisors;
 
 		public Builder braveApiKey(String braveApiKey) {
 			Assert.notNull(braveApiKey, "braveApiKey must not be null");
@@ -105,14 +111,54 @@ public class ClaudeSubagentType {
 			return this;
 		}
 
+		/**
+		 * Gives the Claude sub-agents memory: a task that comes with a session of its own
+		 * keeps its transcript there and can be resumed. Use the service the
+		 * {@code TaskTool} was given.
+		 * @param sessionService where the sub-agents' sessions live
+		 * @return this builder
+		 */
+		public Builder sessionService(SessionService sessionService) {
+			Assert.notNull(sessionService, "sessionService must not be null");
+			this.sessionService = sessionService;
+			return this;
+		}
+
+		/**
+		 * Gives the Claude sub-agents memory with advisors of your choice, in place of the
+		 * ones {@link #sessionService(SessionService)} sets up
+		 * ({@link ClaudeSubagentExecutor#defaultSessionAdvisors(SessionService)}): session
+		 * advisors with compaction, for example, or advisors that also track the turn.
+		 * They are added only to a task that runs on a session, so a sub-agent that runs
+		 * without memory is not affected; do not put them on the sub-agents'
+		 * {@code ChatClient.Builder}. Build them on the service the {@code TaskTool} was
+		 * given, and with the session ID in the tool context
+		 * ({@code sessionIdInToolContext(true)}): a sub-agent's own Task tool finds its
+		 * session there.
+		 * @param sessionAdvisors the advisors that keep a sub-agent's transcript in its
+		 * session
+		 * @return this builder
+		 */
+		public Builder sessionAdvisors(List<Advisor> sessionAdvisors) {
+			Assert.notEmpty(sessionAdvisors, "sessionAdvisors must not be empty");
+			Assert.noNullElements(sessionAdvisors, "sessionAdvisors must not contain null elements");
+			this.sessionAdvisors = List.copyOf(sessionAdvisors);
+			return this;
+		}
+
 		public SubagentType build() {
 
 			Assert.notEmpty(this.chatClientBuilderMap, "At least one chatClientBuilder map not be empty");
 			Assert.isTrue(this.chatClientBuilderMap.containsKey("default"),
 					"chatClientBuilderMap must contain a 'default' builder for the SmartWebFetchTool");
 
+			List<Advisor> advisors = this.sessionAdvisors;
+			if (advisors == null && this.sessionService != null) {
+				advisors = ClaudeSubagentExecutor.defaultSessionAdvisors(this.sessionService);
+			}
+
 			ClaudeSubagentExecutor executor = new ClaudeSubagentExecutor(this.chatClientBuilderMap,
-					this.defaultClaudeSubagentTools(), this.skillsDirectories);
+					this.defaultClaudeSubagentTools(), this.skillsDirectories, advisors);
 
 			return new SubagentType(new ClaudeSubagentResolver(), executor);
 		}

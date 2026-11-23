@@ -197,4 +197,4 @@ See [memory-tools-dream-demo](https://github.com/spring-ai-community/spring-ai-a
 - [AutoDreamAdvisor](AutoDreamAdvisor.md) — the `ChatClient` advisor that schedules dream cycles automatically
 - [AutoMemoryTools](AutoMemoryTools.md) — the memory store the Dreamer consolidates
 - [AutoMemoryToolsAdvisor](AutoMemoryToolsAdvisor.md) — `memoryConsolidationTrigger`, the in-band complement to Auto-Dream
-- [TaskTools](TaskTools.md) — the background-execution infrastructure Auto-Dream reuses for async cycles
+- [Background Tasks](BackgroundTasks.md) — the background-execution infrastructure Auto-Dream reuses for async cycles
