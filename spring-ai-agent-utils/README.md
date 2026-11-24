@@ -17,6 +17,7 @@ These are the agent tools needed to implement any agentic behavior
 - **[ShellTools](../docs/tools/ShellTools.md)** - Execute shell commands with timeout control, background process management, and regex output filtering
 - **[GrepTool](../docs/tools/GrepTool.md)** - Pure Java grep implementation for code search with regex, glob filtering, and multiple output modes
 - **[GlobTool](../docs/tools/GlobTool.md)** - Fast file pattern matching tool for finding files by name patterns with glob syntax
+- **[ContextWebSearchTool](../docs/tools/ContextWebSearchTool.md)** - Optional web search with query-relevant Highlights
 - **[SmartWebFetchTool](../docs/tools/SmartWebFetchTool.md)** - AI-powered web content summarization with caching
 - **[BraveWebSearchTool](../docs/tools/BraveWebSearchTool.md)** - Web search with domain filtering
 
