@@ -60,8 +60,11 @@ nav:
     - AutoDreamService: tools/AutoDreamService.md
     - AutoDreamAdvisor: tools/AutoDreamAdvisor.md
   - Multi-Agent:
-    - Task Tools: tools/TaskTools.md
-    - Subagent Framework: tools/Subagent.md
+    - Overview: tools/TaskTools.md
+    - Claude Sub-Agents: tools/ClaudeSubagents.md
+    - Background Tasks: tools/BackgroundTasks.md
+    - Sub-Agent Memory: tools/SubagentMemory.md
+    - Subagent Framework (SPI): tools/Subagent.md
   - Execution Backends:
     - Workspace & Exec SPI: tools/WorkspaceAndExecSPI.md
     - DockerCliExecBackend: tools/DockerCliExecBackend.md
@@ -69,6 +72,7 @@ nav:
     - InterruptAdvisor: tools/InterruptAdvisor.md
     - ToolCallListener: tools/ToolCallListener.md
   - Migration:
+    - 0.14.0 to 0.15.0: tools/migration-0.15.md
     - 0.13.0 to 0.14.0: tools/migration-0.14.md
     - 0.12.0 to 0.13.0: tools/migration-0.13.md
     - 0.11.0 to 0.12.0: tools/migration-0.12.md

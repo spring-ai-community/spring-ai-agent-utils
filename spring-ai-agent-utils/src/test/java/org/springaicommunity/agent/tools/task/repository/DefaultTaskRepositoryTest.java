@@ -333,4 +333,36 @@ class DefaultTaskRepositoryTest {
 
 	}
 
+
+	@Test
+	@DisplayName("Should run at most the configured number of tasks at once")
+	void shouldRunAtMostTheConfiguredNumberOfTasksAtOnce() throws InterruptedException {
+		DefaultTaskRepository bounded = new DefaultTaskRepository(1);
+		CountDownLatch firstStarted = new CountDownLatch(1);
+		CountDownLatch release = new CountDownLatch(1);
+		try {
+			bounded.putTask("first", () -> {
+				firstStarted.countDown();
+				try {
+					release.await(5, TimeUnit.SECONDS);
+				}
+				catch (InterruptedException ex) {
+					Thread.currentThread().interrupt();
+				}
+				return "first";
+			});
+			BackgroundTask second = bounded.putTask("second", () -> "second");
+
+			assertThat(firstStarted.await(5, TimeUnit.SECONDS)).isTrue();
+			// The second waits for the slot the first holds
+			assertThat(second.waitForCompletion(200)).isFalse();
+			release.countDown();
+			assertThat(second.waitForCompletion(5000)).isTrue();
+			assertThat(second.getResult()).isEqualTo("second");
+		}
+		finally {
+			bounded.shutdown();
+		}
+	}
+
 }

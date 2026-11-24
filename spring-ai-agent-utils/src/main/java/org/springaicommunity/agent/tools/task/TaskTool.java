@@ -18,8 +18,10 @@ package org.springaicommunity.agent.tools.task;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -30,13 +32,18 @@ import org.springaicommunity.agent.common.task.subagent.SubagentReference;
 import org.springaicommunity.agent.common.task.subagent.SubagentResolver;
 import org.springaicommunity.agent.common.task.subagent.SubagentType;
 import org.springaicommunity.agent.common.task.subagent.TaskCall;
+import org.springaicommunity.agent.common.task.subagent.TaskContext;
 import org.springaicommunity.agent.tools.task.claude.ClaudeSubagentDefinition;
 import org.springaicommunity.agent.tools.task.repository.DefaultTaskRepository;
 import org.springaicommunity.agent.tools.task.repository.TaskRepository;
 
+import org.springframework.ai.chat.client.advisor.api.MemoryAdvisor;
+import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.ai.session.SessionService;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Tool for launching specialized subagents to handle complex, multi-step tasks. Supports
@@ -115,63 +122,156 @@ public class TaskTool {
 			</example>
 			""";
 
-	public static class TaskFunction implements Function<TaskCall, String> {
+	/**
+	 * The function behind the tool. With a {@link SessionService}, and a calling request
+	 * whose tool context names its session under {@link MemoryAdvisor#CONVERSATION_ID}
+	 * (the session advisors put it there with {@code sessionIdInToolContext(true)}), every
+	 * sub-agent run gets a session of its own under the caller's: the task and the answer
+	 * are recorded on the caller's session (see {@link SubagentSessions}), the sub-agent's
+	 * transcript is kept in the child, and the answer carries the child's id as the agent id
+	 * to {@code resume} with.
+	 */
+	public static class TaskFunction implements BiFunction<TaskCall, ToolContext, String> {
 
 		private static final Logger logger = LoggerFactory.getLogger(TaskFunction.class);
 
-		// Storage for background tasks
 		private final TaskRepository taskRepository;
 
 		private final Map<String, SubagentDefinition> subagents;
 
 		private final Map<String, SubagentExecutor> subagentExecutors;
 
+		/** Where the sub-agents' sessions live, or {@code null} when they have no memory. */
+		private final SubagentSessions sessions;
+
+		/** The sub-agent sessions with a task running now. */
+		private final Set<String> runningAgents = ConcurrentHashMap.newKeySet();
+
 		public TaskFunction(List<SubagentDefinition> subagents, List<SubagentExecutor> subagentExecutors,
 				TaskRepository taskRepository) {
+			this(subagents, subagentExecutors, taskRepository, null);
+		}
+
+		public TaskFunction(List<SubagentDefinition> subagents, List<SubagentExecutor> subagentExecutors,
+				TaskRepository taskRepository, SessionService sessionService) {
 			this.taskRepository = taskRepository;
 			this.subagents = subagents.stream().collect(Collectors.toMap(sa -> sa.getName(), sa -> sa));
 			this.subagentExecutors = subagentExecutors.stream().collect(Collectors.toMap(se -> se.getKind(), se -> se));
+			this.sessions = (sessionService != null) ? new SubagentSessions(sessionService) : null;
 		}
 
 		@Override
-		public String apply(TaskCall taskCall) {
-
+		public String apply(TaskCall taskCall, ToolContext toolContext) {
 			String subagentName = taskCall.subagent_type();
-
 			if (!this.subagents.containsKey(subagentName)) {
 				throw new RuntimeException("No subagent found with name: " + subagentName);
 			}
-
 			SubagentDefinition subagent = this.subagents.get(subagentName);
-
 			SubagentExecutor subagentExecutor = this.subagentExecutors.get(subagent.getKind());
-
 			if (subagentExecutor == null) {
 				throw new RuntimeException("No subagent executor found for subagent kind: " + subagent.getKind());
 			}
+			Map<String, Object> context = (toolContext != null) ? toolContext.getContext() : Map.of();
+			String callerSessionId = callerSessionId(context);
 
 			if (Boolean.TRUE.equals(taskCall.run_in_background())) {
-				// Create background task using CompletableFuture
 				var bgTask = this.taskRepository.putTask("task_" + UUID.randomUUID(),
-						() -> execute(subagentExecutor, taskCall, subagent));
-
+						() -> run(subagentExecutor, taskCall, subagent, callerSessionId, context));
 				return String.format(
 						"task_id: %s\n\nBackground task started with ID: %s\nUse TaskOutput tool with task_id='%s' to retrieve results.",
 						bgTask.getTaskId(), bgTask.getTaskId(), bgTask.getTaskId());
 			}
+			return run(subagentExecutor, taskCall, subagent, callerSessionId, context);
+		}
 
-			// Synchronous execution (existing behavior)
-			return execute(subagentExecutor, taskCall, subagent);
+		/** The calling agent's session, when sub-agents have memory and the request named it. */
+		private String callerSessionId(Map<String, Object> toolContext) {
+			if (this.sessions == null) {
+				return null;
+			}
+			Object value = toolContext.get(MemoryAdvisor.CONVERSATION_ID);
+			return (value instanceof String id && StringUtils.hasText(id)) ? id : null;
 		}
 
 		/**
-		 * Executes the subagent and logs the full stack trace on failure. The tool-calling
-		 * framework otherwise only surfaces a generic "Request failed" message to the
-		 * model, hiding the real cause.
+		 * Runs the task. On a caller's session, and with an executor that keeps sessions,
+		 * the sub-agent runs on a child of it, new or resumed, and the exchange is recorded
+		 * on the caller's session.
 		 */
-		private String execute(SubagentExecutor subagentExecutor, TaskCall taskCall, SubagentDefinition subagent) {
+		private String run(SubagentExecutor subagentExecutor, TaskCall taskCall, SubagentDefinition subagent,
+				String callerSessionId, Map<String, Object> toolContext) {
+			if (callerSessionId == null || !subagentExecutor.keepsSessions()) {
+				if (callerSessionId != null) {
+					logger.debug("Task: '{}' sub-agents ({} executor) keep no session; running without memory",
+							subagent.getName(), subagent.getKind());
+				}
+				return withoutMemory(subagentExecutor, taskCall, subagent, toolContext);
+			}
+			SubagentSessions.Run run = this.sessions.open(callerSessionId, taskCall.resume(), subagent.getName(),
+					modelOf(subagent));
+			if (run == null) {
+				logger.warn("Task: no session '{}' found for the calling agent; the sub-agent runs without memory",
+						callerSessionId);
+				return withoutMemory(subagentExecutor, taskCall, subagent, toolContext);
+			}
+			if (run.error() != null) {
+				return run.error();
+			}
+			// One run at a time per sub-agent: two would interleave their turns in its log
+			if (!this.runningAgents.add(run.sessionId())) {
+				return "Error: Agent " + run.sessionId()
+						+ " is still running a task; wait for its result before resuming it";
+			}
 			try {
-				return subagentExecutor.execute(taskCall, subagent);
+				this.sessions.messageSent(callerSessionId, run);
+				String result;
+				try {
+					result = execute(subagentExecutor, taskCall, subagent,
+							new TaskContext(run.sessionId(), toolContext));
+				}
+				catch (RuntimeException ex) {
+					this.sessions.messageReceived(callerSessionId, run,
+							(ex.getMessage() != null) ? ex.getMessage() : ex.getClass().getName());
+					throw ex;
+				}
+				this.sessions.messageReceived(callerSessionId, run, null);
+				return "agent_id: " + run.sessionId() + "\n\n" + result;
+			}
+			finally {
+				this.runningAgents.remove(run.sessionId());
+			}
+		}
+
+		/**
+		 * Runs the task on a fresh sub-agent. A {@code resume} that cannot be honoured is
+		 * not silent: the answer tells the model that its earlier context was not there.
+		 */
+		private String withoutMemory(SubagentExecutor subagentExecutor, TaskCall taskCall,
+				SubagentDefinition subagent, Map<String, Object> toolContext) {
+			String result = execute(subagentExecutor, taskCall, subagent, new TaskContext(null, toolContext));
+			if (!StringUtils.hasText(taskCall.resume())) {
+				return result;
+			}
+			logger.warn("Task resume='{}' ignored: sub-agent memory is off. Give TaskTool and the subagent type a"
+					+ " SessionService, and put the caller's session id in the tool context under '{}'"
+					+ " (SessionAdvisors.builder(...).sessionIdInToolContext(true))", taskCall.resume(),
+					MemoryAdvisor.CONVERSATION_ID);
+			return "Note: agent " + taskCall.resume() + " could not be resumed, because sub-agent memory is off;"
+					+ " this task ran on a new agent without its earlier context.\n\n" + result;
+		}
+
+		/** The model the sub-agent's definition declares, the one its executor runs it on. */
+		private static String modelOf(SubagentDefinition subagent) {
+			if (subagent instanceof ClaudeSubagentDefinition claude && StringUtils.hasText(claude.getModel())) {
+				return claude.getModel();
+			}
+			return null;
+		}
+
+		private String execute(SubagentExecutor subagentExecutor, TaskCall taskCall, SubagentDefinition subagent,
+				TaskContext context) {
+			try {
+				return subagentExecutor.execute(taskCall, subagent, context);
 			}
 			catch (Exception ex) {
 				logger.error("Subagent '{}' (kind '{}') execution failed", subagent.getName(), subagent.getKind(), ex);
@@ -195,7 +295,27 @@ public class TaskTool {
 
 		private TaskRepository taskRepository = new DefaultTaskRepository();
 
+		private SessionService sessionService;
+
 		private Builder() {
+		}
+
+		/**
+		 * Gives sub-agents memory: each run gets a session of its own, a child of the
+		 * calling agent's session, that keeps its transcript and can be resumed. The
+		 * calling request must name its session in the tool context under
+		 * {@link MemoryAdvisor#CONVERSATION_ID}, which the session advisors do with
+		 * {@code SessionAdvisors.builder(sessionService).sessionIdInToolContext(true)};
+		 * without it, or without this service, sub-agents keep nothing. Give the same
+		 * service to the subagent types whose executors keep a transcript, like
+		 * {@code ClaudeSubagentType}.
+		 * @param sessionService where the sessions live
+		 * @return this builder
+		 */
+		public Builder sessionService(SessionService sessionService) {
+			Assert.notNull(sessionService, "sessionService must not be null");
+			this.sessionService = sessionService;
+			return this;
 		}
 
 		public Builder subagentReferences(List<SubagentReference> subagentReferences) {
@@ -270,7 +390,8 @@ public class TaskTool {
 			var executors = this.subagentTypes.stream().map(st -> st.executor()).toList();
 
 			return FunctionToolCallback
-				.builder("Task", new TaskFunction(subagentDefinitions, executors, this.taskRepository))
+				.builder("Task",
+						new TaskFunction(subagentDefinitions, executors, this.taskRepository, this.sessionService))
 				.description(this.taskDescriptionTemplate.formatted(subagentRegistrations))
 				.inputType(TaskCall.class)
 				.build();

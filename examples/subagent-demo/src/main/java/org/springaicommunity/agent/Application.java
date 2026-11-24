@@ -47,13 +47,21 @@ public class Application {
 
 		return args -> {
 
+			// One in-memory session store, reset on every run, for the main agent and its
+			// sub-agents: each Task call runs on a child of the main agent's session, keeps
+			// its transcript there, and can be resumed by the agent id the Task tool returns
+			SessionService sessionService = DefaultSessionService.builder()
+				.sessionRepository(InMemorySessionRepository.builder().build())
+				.build();
+
 			var taskTools = TaskTool.builder()
+				.sessionService(sessionService) // sub-agent memory
 				.subagentTypes(ClaudeSubagentType.builder()
 					.skillsResources(skillPaths)
 					// configuration used by the local Claude subagents
 					.chatClientBuilder("default",
 							chatClientBuilder.clone().defaultAdvisors(new MyLoggingAdvisor(0, "[TASK]")))
-
+					.sessionService(sessionService) // keeps each sub-agent's transcript in its session
 					.braveApiKey(braveApiKey)
 					.build())
 				.build();
@@ -61,11 +69,6 @@ public class Application {
 			// Brave web search is optional: register it only when BRAVE_API_KEY is set
 			List<Object> webSearchTools = StringUtils.hasText(braveApiKey)
 					? List.of(BraveWebSearchTool.builder(braveApiKey).resultCount(15).build()) : List.of();
-
-			// Short-term conversation memory: an in-memory session store, reset on every run
-			SessionService sessionService = DefaultSessionService.builder()
-				.sessionRepository(InMemorySessionRepository.builder().build())
-				.build();
 
 			ChatClient chatClient = chatClientBuilder // @formatter:off
 				// system prompt
@@ -99,8 +102,11 @@ public class Application {
 				// Advisors
 				.defaultAdvisors(new MyLoggingAdvisor()) // logging advisor
 
-				// Conversation memory: the session advisors replay the last 500 events of the session
+				// Conversation memory: the session advisors replay the last 500 events of the
+				// session, and put its id into the tool context, where the Task tool finds the
+				// main agent's session to create the sub-agents' sessions under
 				.defaultAdvisors(SessionAdvisors.builder(sessionService)
+					.sessionIdInToolContext(true)
 					.memory(memory -> memory.eventFilter(EventFilter.lastN(500)))
 					.build())
 
