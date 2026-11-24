@@ -91,6 +91,12 @@
 
 			<dependency>
 				<groupId>org.springaicommunity</groupId>
+				<artifactId>spring-ai-agent-utils-test</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springaicommunity</groupId>
 				<artifactId>spring-ai-agent-utils-a2a</artifactId>
 				<version>${project.version}</version>
 			</dependency>
