@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springaicommunity.agent.common.workspace.Workspace;
 import org.springaicommunity.agent.utils.Skills;
 
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.ai.tool.function.FunctionToolCallback;
@@ -71,9 +73,9 @@ public class SkillsTool {
 
 	public static class SkillsFunction implements Function<SkillsInput, String> {
 
-		private Map<String, Skill> skillsMap;
+		private final Map<String, Skill> skillsMap;
 
-		private Workspace workspace;
+		private final Workspace workspace;
 
 		public SkillsFunction(Map<String, Skill> skillsMap) {
 			this(skillsMap, null);
@@ -86,15 +88,26 @@ public class SkillsTool {
 
 		@Override
 		public String apply(SkillsInput input) {
+			return apply(input, null, List.of());
+		}
+
+		String apply(SkillsInput input, ToolContext toolContext, List<SkillLoadedListener> listeners) {
 			Skill skill = this.skillsMap.get(input.command());
 
 			if (skill != null) {
+				String result;
 				if (skill.basePath() == null || skill.basePath().isEmpty()) {
-					return skill.content();
+					result = skill.content();
 				}
-				String basePath = (this.workspace != null) ? this.workspace.display(skill.basePath())
-						: skill.basePath();
-				return "Base directory for this skill: %s\n\n%s".formatted(basePath, skill.content());
+				else {
+					String basePath = (this.workspace != null) ? this.workspace.display(skill.basePath())
+							: skill.basePath();
+					result = "Base directory for this skill: %s\n\n%s".formatted(basePath, skill.content());
+				}
+				for (SkillLoadedListener listener : listeners) {
+					listener.onSkillLoaded(skill, toolContext);
+				}
+				return result;
 			}
 
 			return "Skill not found: " + input.command();
@@ -109,6 +122,8 @@ public class SkillsTool {
 	public static class Builder {
 
 		private List<Skill> skills = new ArrayList<>();
+
+		private List<SkillLoadedListener> skillLoadedListeners = new ArrayList<>();
 
 		private String toolDescriptionTemplate = TOOL_DESCRIPTION_TEMPLATE;
 
@@ -177,6 +192,19 @@ public class SkillsTool {
 			return this;
 		}
 
+		/**
+		 * Registers a listener to observe when skills are loaded and prepared for the
+		 * model. Multiple listeners may be registered and are invoked in registration
+		 * order.
+		 * @param listener the listener to observe skill activation
+		 * @return this builder
+		 */
+		public Builder onSkillLoaded(SkillLoadedListener listener) {
+			Assert.notNull(listener, "listener must not be null");
+			this.skillLoadedListeners.add(listener);
+			return this;
+		}
+
 		public ToolCallback build() {
 			Assert.notEmpty(this.skills, "At least one skill must be configured");
 
@@ -184,7 +212,13 @@ public class SkillsTool {
 
 			String skillsXml = uniqueSkills.stream().map(s -> s.toXml()).collect(Collectors.joining("\n"));
 
-			return FunctionToolCallback.builder("Skill", new SkillsFunction(toSkillsMap(uniqueSkills), this.workspace))
+			SkillsFunction delegate = new SkillsFunction(toSkillsMap(uniqueSkills), this.workspace);
+			List<SkillLoadedListener> listenersSnapshot = List.copyOf(this.skillLoadedListeners);
+
+			BiFunction<SkillsInput, ToolContext, String> adapter = (input, context) -> delegate.apply(input,
+					context, listenersSnapshot);
+
+			return FunctionToolCallback.builder("Skill", adapter)
 				.description(this.toolDescriptionTemplate.formatted(skillsXml))
 				.inputType(SkillsInput.class)
 				.build();
